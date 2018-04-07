@@ -12,7 +12,7 @@ var ctr   = 0
 var peer    Peer
 var tracker Tracker
 
-type SimulationTorrent struct {
+type SimulatedTorrent struct {
   AutowiredTorrentNode
 
   id         string
@@ -22,7 +22,7 @@ type SimulationTorrent struct {
 }
 
 /* Interface functions. */
-func (t *SimulationTorrent) OnJoin() {
+func (t *SimulatedTorrent) OnJoin() {
   /* Wait for engine access. */
   Wait(func () bool {
     return t.Transfer() == nil
@@ -46,21 +46,21 @@ func (t *SimulationTorrent) OnJoin() {
   t.node.OnJoin()
 }
 
-func (t *SimulationTorrent) OnQuery(query DHTQuery) error {
+func (t *SimulatedTorrent) OnQuery(query DHTQuery) error {
   if t.node == nil {
     return nil
   }
   return t.node.OnQuery(query)
 }
 
-func (t *SimulationTorrent) OnLeave() {
+func (t *SimulatedTorrent) OnLeave() {
   if t.node != nil {
     t.node.OnLeave()
   }
 }
 
-func (t *SimulationTorrent) NewDHTNode() DHTNode {
-  node := new(SimulationTorrent)
+func (t *SimulatedTorrent) NewDHTNode() DHTNode {
+  node := new(SimulatedTorrent)
 
   node.Autowire(t)
 
@@ -71,7 +71,7 @@ func (t *SimulationTorrent) NewDHTNode() DHTNode {
   return node
 }
 
-func (t *SimulationTorrent) Key() string {
+func (t *SimulatedTorrent) Key() string {
   if t.node == nil {
     return ""
   }
