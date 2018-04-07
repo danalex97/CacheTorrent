@@ -10,7 +10,7 @@ var mutex = new(sync.Mutex)
 var ctr   = 0
 
 var peer    Peer
-var tracker Tracker
+var tracker Peer
 
 type SimulatedTorrent struct {
   AutowiredTorrentNode
@@ -38,9 +38,9 @@ func (t *SimulatedTorrent) OnJoin() {
   mutex.Unlock()
 
   if t.isTracker {
-    t.node = peer.New(t.id)
+    t.node = newSimulatedPeer(t.id, t.Transfer(), peer)
   } else {
-    t.node = tracker.New(t.id)
+    t.node = newSimulatedPeer(t.id, t.Transfer(), tracker)
   }
 
   t.node.OnJoin()

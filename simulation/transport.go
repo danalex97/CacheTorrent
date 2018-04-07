@@ -1,16 +1,30 @@
 package simulation
 
+import (
+  "github.com/danalex97/Speer/capacity"
+)
+
 /* All the interfaces as provided by the Speer simulator. */
+
+type Data capacity.Data
+/**
 type Data struct {
   Id   string
   Size int
 }
+*/
 
+type Node capacity.Node
+
+/**
 type Node interface {
   Up()   int
   Down() int
 }
+*/
 
+type Link capacity.Link
+/**
 type Link interface {
   Upload(Data)
   Download() <-chan Data
@@ -19,7 +33,10 @@ type Link interface {
   To()   Node
 }
 
-/* Internal interface identical to Speer's Engine interface. */
+**/
+
+type Transport capacity.Engine
+/**
 type Transport interface {
   Node
 
@@ -29,3 +46,4 @@ type Transport interface {
   ControlSend(string, interface {})
   ControlRecv() <-chan interface {}
 }
+*/
