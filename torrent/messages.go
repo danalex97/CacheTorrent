@@ -10,3 +10,11 @@ type join struct {
 type neighbours struct {
   ids []string
 }
+
+type trackerReq struct {
+  from string
+}
+
+type trackerRes struct {
+  id string
+}

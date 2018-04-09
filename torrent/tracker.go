@@ -46,6 +46,8 @@ func (t *Tracker) OnJoin() {
         switch msg := m.(type) {
         case join:
           t.join(msg)
+        case trackerReq:
+          t.transport.ControlSend(msg.from, trackerRes{t.id})
         }
 
       default:
