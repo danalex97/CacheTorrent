@@ -85,7 +85,7 @@ func (p *Peer) InitRecv() {
 
         // make connectors
         for _, id := range p.ids {
-          p.connectors[id] = NewConnector()
+          p.connectors[id] = NewConnector(p.id, id)
         }
       case seedRes:
         p.pieces = msg.pieces
@@ -111,6 +111,11 @@ func (p *Peer) Run() {
     for _, piece := range p.pieces {
       p.transport.ControlSend(id, have{p.id, piece.index})
     }
+  }
+
+  // Run all connectors
+  for _, connector := range p.connectors {
+    go connector.Run()
   }
 }
 
