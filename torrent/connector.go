@@ -20,8 +20,8 @@ func NewConnector(from, to string) Runner {
   connector.from = from
   connector.to = to
 
-  connector.upload   = NewUpload()
-  connector.download = NewDownload()
+  connector.upload   = NewUpload(from, to)
+  connector.download = NewDownload(from, to)
 
   return connector
 }
