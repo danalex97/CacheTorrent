@@ -16,6 +16,10 @@ type Peer struct {
   // BitTorrent protocol
   pieces []request
 
+  // BitTorrent components
+  upload   Runner
+  download Runner
+
   // used only to identify tracker
   join    string
 }
@@ -41,6 +45,9 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.id        = util.Id()
   peer.join      = util.Join()
   peer.transport = util.Transport()
+
+  peer.upload   = nil
+  peer.download = nil
 
   return peer
 }
@@ -97,8 +104,20 @@ func (p *Peer) Run() {
       p.transport.ControlSend(id, have{p.id, piece.index})
     }
   }
+
+  p.download = NewDownload()
+  p.upload   = NewUpload()
+
+  go p.download.Run()
+  go p.upload.Run()
 }
 
 func (p *Peer) RunRecv(m interface {}) {
-  // Main Peer receive
+  if p.download != nil {
+    p.download.Recv(m)
+  }
+
+  if p.upload != nil {
+    p.upload.Recv(m)
+  }
 }
