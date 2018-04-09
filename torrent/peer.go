@@ -91,12 +91,19 @@ func (p *Peer) InitRecv() {
 }
 
 func (p *Peer) Run() {
-  fmt.Println(p.pieces)
+  // Let all the neighbouring peers know what pieces I have
+  for _, id := range p.ids {
+    for _, piece := range p.pieces {
+      p.transport.ControlSend(id, have{p.id, piece.index})
+    }
+  }
 }
 
 func (p *Peer) RunRecv(m interface {}) {
   // Main Peer receive
 
   switch msg := m.(type) {
+  case have:
+    fmt.Println(msg)
   }
 }

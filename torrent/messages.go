@@ -10,7 +10,10 @@ type unchoke struct {}
 type interested struct {}
 type notInterested struct {}
 
+// A have message is sent to neighbours whenever a peer
+// obtains a new piece.
 type have struct {
+  id    string
   index int // Index of the piece that I have
 }
 
