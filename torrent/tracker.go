@@ -30,7 +30,7 @@ func (t *Tracker) New(util TorrentNodeUtil) TorrentNode {
 
   tracker.limit = minNodes
   tracker.neigh = peerNeighbours
-  tracker.id        = util.Id()
+  tracker.id     = util.Id()
 
   tracker.transport = util.Transport()
 
@@ -110,18 +110,18 @@ func (t *Tracker) seedRequest(req seedReq) seedRes {
     if id == req.from {
       if i < seeds {
         // It's a seed
-        ps     := []request{}
+        ps     := []pieceMeta{}
         begin  := 0
         length := pieceSize
 
         for j := 0; j < pieces; j++ {
-          ps    = append(ps, request{j, begin, length})
+          ps    = append(ps, pieceMeta{j, begin, length})
           begin = begin + length
         }
 
         return seedRes{ps}
       } else {
-        return seedRes{[]request{}}
+        return seedRes{[]pieceMeta{}}
       }
     }
   }

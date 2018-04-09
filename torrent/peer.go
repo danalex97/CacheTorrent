@@ -14,11 +14,10 @@ type Peer struct {
   transport Transport
 
   // BitTorrent protocol
-  pieces []request
+  pieces []pieceMeta
 
   // BitTorrent components
-  upload   Runner
-  download Runner
+  connectors map[string]Runner
 
   // used only to identify tracker
   join    string
@@ -46,8 +45,8 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.join      = util.Join()
   peer.transport = util.Transport()
 
-  peer.upload   = nil
-  peer.download = nil
+  peer.pieces     = []pieceMeta{}
+  peer.connectors = make(map[string]Runner)
 
   return peer
 }
@@ -83,11 +82,20 @@ func (p *Peer) InitRecv() {
 
         // Find if I'm a seed
         p.transport.ControlSend(p.tracker, seedReq{p.id})
+
+        // make connectors
+        for _, id := range p.ids {
+          p.connectors[id] = NewConnector()
+        }
       case seedRes:
         p.pieces = msg.pieces
+
         go p.Run()
       default:
-        p.RunRecv(m)
+        // We run this only when the connectors are initialized
+        if len(p.connectors) > 0 {
+          p.RunRecv(m)
+        }
       }
 
     default:
@@ -104,20 +112,23 @@ func (p *Peer) Run() {
       p.transport.ControlSend(id, have{p.id, piece.index})
     }
   }
-
-  p.download = NewDownload()
-  p.upload   = NewUpload()
-
-  go p.download.Run()
-  go p.upload.Run()
 }
 
 func (p *Peer) RunRecv(m interface {}) {
-  if p.download != nil {
-    p.download.Recv(m)
+  var connector Runner
+
+  // Redirect the message to the connector
+  switch msg := m.(type) {
+  case choke: connector = p.connectors[msg.id]
+  case unchoke: connector = p.connectors[msg.id]
+  case interested: connector = p.connectors[msg.id]
+  case notInterested: connector = p.connectors[msg.id]
+  case have: connector = p.connectors[msg.id]
+  case request: connector = p.connectors[msg.id]
+  case piece: connector = p.connectors[msg.id]
   }
 
-  if p.upload != nil {
-    p.upload.Recv(m)
+  if connector != nil {
+    connector.Recv(m)
   }
 }

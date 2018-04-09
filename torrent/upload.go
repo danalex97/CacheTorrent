@@ -6,14 +6,14 @@ type Upload struct {
 }
 
 func NewUpload() Runner {
-  download := new(Upload)
-  return download
+  upload := new(Upload)
+  return upload
 }
 
-func (d *Upload) Run() {
+func (u *Upload) Run() {
 
 }
 
-func (d *Upload) Recv(m interface {}) {
+func (u *Upload) Recv(m interface {}) {
 
 }

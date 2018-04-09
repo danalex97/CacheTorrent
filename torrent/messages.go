@@ -18,6 +18,8 @@ type have struct {
 }
 
 type request struct {
+  id string
+
   index  int
   begin  int
   length int
@@ -25,6 +27,8 @@ type request struct {
 
 // The actual piece as a response to a `request` message
 type piece struct {
+  id string
+
   index  int
   begin  int
   piece  Data
@@ -58,5 +62,5 @@ type seedReq struct {
 }
 
 type seedRes struct {
-  pieces []request
+  pieces []pieceMeta
 }
