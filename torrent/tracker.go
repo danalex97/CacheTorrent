@@ -9,6 +9,9 @@ import (
 
 const minNodes       int = config.MinNodes
 const peerNeighbours int = config.PeerNeighbours
+const seeds          int = config.Seeds
+const pieces         int = config.Pieces
+const pieceSize      int = config.PieceSize
 
 type Tracker struct {
   ids       []string
@@ -48,6 +51,8 @@ func (t *Tracker) OnJoin() {
           t.join(msg)
         case trackerReq:
           t.transport.ControlSend(msg.from, trackerRes{t.id})
+        case seedReq:
+          t.transport.ControlSend(msg.from, t.seedRequest(msg))
         }
 
       default:
@@ -98,4 +103,27 @@ func (t *Tracker) neighbours(id string) neighbours {
     neighbours.ids = append(neighbours.ids, id)
   }
   return neighbours
+}
+
+func (t *Tracker) seedRequest(req seedReq) seedRes {
+  for i, id := range t.ids {
+    if id == req.from {
+      if i < seeds {
+        // It's a seed
+        ps     := []request{}
+        begin  := 0
+        length := pieceSize
+
+        for j := 0; j < pieces; j++ {
+          ps    = append(ps, request{j, begin, length})
+          begin = begin + length
+        }
+
+        return seedRes{ps}
+      } else {
+        return seedRes{[]request{}}
+      }
+    }
+  }
+  panic("Seed request: from ID not found!")
 }

@@ -13,6 +13,9 @@ type Peer struct {
 
   transport Transport
 
+  // BitTorrent protocol
+  pieces []request
+
   // used only to identify tracker
   join    string
 }
@@ -70,6 +73,11 @@ func (p *Peer) InitRecv() {
         p.transport.ControlSend(msg.from, trackerRes{p.tracker})
       case neighbours:
         p.ids = msg.ids
+
+        // Find if I'm a seed
+        p.transport.ControlSend(p.tracker, seedReq{p.id})
+      case seedRes:
+        p.pieces = msg.pieces
         go p.Run()
       default:
         p.RunRecv(m)
@@ -83,9 +91,12 @@ func (p *Peer) InitRecv() {
 }
 
 func (p *Peer) Run() {
-  // Main Peer loop
+  fmt.Println(p.pieces)
 }
 
 func (p *Peer) RunRecv(m interface {}) {
   // Main Peer receive
+
+  switch msg := m.(type) {
+  }
 }

@@ -45,3 +45,15 @@ type trackerReq struct {
 type trackerRes struct {
   id string
 }
+
+/* Used to model seeds:
+    - each peers sends a seed request
+    - in seed response finds if its a seed how many pieces it has
+ */
+type seedReq struct {
+  from string
+}
+
+type seedRes struct {
+  pieces []request
+}
