@@ -1,4 +1,4 @@
 package config
 
-const MinNodes       int = 100
-const PeerNeighbours int = 35
+const MinNodes       int = 10
+const PeerNeighbours int = 2

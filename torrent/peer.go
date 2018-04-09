@@ -9,6 +9,7 @@ import (
 type Peer struct {
   id      string
   tracker string
+  ids     []string
 
   transport Transport
 
@@ -32,6 +33,9 @@ func (p *Peer) OnJoin() {
   // The peer should be initialized
   fmt.Printf("Node %s started with tracker %s\n", p.id, p.tracker)
 
+  // Send join message to the tracker
+  p.transport.ControlSend(p.tracker, join{p.id})
+
   go func() {
     for {
       select {
@@ -43,6 +47,9 @@ func (p *Peer) OnJoin() {
         switch msg := m.(type) {
         case trackerReq:
           p.transport.ControlSend(msg.from, trackerRes{p.tracker})
+        case neighbours:
+          p.ids = msg.ids
+          fmt.Println("Joined torrent: ", p.ids)
         }
 
       default:

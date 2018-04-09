@@ -13,11 +13,11 @@ func SmallTorrentSimulation() Simulation {
     WithPoissonProcessModel(2, 2).
     WithInternetworkUnderlay(10, 50, 20, 50).
     WithDefaultQueryGenerator().
-    WithLimitedNodes(10).
+    WithLimitedNodes(11).
     // WithMetrics().
     //====================================
     WithCapacities().
     WithTransferInterval(10).
-    WithCapacityNodes(10, 10, 20).
+    WithCapacityNodes(11, 10, 20).
     Build()
 }
