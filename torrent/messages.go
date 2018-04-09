@@ -5,10 +5,10 @@ import (
 )
 
 /* Original BitTorrent protocol messages. */
-type choke struct {}
-type unchoke struct {}
-type interested struct {}
-type notInterested struct {}
+type choke struct { id string }
+type unchoke struct { id string }
+type interested struct { id string }
+type notInterested struct { id string }
 
 // A have message is sent to neighbours whenever a peer
 // obtains a new piece.

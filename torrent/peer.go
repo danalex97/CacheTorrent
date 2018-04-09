@@ -101,9 +101,4 @@ func (p *Peer) Run() {
 
 func (p *Peer) RunRecv(m interface {}) {
   // Main Peer receive
-
-  switch msg := m.(type) {
-  case have:
-    fmt.Println(msg)
-  }
 }
