@@ -1,10 +1,12 @@
 package torrent
 
+// This file follows the 'download.py' file from BitTorrent 5.3.0 release
+
 import (
-  // "fmt"
+  "github.com/danalex97/nfsTorrent/config"
 )
 
-// This file follows the 'download.py' file from BitTorrent 5.3.0 release
+const backlog int = config.Backlog
 
 type Download struct {
   *Components
@@ -12,7 +14,7 @@ type Download struct {
   me   string // the node that downloads
   from string // the node that we download from
 
-  activeRequests map[pieceMeta]bool // requests that were made, but we still
+  activeRequests map[int]bool // requests that were made, but we still
   // did not received a piece back as a response
 
   connector *Connector
@@ -25,7 +27,7 @@ func NewDownload(connector *Connector) Runner {
     connector.from,
     connector.to,
 
-    make(map[pieceMeta]bool),
+    make(map[int]bool),
 
     connector,
   }
@@ -41,28 +43,26 @@ func (d *Download) Recv(m interface {}) {
     d.connector.choked = true
 
     // Request queued pieces that were lost from the peer that choked us
-    lost := []pieceMeta{}
+    lost := []int{}
     for p, _ := range d.activeRequests {
       lost = append(lost, p)
     }
     d.MultiDownload.Lost(lost)
 
     // Since I am choked, I remove all activeRequests
-    d.activeRequests = make(map[pieceMeta]bool)
+    d.activeRequests = make(map[int]bool)
 
     // Send interested message to node, since I am choked
     d.Transport.ControlSend(d.from, interested{d.me})
   case unchoke:
     // Request pieces from peer
-    // [TODO]
+    d.connector.choked = false
+
+    d.requestMore()
   case piece:
     // Remove the request from activeRequests
-    piece := pieceMeta{
-      msg.index,
-      msg.begin,
-      msg.piece.Size,
-    }
-    delete(d.activeRequests, piece)
+    index := msg.index
+    delete(d.activeRequests, index)
 
     // Request more pieces
     d.requestMore()
@@ -88,5 +88,21 @@ func (d *Download) Recv(m interface {}) {
 }
 
 func (d *Download) requestMore() {
-  //[TODO]
+  size := backlog
+  if len(d.activeRequests) >= size {
+    return
+  }
+
+  // Request more pieces
+  for len(d.activeRequests) < size {
+    interest := d.Picker.Next(d.me)
+
+    // If I'm not interested, become interested
+    d.Transport.ControlSend(d.from, interested{d.me})
+
+    // Send request
+    d.Transport.ControlSend(d.from, request{d.me, interest})
+
+    //
+  }
 }

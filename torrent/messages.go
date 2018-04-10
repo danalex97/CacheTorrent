@@ -21,8 +21,8 @@ type request struct {
   id string
 
   index  int
-  begin  int
-  length int
+  // We only use the index for requests instead of specifying
+  // the begin and length of the data.
 }
 
 // The actual piece as a response to a `request` message
