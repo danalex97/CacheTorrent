@@ -4,7 +4,7 @@ import (
   // "fmt"
 )
 
-// This file follows the 'download' file from BitTorrent 5.3.0 release
+// This file follows the 'download.py' file from BitTorrent 5.3.0 release
 
 type Download struct {
   *Components
@@ -61,6 +61,6 @@ func (d *Download) Recv(m interface {}) {
     }
 
     // let picker know I can get piece index
-    d.Picker.GotHave(index)
+    d.Picker.GotHave(d.from, index)
   }
 }

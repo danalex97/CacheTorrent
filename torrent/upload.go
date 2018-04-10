@@ -1,6 +1,6 @@
 package torrent
 
-// This file follows the 'Upload' file from BitTorrent 5.3.0 release
+// This file follows the 'Upload.py' file from BitTorrent 5.3.0 release
 
 import (
   . "github.com/danalex97/Speer/interfaces"
@@ -42,6 +42,7 @@ func (u *Upload) Recv(m interface {}) {
       meta.length,
     }
 
+    // When we receive a request we can upload the piece.
     u.upload(u.to, meta, toUpload)
   }
 }
