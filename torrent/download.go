@@ -1,5 +1,9 @@
 package torrent
 
+import (
+  // "fmt"
+)
+
 // This file follows the 'download' BitTorrent 5.3.0 release
 
 type Download struct {
@@ -36,6 +40,7 @@ func (d *Download) Recv(m interface {}) {
       // I need to be interested in the piece as well
       if _, ok := d.Storage.Have(index); !ok {
         // Send interested message to node
+        d.Transport.ControlSend(d.from, interested{d.me})
       }
     }
 

@@ -1,5 +1,9 @@
 package torrent
 
+import (
+  "github.com/danalex97/Speer/interfaces"
+)
+
 type pieceMeta struct {
   index  int
   begin  int
@@ -9,4 +13,5 @@ type pieceMeta struct {
 type Components struct {
   Picker     *Picker
   Storage    *Storage
+  Transport  interfaces.Transport
 }

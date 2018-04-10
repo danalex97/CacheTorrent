@@ -17,7 +17,8 @@ type Peer struct {
   pieces []pieceMeta
 
   // BitTorrent components
-  connectors map[string]Runner
+  connectors    map[string]Runner // the connectors that were chosen by tracker
+  allConnectors map[string]Runner // the connections with other peers(uploaders)
   components *Components
 
   // used only to identify tracker
@@ -47,7 +48,8 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.transport = util.Transport()
 
   peer.pieces     = []pieceMeta{}
-  peer.connectors = make(map[string]Runner)
+  peer.connectors    = make(map[string]Runner)
+  peer.allConnectors = make(map[string]Runner)
   peer.components = new(Components)
 
   return peer
@@ -87,11 +89,15 @@ func (p *Peer) InitRecv() {
       case seedRes:
         p.pieces = msg.pieces
 
-        go p.Run()
+        // Since we do Run here, it must be that it will not hang
+        p.Run()
       default:
-        // We run this only when the connectors are initialized
+        // Wait for connectors to get initialized
         if len(p.connectors) > 0 {
           p.RunRecv(m)
+        } else {
+          // Requeue the message if the connectors are not initialized
+          p.transport.ControlSend(p.id, m)
         }
       }
 
@@ -103,13 +109,18 @@ func (p *Peer) InitRecv() {
 }
 
 func (p *Peer) Run() {
+  // We want to bind all these variables here, so
+  // we don't need any synchroization.
+
   // make per peer variables
-  p.components.Picker  = NewPicker(p.pieces)
-  p.components.Storage = NewStorage(p.pieces)
+  p.components.Picker    = NewPicker(p.pieces)
+  p.components.Storage   = NewStorage(p.pieces)
+  p.components.Transport = p.transport
 
   // make connectors
   for _, id := range p.ids {
     p.connectors[id] = NewConnector(p.id, id, p.components)
+    p.allConnectors[id] = p.connectors[id]
   }
 
   // Let all the neighbouring peers know what pieces I have
@@ -126,20 +137,27 @@ func (p *Peer) Run() {
 }
 
 func (p *Peer) RunRecv(m interface {}) {
-  var connector Runner
+  id := ""
 
   // Redirect the message to the connector
   switch msg := m.(type) {
-  case choke: connector = p.connectors[msg.id]
-  case unchoke: connector = p.connectors[msg.id]
-  case interested: connector = p.connectors[msg.id]
-  case notInterested: connector = p.connectors[msg.id]
-  case have: connector = p.connectors[msg.id]
-  case request: connector = p.connectors[msg.id]
-  case piece: connector = p.connectors[msg.id]
+  case choke: id = msg.id
+  case unchoke: id = msg.id
+  case interested: id = msg.id
+  case notInterested: id = msg.id
+  case have: id = msg.id
+  case request: id = msg.id
+  case piece: id = msg.id
   }
 
-  if connector != nil {
-    connector.Recv(m)
+  if id == "" {
+    return
   }
+
+  if _, ok := p.allConnectors[id]; !ok {
+    p.allConnectors[id] = NewConnector(p.id, id, p.components)
+  }
+
+  connector := p.allConnectors[id]
+  connector.Recv(m)
 }
