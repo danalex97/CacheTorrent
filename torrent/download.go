@@ -4,7 +4,7 @@ import (
   // "fmt"
 )
 
-// This file follows the 'download' BitTorrent 5.3.0 release
+// This file follows the 'download' file from BitTorrent 5.3.0 release
 
 type Download struct {
   *Components
