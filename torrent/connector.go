@@ -19,7 +19,7 @@ type Connector struct {
   components *Components
 }
 
-func NewConnector(from, to string, components *Components) Runner {
+func NewConnector(from, to string, components *Components) *Connector {
   connector := new(Connector)
 
   connector.from = from
@@ -45,4 +45,18 @@ func (c *Connector) Run() {
 func (c *Connector) Recv(m interface {}) {
   c.upload.Recv(m)
   c.download.Recv(m)
+}
+
+/*
+ * Returns the downoad rate of the connection.
+ */
+func (c *Connector) Rate() float64 {
+  // [TODO]
+  return 0
+}
+
+func (c *Connector) Choke() {
+}
+
+func (c *Connector) Unchoke() {
 }

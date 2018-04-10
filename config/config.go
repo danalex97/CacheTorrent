@@ -6,3 +6,6 @@ const Seeds          int = 1
 
 const PieceSize int = 10
 const Pieces    int = 10
+
+const Uploads     int = 5
+const Optimistics int = 1

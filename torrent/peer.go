@@ -116,10 +116,14 @@ func (p *Peer) Run() {
   p.components.Picker    = NewPicker(p.pieces)
   p.components.Storage   = NewStorage(p.pieces)
   p.components.Transport = p.transport
+  p.components.Choker    = NewChoker()
 
   // make connectors
   for _, id := range p.ids {
-    p.connectors[id] = NewConnector(p.id, id, p.components)
+    connector := NewConnector(p.id, id, p.components)
+    p.components.Choker.AddConnector(connector)
+
+    p.connectors[id]    = connector
     p.allConnectors[id] = p.connectors[id]
   }
 

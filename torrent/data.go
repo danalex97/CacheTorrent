@@ -14,4 +14,5 @@ type Components struct {
   Picker     *Picker
   Storage    *Storage
   Transport  interfaces.Transport
+  Choker     *Choker   
 }
