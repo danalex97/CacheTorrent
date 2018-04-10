@@ -11,7 +11,7 @@ type Connector struct {
   to   string
 
   interested bool
-  chocked    bool
+  choked     bool
 
   upload   Runner
   download Runner
@@ -30,7 +30,7 @@ func NewConnector(from, to string, components *Components) Runner {
   connector.download   = NewDownload(connector)
 
   connector.interested = false
-  connector.chocked    = true
+  connector.choked     = true
 
   return connector
 }

@@ -17,7 +17,7 @@ func NewStorage(pieces []pieceMeta) *Storage {
   for _, p := range pieces {
     storage.pieces[p.index] = p
   }
-  
+
   return storage
 }
 
@@ -27,4 +27,15 @@ func (s *Storage) Have(index int) (pieceMeta, bool) {
 
   p, ok := s.pieces[index]
   return p, ok
+}
+
+func (s *Storage) Store(p piece) {
+  s.Lock()
+  defer s.Unlock()
+
+  s.pieces[p.index] = pieceMeta{
+    p.index,
+    p.begin,
+    p.piece.Size,
+  }
 }
