@@ -5,3 +5,8 @@ type pieceMeta struct {
   begin  int
   length int
 }
+
+type Components struct {
+  Picker     *Picker
+  Storage    *Storage
+}

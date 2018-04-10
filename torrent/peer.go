@@ -18,6 +18,7 @@ type Peer struct {
 
   // BitTorrent components
   connectors map[string]Runner
+  components *Components
 
   // used only to identify tracker
   join    string
@@ -47,6 +48,7 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
 
   peer.pieces     = []pieceMeta{}
   peer.connectors = make(map[string]Runner)
+  peer.components = new(Components)
 
   return peer
 }
@@ -82,11 +84,6 @@ func (p *Peer) InitRecv() {
 
         // Find if I'm a seed
         p.transport.ControlSend(p.tracker, seedReq{p.id})
-
-        // make connectors
-        for _, id := range p.ids {
-          p.connectors[id] = NewConnector(p.id, id)
-        }
       case seedRes:
         p.pieces = msg.pieces
 
@@ -106,6 +103,15 @@ func (p *Peer) InitRecv() {
 }
 
 func (p *Peer) Run() {
+  // make per peer variables
+  p.components.Picker  = NewPicker(p.pieces)
+  p.components.Storage = NewStorage(p.pieces)
+
+  // make connectors
+  for _, id := range p.ids {
+    p.connectors[id] = NewConnector(p.id, id, p.components)
+  }
+
   // Let all the neighbouring peers know what pieces I have
   for _, id := range p.ids {
     for _, piece := range p.pieces {

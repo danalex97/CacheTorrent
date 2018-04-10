@@ -5,15 +5,16 @@ package torrent
 type Upload struct {
   me string
   to string
+
+  connector *Connector
 }
 
-func NewUpload(me, to string) Runner {
-  upload := new(Upload)
-
-  upload.me = me
-  upload.to = to
-
-  return upload
+func NewUpload(connector *Connector) Runner {
+  return &Upload{
+    connector.from,
+    connector.to,
+    connector,
+  }
 }
 
 func (u *Upload) Run() {

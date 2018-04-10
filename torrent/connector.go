@@ -10,18 +10,27 @@ type Connector struct {
   from string
   to   string
 
+  interested bool
+  chocked    bool
+
   upload   Runner
   download Runner
+
+  components *Components
 }
 
-func NewConnector(from, to string) Runner {
+func NewConnector(from, to string, components *Components) Runner {
   connector := new(Connector)
 
   connector.from = from
   connector.to = to
 
-  connector.upload   = NewUpload(from, to)
-  connector.download = NewDownload(from, to)
+  connector.components = components
+  connector.upload     = NewUpload(connector)
+  connector.download   = NewDownload(connector)
+
+  connector.interested = false
+  connector.chocked    = true
 
   return connector
 }
