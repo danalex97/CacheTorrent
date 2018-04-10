@@ -12,6 +12,9 @@ type Download struct {
   me   string // the node that downloads
   from string // the node that we download from
 
+  activeRequests map[pieceMeta]bool // requests that were made, but we still
+  // did not received a piece back as a response
+
   connector *Connector
 }
 
@@ -21,6 +24,8 @@ func NewDownload(connector *Connector) Runner {
 
     connector.from,
     connector.to,
+
+    make(map[pieceMeta]bool),
 
     connector,
   }
@@ -36,14 +41,32 @@ func (d *Download) Recv(m interface {}) {
     d.connector.choked = true
 
     // Request queued pieces that were lost from the peer that choked us
-    // [TODO]
+    lost := []pieceMeta{}
+    for p, _ := range d.activeRequests {
+      lost = append(lost, p)
+    }
+    d.MultiDownload.Lost(lost)
 
-    // Send interested message to node
+    // Since I am choked, I remove all activeRequests
+    d.activeRequests = make(map[pieceMeta]bool)
+
+    // Send interested message to node, since I am choked
     d.Transport.ControlSend(d.from, interested{d.me})
   case unchoke:
     // Request pieces from peer
     // [TODO]
   case piece:
+    // Remove the request from activeRequests
+    piece := pieceMeta{
+      msg.index,
+      msg.begin,
+      msg.piece.Size,
+    }
+    delete(d.activeRequests, piece)
+
+    // Request more pieces
+    d.requestMore()
+
     // Store the piece
     d.Storage.Store(msg)
   case have:
@@ -62,4 +85,8 @@ func (d *Download) Recv(m interface {}) {
     // let picker know I can get piece index
     d.Picker.GotHave(d.from, index)
   }
+}
+
+func (d *Download) requestMore() {
+  //[TODO]
 }

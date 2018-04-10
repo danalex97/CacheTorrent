@@ -56,7 +56,9 @@ func (c *Connector) Rate() float64 {
 }
 
 func (c *Connector) Choke() {
+  c.components.Transport.ControlSend(c.from, choke{c.to})
 }
 
 func (c *Connector) Unchoke() {
+  c.components.Transport.ControlSend(c.from, unchoke{c.to})
 }

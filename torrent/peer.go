@@ -116,10 +116,11 @@ func (p *Peer) Run() {
   // we don't need any synchroization.
 
   // make per peer variables
-  p.components.Picker    = NewPicker(p.pieces)
-  p.components.Storage   = NewStorage(p.pieces)
-  p.components.Transport = p.transport
-  p.components.Choker    = NewChoker(p.time)
+  p.components.Picker        = NewPicker(p.pieces)
+  p.components.Storage       = NewStorage(p.pieces)
+  p.components.Transport     = p.transport
+  p.components.Choker        = NewChoker(p.time)
+  p.components.MultiDownload = NewMultiDownload()
 
   // make connectors
   for _, id := range p.ids {
