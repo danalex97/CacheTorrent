@@ -7,19 +7,20 @@ import (
 )
 
 type Upload struct {
+  *Components
+
   me string
   to string
 
   connector  *Connector
-  components *Components
 }
 
 func NewUpload(connector *Connector) Runner {
   return &Upload{
+    connector.components,
     connector.from,
     connector.to,
     connector,
-    connector.components,
   }
 }
 
@@ -35,7 +36,7 @@ func (u *Upload) Recv(m interface {}) {
     u.connector.interested = true
     u.interested(u.connector.interested)
   case request:
-    meta ,_ := u.components.Storage.Have(msg.index)
+    meta ,_ := u.Storage.Have(msg.index)
 
     toUpload := Data{
       string(meta.index),
@@ -48,8 +49,11 @@ func (u *Upload) Recv(m interface {}) {
 }
 
 func (u *Upload) interested(interested bool) {
-  // Let checker know
-  // [TODO]
+  if interested {
+    u.Choker.Interested(u.connector)
+  } else {
+    u.Choker.NotInterested(u.connector)
+  }
 }
 
 func (u *Upload) upload(id string, meta pieceMeta, upload Data) {
