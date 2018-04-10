@@ -27,7 +27,6 @@ func NewDownload(connector *Connector) Runner {
 }
 
 func (d *Download) Run() {
-
 }
 
 func (d *Download) Recv(m interface {}) {

@@ -16,18 +16,22 @@ package torrent
 import (
   "github.com/danalex97/nfsTorrent/config"
   "math/rand"
+  "runtime"
   "sort"
 )
 
 const uploads     int = config.Uploads
 const optimistics int = config.Optimistics
+const interval    int = config.Interval
 
 type Choker struct {
+  time  func() int
   conns []*Connector
 }
 
-func NewChoker() *Choker {
+func NewChoker(time func() int) *Choker {
   return &Choker{
+    time,
     []*Connector{},
   }
 }
@@ -78,5 +82,21 @@ func (c *Choker) Interested(conn *Connector) {
 func (c *Choker) NotInterested(conn *Connector) {
   if !conn.choked {
     c.rechoke()
+  }
+}
+
+func (c *Choker) Run() {
+  c.rechoke()
+  t := c.time()
+  l := t
+  for {
+    t = c.time()
+
+    // This seems to work fine for up to 1000 nodes.
+    if t - l > interval {
+      c.rechoke()
+      l = t
+    }
+    runtime.Gosched()
   }
 }

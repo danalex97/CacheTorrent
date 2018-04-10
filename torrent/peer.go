@@ -12,6 +12,7 @@ type Peer struct {
   ids     []string
 
   transport Transport
+  time      func() int
 
   // BitTorrent protocol
   pieces []pieceMeta
@@ -51,6 +52,8 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.connectors    = make(map[string]Runner)
   peer.allConnectors = make(map[string]Runner)
   peer.components = new(Components)
+
+  peer.time = util.Time()
 
   return peer
 }
@@ -116,7 +119,7 @@ func (p *Peer) Run() {
   p.components.Picker    = NewPicker(p.pieces)
   p.components.Storage   = NewStorage(p.pieces)
   p.components.Transport = p.transport
-  p.components.Choker    = NewChoker()
+  p.components.Choker    = NewChoker(p.time)
 
   // make connectors
   for _, id := range p.ids {
@@ -138,6 +141,8 @@ func (p *Peer) Run() {
   for _, connector := range p.connectors {
     go connector.Run()
   }
+
+  go p.components.Choker.Run()
 }
 
 func (p *Peer) RunRecv(m interface {}) {
