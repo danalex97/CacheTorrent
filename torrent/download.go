@@ -98,11 +98,16 @@ func (d *Download) requestMore() {
     interest := d.Picker.Next(d.me)
 
     // If I'm not interested, become interested
-    d.Transport.ControlSend(d.from, interested{d.me})
+    if !d.connector.interested {
+      d.Transport.ControlSend(d.from, interested{d.me})
+    }
 
     // Send request
     d.Transport.ControlSend(d.from, request{d.me, interest})
 
-    //
+    // Update active requests: since our network model is assumed
+    // to be perfect, we assume the requests that we make to be active.
+    // [see new_request @ RequestManager.py]
+    d.activeRequests[interest] = true
   }
 }
