@@ -100,3 +100,14 @@ func (c *Choker) Run() {
     runtime.Gosched()
   }
 }
+
+/**
+ * We moved the responsibility of 'MultiDownload.py' to 'download.py'
+ * and the functions below in the Choker as we only need a struct
+ * which references the list of connections.
+ */
+func (c *Choker) Lost(lost []int) {
+  // handle pieces that were lost due to chocking
+
+  
+}

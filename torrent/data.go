@@ -15,5 +15,4 @@ type Components struct {
   Storage       *Storage
   Transport     interfaces.Transport
   Choker        *Choker
-  MultiDownload *MultiDownload
 }

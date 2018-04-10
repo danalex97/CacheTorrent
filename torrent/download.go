@@ -1,6 +1,6 @@
 package torrent
 
-// This file follows the 'download.py' file from BitTorrent 5.3.0 release
+// This file follows the 'download.py' file from BitTorrent 5.3.0 release.
 
 import (
   "github.com/danalex97/nfsTorrent/config"
@@ -47,7 +47,7 @@ func (d *Download) Recv(m interface {}) {
     for p, _ := range d.activeRequests {
       lost = append(lost, p)
     }
-    d.MultiDownload.Lost(lost)
+    d.Choker.Lost(lost)
 
     // Since I am choked, I remove all activeRequests
     d.activeRequests = make(map[int]bool)
