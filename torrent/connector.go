@@ -13,8 +13,8 @@ type Connector struct {
   interested bool
   choked     bool
 
-  upload   Runner
-  download Runner
+  upload   *Upload
+  download *Download
 
   components *Components
 }
@@ -61,4 +61,8 @@ func (c *Connector) Choke() {
 
 func (c *Connector) Unchoke() {
   c.components.Transport.ControlSend(c.from, unchoke{c.to})
+}
+
+func (c *Connector) RequestMore() {
+  c.download.RequestMore()
 }

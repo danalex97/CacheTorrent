@@ -20,7 +20,7 @@ type Download struct {
   connector *Connector
 }
 
-func NewDownload(connector *Connector) Runner {
+func NewDownload(connector *Connector) *Download {
   return &Download{
     connector.components,
 
@@ -43,11 +43,12 @@ func (d *Download) Recv(m interface {}) {
     d.connector.choked = true
 
     // Request queued pieces that were lost from the peer that choked us
-    lost := []int{}
     for p, _ := range d.activeRequests {
-      lost = append(lost, p)
+      // let picker know
+      d.Picker.Inactive(p)
     }
-    d.Choker.Lost(lost)
+    // Redistribute the requests for lost pieces
+    d.Choker.Lost()
 
     // Since I am choked, I remove all activeRequests
     d.activeRequests = make(map[int]bool)
@@ -58,7 +59,7 @@ func (d *Download) Recv(m interface {}) {
     // Request pieces from peer
     d.connector.choked = false
 
-    d.requestMore()
+    d.RequestMore()
   case piece:
     // Remove the request from activeRequests
     index := msg.index
@@ -68,7 +69,7 @@ func (d *Download) Recv(m interface {}) {
     d.Picker.Inactive(index)
 
     // Request more pieces
-    d.requestMore()
+    d.RequestMore()
 
     // Store the piece
     d.Storage.Store(msg)
@@ -90,7 +91,7 @@ func (d *Download) Recv(m interface {}) {
   }
 }
 
-func (d *Download) requestMore() {
+func (d *Download) RequestMore() {
   size := backlog
   if len(d.activeRequests) >= size {
     return

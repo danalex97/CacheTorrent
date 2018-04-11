@@ -106,8 +106,8 @@ func (c *Choker) Run() {
  * and the functions below in the Choker as we only need a struct
  * which references the list of connections.
  */
-func (c *Choker) Lost(lost []int) {
-  // handle pieces that were lost due to chocking
-
-  //[TODO]
+func (c *Choker) Lost() {
+  for _, conn := range c.conns {
+    conn.RequestMore()
+  }
 }

@@ -15,7 +15,7 @@ type Upload struct {
   connector  *Connector
 }
 
-func NewUpload(connector *Connector) Runner {
+func NewUpload(connector *Connector) *Upload {
   return &Upload{
     connector.components,
     connector.from,
