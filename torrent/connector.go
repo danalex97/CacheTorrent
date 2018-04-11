@@ -2,43 +2,30 @@ package torrent
 
 // This file follows the 'Upload' BitTorrent 5.3.0 release
 
-import (
-  . "github.com/danalex97/Speer/interfaces"
-  "fmt"
-)
-
 type Connector struct {
   from string
   to   string
-  link  Link
 
   interested bool
   choked     bool
 
   upload    *Upload
   download  *Download
+  handshake *Handshake
 
   components *Components
 }
 
-func NewConnector(from, to string, components *Components, link Link) *Connector {
+func NewConnector(from, to string, components *Components) *Connector {
   connector := new(Connector)
 
   connector.from  = from
   connector.to    = to
 
-  if link == nil {
-    connector.link = components.Transport.Connect(to)
-
-    // Initiate the connection
-    components.Transport.ControlSend(to, connReq{from, connector.link})
-  } else {
-    connector.link = link
-  }
-
   connector.components = components
   connector.upload     = NewUpload(connector)
   connector.download   = NewDownload(connector)
+  connector.handshake  = NewHandshake(connector)
 
   connector.interested = false
   connector.choked     = true
@@ -47,8 +34,6 @@ func NewConnector(from, to string, components *Components, link Link) *Connector
 }
 
 func (c *Connector) Run() {
-  fmt.Println(c)
-
   go c.upload.Run()
   go c.download.Run()
 }

@@ -13,7 +13,7 @@ type Upload struct {
   me string
   to string
 
-  link Link
+  handshake *Handshake
 
   connector  *Connector
 }
@@ -23,7 +23,7 @@ func NewUpload(connector *Connector) *Upload {
     connector.components,
     connector.from,
     connector.to,
-    connector.link,
+    connector.handshake,
     connector,
   }
 }
@@ -48,7 +48,7 @@ func (u *Upload) Recv(m interface {}) {
     }
 
     // When we receive a request we can upload the piece.
-    u.link.Upload(toUpload)
+    u.handshake.Link().Upload(toUpload)
   }
 }
 

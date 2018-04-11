@@ -124,7 +124,7 @@ func (p *Peer) Run() {
 
   // make connectors
   for _, id := range p.ids {
-    connector := NewConnector(p.id, id, p.components, nil)
+    connector := NewConnector(p.id, id, p.components)
     p.components.Choker.AddConnector(connector)
 
     p.connectors[id]    = connector
@@ -148,7 +148,6 @@ func (p *Peer) Run() {
 
 func (p *Peer) RunRecv(m interface {}) {
   id   := ""
-  link := (Link)(nil)
 
   // Redirect the message to the connector
   switch msg := m.(type) {
@@ -174,8 +173,10 @@ func (p *Peer) RunRecv(m interface {}) {
     id = msg.id
     fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case connReq:
-    id   = msg.id
-    link = msg.link
+    id = msg.id
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+  case connRes:
+    id = msg.id
     fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   }
 
@@ -184,7 +185,7 @@ func (p *Peer) RunRecv(m interface {}) {
   }
 
   if _, ok := p.allConnectors[id]; !ok {
-    p.allConnectors[id] = NewConnector(p.id, id, p.components, link)
+    p.allConnectors[id] = NewConnector(p.id, id, p.components)
   }
 
   connector := p.allConnectors[id]
