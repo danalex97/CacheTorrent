@@ -108,6 +108,9 @@ func (c *Choker) Run() {
  */
 func (c *Choker) Lost() {
   for _, conn := range c.conns {
-    conn.RequestMore()
+    // We try to request more pieces only if the connection is not choked
+    if !conn.choked {
+      conn.RequestMore()
+    }
   }
 }
