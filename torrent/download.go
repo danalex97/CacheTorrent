@@ -6,6 +6,7 @@ import (
   "github.com/danalex97/nfsTorrent/config"
   "strconv"
   "runtime"
+  "fmt"
 )
 
 const backlog int = config.Backlog
@@ -42,6 +43,7 @@ func (d *Download) Run() {
   for {
     select {
     case data, ok := <-d.handshake.Link().Download():
+      fmt.Println(d.me, len(d.handshake.Link().Download()))
       if !ok {
         runtime.Gosched()
         continue
@@ -58,6 +60,8 @@ func (d *Download) Run() {
         begin,
         data,
       }
+
+      fmt.Println(d.me, "download from ", d.from, data)
 
       // send message to myself
       d.Transport.ControlSend(d.me, piece)

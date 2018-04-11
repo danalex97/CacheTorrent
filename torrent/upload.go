@@ -5,6 +5,7 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "strconv"
+  "fmt"
 )
 
 type Upload struct {
@@ -47,6 +48,7 @@ func (u *Upload) Recv(m interface {}) {
       meta.length,
     }
 
+    fmt.Println(u.me, "upload to", u.to, toUpload)
     // When we receive a request we can upload the piece.
     u.handshake.Link().Upload(toUpload)
   }
