@@ -34,11 +34,13 @@ func NewConnector(from, to string, components *Components) *Connector {
 }
 
 func (c *Connector) Run() {
+  go c.handshake.Run()
   go c.upload.Run()
   go c.download.Run()
 }
 
 func (c *Connector) Recv(m interface {}) {
+  c.handshake.Recv(m)
   c.upload.Recv(m)
   c.download.Recv(m)
 }

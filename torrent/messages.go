@@ -69,6 +69,7 @@ type seedRes struct {
 
 type connReq struct {
   id   string
+  sent bool
   link Link
 }
 
