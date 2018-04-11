@@ -64,6 +64,9 @@ func (d *Download) Recv(m interface {}) {
     index := msg.index
     delete(d.activeRequests, index)
 
+    // Let Picker know active requests changed
+    d.Picker.Inactive(d.me, index)
+
     // Request more pieces
     d.requestMore()
 
@@ -109,5 +112,8 @@ func (d *Download) requestMore() {
     // to be perfect, we assume the requests that we make to be active.
     // [see new_request @ RequestManager.py]
     d.activeRequests[interest] = true
+
+    // Let Picker know active requests changed
+    d.Picker.Active(d.me, interest)
   }
 }
