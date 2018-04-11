@@ -23,9 +23,9 @@ func NewConnector(from, to string, components *Components) *Connector {
   connector.to    = to
 
   connector.components = components
+  connector.handshake  = NewHandshake(connector)
   connector.upload     = NewUpload(connector)
   connector.download   = NewDownload(connector)
-  connector.handshake  = NewHandshake(connector)
 
   connector.interested = false
   connector.choked     = true

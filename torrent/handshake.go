@@ -7,8 +7,8 @@ import (
 )
 
 type Handshake struct {
+  sync.RWMutex
   *Components
-  *sync.RWMutex
 
   from  string
   to    string
@@ -20,13 +20,12 @@ type Handshake struct {
 
 func NewHandshake(connector *Connector) *Handshake {
   return &Handshake{
-    connector.components,
-    new(sync.RWMutex),
-    connector.from,
-    connector.to,
-    false,
-    false,
-    (Link)(nil),
+    Components: connector.components,
+    from:       connector.from,
+    to:         connector.to,
+    sent:       false,
+    done:       false,
+    link:       (Link)(nil),
   }
 }
 
@@ -35,8 +34,10 @@ func (h *Handshake) Link() Link {
   for !h.done {
     h.RUnlock()
     runtime.Gosched()
+    h.RLock()
   }
 
+  defer h.RUnlock()
   return h.link
 }
 
