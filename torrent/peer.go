@@ -3,6 +3,7 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "runtime"
+  "reflect"
   "fmt"
 )
 
@@ -151,16 +152,31 @@ func (p *Peer) RunRecv(m interface {}) {
 
   // Redirect the message to the connector
   switch msg := m.(type) {
-  case choke: id = msg.id
-  case unchoke: id = msg.id
-  case interested: id = msg.id
-  case notInterested: id = msg.id
-  case have: id = msg.id
-  case request: id = msg.id
-  case piece: id = msg.id
+  case choke:
+    id = msg.id
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+  case unchoke:
+    id = msg.id
+    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+  case interested:
+    id = msg.id
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+  case notInterested:
+    id = msg.id
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+  case have:
+    id = msg.id
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+  case request:
+    id = msg.id
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+  case piece:
+    id = msg.id
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case connReq:
     id   = msg.id
     link = msg.link
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   }
 
   if id == "" {

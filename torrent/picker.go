@@ -107,6 +107,10 @@ func (p *Picker) Next(peer string) (int, bool) {
   }
   tiebreaks := p.active
 
+  if len(haves) == 0 {
+    return 0, false
+  }
+
   // find maximum frequency
   mx := -1
   for fr, _ := range p.buckets {

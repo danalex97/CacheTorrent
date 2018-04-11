@@ -134,7 +134,7 @@ func (d *Download) RequestMore() {
 
   // Request more pieces
   for len(d.activeRequests) < size {
-    interest, ok := d.Picker.Next(d.me)
+    interest, ok := d.Picker.Next(d.from)
     if !ok {
       // We can't find any useful piece to request
       break

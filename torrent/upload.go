@@ -4,6 +4,7 @@ package torrent
 
 import (
   . "github.com/danalex97/Speer/interfaces"
+  "strconv"
 )
 
 type Upload struct {
@@ -42,7 +43,7 @@ func (u *Upload) Recv(m interface {}) {
     meta ,_ := u.Storage.Have(msg.index)
 
     toUpload := Data{
-      string(meta.index),
+      strconv.Itoa(meta.index),
       meta.length,
     }
 
