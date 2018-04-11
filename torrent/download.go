@@ -65,7 +65,7 @@ func (d *Download) Recv(m interface {}) {
     delete(d.activeRequests, index)
 
     // Let Picker know active requests changed
-    d.Picker.Inactive(d.me, index)
+    d.Picker.Inactive(index)
 
     // Request more pieces
     d.requestMore()
@@ -98,7 +98,11 @@ func (d *Download) requestMore() {
 
   // Request more pieces
   for len(d.activeRequests) < size {
-    interest := d.Picker.Next(d.me)
+    interest, ok := d.Picker.Next(d.me)
+    if !ok {
+      // We can't find any useful piece to request
+      break
+    }
 
     // If I'm not interested, become interested
     if !d.connector.interested {
@@ -114,6 +118,6 @@ func (d *Download) requestMore() {
     d.activeRequests[interest] = true
 
     // Let Picker know active requests changed
-    d.Picker.Active(d.me, interest)
+    d.Picker.Active(interest)
   }
 }
