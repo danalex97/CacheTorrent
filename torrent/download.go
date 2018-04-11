@@ -5,6 +5,8 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
+  "strconv"
+  "runtime"
 )
 
 const backlog int = config.Backlog
@@ -38,6 +40,33 @@ func NewDownload(connector *Connector) *Download {
 
 func (d *Download) Run() {
   // Watch the link to deliver the piece messages
+  for {
+    select {
+    case data, ok := <-d.link.Download():
+      if !ok {
+        runtime.Gosched()
+        continue
+      }
+
+      index, _ := strconv.Atoi(data.Id)
+      length   := data.Size
+      // assumes equal sized pieces
+      begin    := index * length
+
+      piece := piece{
+        d.from,
+        index,
+        begin,
+        data,
+      }
+
+      // send message to myself
+      d.Transport.ControlSend(d.me, piece)
+    default:
+      // allow other nodes in simulation run
+      runtime.Gosched()
+    }
+  }
 }
 
 func (d *Download) Recv(m interface {}) {
