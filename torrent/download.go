@@ -3,6 +3,7 @@ package torrent
 // This file follows the 'download.py' file from BitTorrent 5.3.0 release.
 
 import (
+  . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
 )
 
@@ -16,6 +17,7 @@ type Download struct {
 
   activeRequests map[int]bool // requests that were made, but we still
   // did not received a piece back as a response
+  link Link
 
   connector *Connector
 }
@@ -28,12 +30,14 @@ func NewDownload(connector *Connector) *Download {
     connector.to,
 
     make(map[int]bool),
+    connector.link,
 
     connector,
   }
 }
 
 func (d *Download) Run() {
+  // Watch the link to deliver the piece messages
 }
 
 func (d *Download) Recv(m interface {}) {
@@ -49,6 +53,8 @@ func (d *Download) Recv(m interface {}) {
     }
     // Redistribute the requests for lost pieces
     d.Choker.Lost()
+    // Stop the download link as well
+    d.link.Clear()
 
     // Since I am choked, I remove all activeRequests
     d.activeRequests = make(map[int]bool)

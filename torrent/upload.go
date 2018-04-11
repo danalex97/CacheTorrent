@@ -12,6 +12,8 @@ type Upload struct {
   me string
   to string
 
+  link Link
+
   connector  *Connector
 }
 
@@ -20,6 +22,7 @@ func NewUpload(connector *Connector) *Upload {
     connector.components,
     connector.from,
     connector.to,
+    connector.link,
     connector,
   }
 }
@@ -44,7 +47,7 @@ func (u *Upload) Recv(m interface {}) {
     }
 
     // When we receive a request we can upload the piece.
-    u.upload(u.to, meta, toUpload)
+    u.link.Upload(toUpload)
   }
 }
 
@@ -54,8 +57,4 @@ func (u *Upload) interested(interested bool) {
   } else {
     u.Choker.NotInterested(u.connector)
   }
-}
-
-func (u *Upload) upload(id string, meta pieceMeta, upload Data) {
-  // [TODO]
 }

@@ -3,27 +3,38 @@ package torrent
 // This file follows the 'Upload' BitTorrent 5.3.0 release
 
 import (
+  . "github.com/danalex97/Speer/interfaces"
   "fmt"
 )
 
 type Connector struct {
   from string
   to   string
+  link  Link
 
   interested bool
   choked     bool
 
-  upload   *Upload
-  download *Download
+  upload    *Upload
+  download  *Download
 
   components *Components
 }
 
-func NewConnector(from, to string, components *Components) *Connector {
+func NewConnector(from, to string, components *Components, link Link) *Connector {
   connector := new(Connector)
 
-  connector.from = from
-  connector.to = to
+  connector.from  = from
+  connector.to    = to
+
+  if link == nil {
+    connector.link = components.Transport.Connect(to)
+
+    // Initiate the connection
+    components.Transport.ControlSend(to, connReq{from, connector.link})
+  } else {
+    connector.link = link
+  }
 
   connector.components = components
   connector.upload     = NewUpload(connector)

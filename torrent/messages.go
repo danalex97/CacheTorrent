@@ -64,3 +64,10 @@ type seedReq struct {
 type seedRes struct {
   pieces []pieceMeta
 }
+
+/* Connections */
+
+type connReq struct {
+  id   string
+  link Link
+}
