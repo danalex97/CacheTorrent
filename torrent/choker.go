@@ -11,6 +11,12 @@ package torrent
  *
  * Version 5.3.0 uses allocates 30% of the slots to seeds and 70% to other
  * peers.
+ *
+ * The seeder will have no upload made to it. The seeder can either:
+ *  - upload to best download rates
+ *  - upload randomly
+ * For the moment our implementation is random.
+ *
  */
 
 import (
