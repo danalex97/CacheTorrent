@@ -14,7 +14,7 @@ func main() {
   s := simulation.SmallTorrentSimulation()
   s.Run()
 
-  time.Sleep(time.Duration(float64(time.Second) * 3))
+  time.Sleep(time.Duration(float64(time.Second) * 10))
   fmt.Println("Done")
   s.Stop()
 

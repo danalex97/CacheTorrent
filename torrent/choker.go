@@ -18,6 +18,7 @@ import (
   "math/rand"
   "runtime"
   "sort"
+  "sync"
 )
 
 const uploads     int = config.Uploads
@@ -25,22 +26,31 @@ const optimistics int = config.Optimistics
 const interval    int = config.Interval
 
 type Choker struct {
+  *sync.Mutex
+
   time  func() int
   conns []*Connector
 }
 
 func NewChoker(time func() int) *Choker {
   return &Choker{
+    new(sync.Mutex),
     time,
     []*Connector{},
   }
 }
 
 func (c *Choker) AddConnector(conn *Connector) {
+  c.Lock()
+  c.Unlock()
+
   c.conns = append(c.conns, conn)
 }
 
 func (c *Choker) rechoke() {
+  c.Lock()
+  c.Unlock()
+
   // Sort the choked connections
   sort.Slice(c.conns, func(i, j int) bool {
     return c.conns[i].Rate() > c.conns[i].Rate()

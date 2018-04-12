@@ -8,7 +8,7 @@ import (
 )
 
 const minNodes       int = config.MinNodes
-const peerNeighbours int = config.PeerNeighbours
+const peerNeighbours int = config.OutPeers
 const seeds          int = config.Seeds
 const pieces         int = config.Pieces
 const pieceSize      int = config.PieceSize

@@ -2,10 +2,13 @@ package torrent
 
 import (
   . "github.com/danalex97/Speer/interfaces"
+  "github.com/danalex97/nfsTorrent/config"
   "runtime"
   // "reflect"
   "fmt"
 )
+
+const maxPeers int = config.InPeers + config.OutPeers
 
 type Peer struct {
   id      string
@@ -19,8 +22,7 @@ type Peer struct {
   pieces []pieceMeta
 
   // BitTorrent components
-  connectors    map[string]Runner // the connectors that were chosen by tracker
-  allConnectors map[string]Runner // the connections with other peers(uploaders)
+  connectors  map[string]Runner // the connectors that were chosen by tracker
   components *Components
 
   // used only to identify tracker
@@ -51,7 +53,6 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
 
   peer.pieces     = []pieceMeta{}
   peer.connectors    = make(map[string]Runner)
-  peer.allConnectors = make(map[string]Runner)
   peer.components = new(Components)
 
   peer.time = util.Time()
@@ -128,8 +129,7 @@ func (p *Peer) Run() {
     connector := NewConnector(p.id, id, p.components)
     p.components.Choker.AddConnector(connector)
 
-    p.connectors[id]    = connector
-    p.allConnectors[id] = p.connectors[id]
+    p.connectors[id] = connector
   }
 
   // Let all the neighbouring peers know what pieces I have
@@ -182,10 +182,27 @@ func (p *Peer) RunRecv(m interface {}) {
     return
   }
 
-  if _, ok := p.allConnectors[id]; !ok {
-    p.allConnectors[id] = NewConnector(p.id, id, p.components)
+  /**
+   * The peer can have up to at most config.OutPeers connections
+   * initiated by it.
+   *
+   * A perfect tracker would not keep "one-way" connections, that
+   * is connections that are not reciprocated. (i.e. accepted as an
+   * in-connection)
+   *
+   * To handle this, some protocols allow the peers to be
+   * periodically changed. However, when using a perfect tracker, this
+   * is not needed and we can set OutPeers = 0.
+   */
+
+  if _, ok := p.connectors[id]; !ok && len(p.connectors) < maxPeers {
+    /*
+     * This should not be reached when we having a perfect tracker.
+     */
+    p.connectors[id] = NewConnector(p.id, id, p.components)
   }
 
-  connector := p.allConnectors[id]
-  connector.Recv(m)
+  if connector, ok := p.connectors[id]; ok {
+    connector.Recv(m)
+  }
 }
