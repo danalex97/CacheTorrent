@@ -114,6 +114,9 @@ func (d *Download) Recv(m interface {}) {
     // Store the piece
     d.Storage.Store(msg)
 
+    // Let the others know I have the piece
+    d.Choker.Have(index)
+
     // We need to request more only after we stored the piece, so we don't
     // request the same thing twice.
     d.RequestMore()

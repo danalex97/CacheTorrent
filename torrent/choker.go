@@ -34,8 +34,8 @@ const interval    int = config.Interval
 type Choker struct {
   *sync.Mutex
 
-  time  func() int
-  conns []*Connector
+  time      func() int
+  conns     []*Connector
 }
 
 func NewChoker(time func() int) *Choker {
@@ -128,5 +128,12 @@ func (c *Choker) Lost() {
     if !conn.choked {
       conn.RequestMore()
     }
+  }
+}
+
+func (c *Choker) Have(index int) {
+  for _, conn := range c.conns {
+    t := conn.components.Transport
+    t.ControlSend(conn.to, have{conn.from, index})
   }
 }
