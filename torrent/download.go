@@ -142,6 +142,7 @@ func (d *Download) RequestMore() {
 
     // If I'm not interested, become interested
     if !d.connector.interested {
+      d.connector.interested = true
       d.Transport.ControlSend(d.from, interested{d.me})
     }
 

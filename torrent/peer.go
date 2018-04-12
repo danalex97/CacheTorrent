@@ -115,6 +115,7 @@ func (p *Peer) InitRecv() {
 func (p *Peer) Run() {
   // We want to bind all these variables here, so
   // we don't need any synchroization.
+  fmt.Println(p.id, p.ids)
 
   // make per peer variables
   p.components.Storage   = NewStorage(p.id, p.pieces)
