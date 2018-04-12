@@ -51,6 +51,13 @@ func (c *Choker) AddConnector(conn *Connector) {
   c.Unlock()
 
   c.conns = append(c.conns, conn)
+
+  // Send haves at connection
+  s := conn.components.Storage
+  t := conn.components.Transport
+  for _, piece := range s.pieces {
+    t.ControlSend(conn.to, have{conn.from, piece.index})
+  }
 }
 
 func (c *Choker) rechoke() {

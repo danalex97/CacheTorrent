@@ -5,7 +5,8 @@ package torrent
 import (
   "github.com/danalex97/nfsTorrent/config"
   "strconv"
-  "runtime"
+  // "runtime"
+  // "fmt"
 )
 
 const backlog int = config.Backlog
@@ -40,31 +41,26 @@ func NewDownload(connector *Connector) *Download {
 func (d *Download) Run() {
   // Watch the link to deliver the piece messages
   for {
-    select {
-    case data, ok := <-d.handshake.Downlink().Download():
-      if !ok {
-        runtime.Gosched()
-        continue
-      }
-
-      index, _ := strconv.Atoi(data.Id)
-      length   := data.Size
-      // assumes equal sized pieces
-      begin    := index * length
-
-      piece := piece{
-        d.from,
-        index,
-        begin,
-        data,
-      }
-
-      // send message to myself
-      d.Transport.ControlSend(d.me, piece)
-    default:
-      // allow other nodes in simulation run
-      runtime.Gosched()
+    data, ok := <-d.handshake.Downlink().Download()
+    if !ok {
+      // channel closed
+      break
     }
+
+    index, _ := strconv.Atoi(data.Id)
+    length   := data.Size
+    // assumes equal sized pieces
+    begin    := index * length
+
+    piece := piece{
+      d.from,
+      index,
+      begin,
+      data,
+    }
+
+    // send message to myself
+    d.Transport.ControlSend(d.me, piece)
   }
 }
 
@@ -82,7 +78,7 @@ func (d *Download) Recv(m interface {}) {
     // Redistribute the requests for lost pieces
     d.Choker.Lost()
     // Stop the download link as well
-    // [TODO]
+    d.handshake.Downlink().Clear()
 
     // Handle control messages
     if len(d.activeRequests) > 0 {

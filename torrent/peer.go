@@ -132,13 +132,6 @@ func (p *Peer) Run() {
     p.connectors[id] = connector
   }
 
-  // Let all the neighbouring peers know what pieces I have
-  for _, id := range p.ids {
-    for _, piece := range p.pieces {
-      p.transport.ControlSend(id, have{p.id, piece.index})
-    }
-  }
-
   // Run all connectors
   for _, connector := range p.connectors {
     go connector.Run()
@@ -199,7 +192,10 @@ func (p *Peer) RunRecv(m interface {}) {
     /*
      * This should not be reached when we having a perfect tracker.
      */
-    p.connectors[id] = NewConnector(p.id, id, p.components)
+    connector := NewConnector(p.id, id, p.components)
+
+    p.connectors[id] = connector
+    p.components.Choker.AddConnector(connector)
   }
 
   if connector, ok := p.connectors[id]; ok {
