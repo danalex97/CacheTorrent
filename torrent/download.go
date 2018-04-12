@@ -82,7 +82,7 @@ func (d *Download) Recv(m interface {}) {
     // Redistribute the requests for lost pieces
     d.Choker.Lost()
     // Stop the download link as well
-    d.handshake.Downlink().Clear()
+    // [TODO]
 
     // Handle control messages
     if len(d.activeRequests) > 0 {
@@ -128,8 +128,7 @@ func (d *Download) Recv(m interface {}) {
       // I need to be interested in the piece as well
       if _, ok := d.Storage.Have(index); !ok {
         // Send interested message to node
-        d.connector.interested = true
-        d.Transport.ControlSend(d.from, interested{d.me})
+        d.interested(true)
       }
     }
 
@@ -154,8 +153,6 @@ func (d *Download) RequestMore() {
 
     // If I'm not interested, become interested
     d.interested(true)
-
-    // Send request
     d.Transport.ControlSend(d.from, request{d.me, interest})
 
     // Update active requests: since our network model is assumed

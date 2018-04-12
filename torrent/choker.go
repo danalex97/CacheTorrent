@@ -90,6 +90,7 @@ func (c *Choker) rechoke() {
 }
 
 func (c *Choker) Interested(conn *Connector) {
+  // [TODO] Check
   if !conn.choked {
     c.rechoke()
   }
