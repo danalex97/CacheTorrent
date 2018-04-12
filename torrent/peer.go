@@ -175,9 +175,6 @@ func (p *Peer) RunRecv(m interface {}) {
   case connReq:
     id = msg.id
     // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
-  case connRes:
-    id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   }
 
   if id == "" {

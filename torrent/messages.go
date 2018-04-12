@@ -71,7 +71,3 @@ type connReq struct {
   id   string
   link Link
 }
-
-type connRes struct {
-  id string
-}

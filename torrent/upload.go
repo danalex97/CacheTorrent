@@ -50,7 +50,7 @@ func (u *Upload) Recv(m interface {}) {
 
     fmt.Println(u.me, "upload to", u.to, toUpload)
     // When we receive a request we can upload the piece.
-    u.handshake.Link().Upload(toUpload)
+    u.handshake.Uplink().Upload(toUpload)
   }
 }
 

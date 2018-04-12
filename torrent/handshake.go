@@ -13,52 +13,57 @@ type Handshake struct {
   from  string
   to    string
 
-  sent  bool
   done  bool
-  link  Link
+
+  downlink Link
+  uplink   Link
 }
 
 func NewHandshake(connector *Connector) *Handshake {
+  t    := connector.components.Transport
+  link := t.Connect(connector.to)
+
   return &Handshake{
     Components: connector.components,
     from:       connector.from,
     to:         connector.to,
-    sent:       false,
     done:       false,
-    link:       (Link)(nil),
+    downlink:   (Link)(nil),
+    uplink:     link,
   }
 }
 
-func (h *Handshake) Link() Link {
+func (h *Handshake) Uplink() Link {
+  return h.uplink
+}
+
+func (h *Handshake) Downlink() Link {
+  h.wait()
+
+  h.RLock()
+  defer h.RUnlock()
+
+  return h.downlink
+}
+
+func (h *Handshake) wait() {
   h.RLock()
   for !h.done {
     h.RUnlock()
     runtime.Gosched()
     h.RLock()
   }
-
-  defer h.RUnlock()
-  return h.link
+  h.RUnlock()
 }
 
 func (h *Handshake) Run() {
-  h.Lock()
-  defer h.Unlock()
-
-  if h.link == nil {
-    h.link = h.Transport.Connect(h.to)
-    h.Transport.ControlSend(h.to, connReq{h.from, h.link})
-
-    h.sent = true
-  }
+  h.Transport.ControlSend(h.to, connReq{h.from, h.uplink})
 }
 
 func (h *Handshake) Recv(m interface {}) {
   switch msg := m.(type) {
   case connReq:
     h.handleReq(msg)
-  case connRes:
-    h.handleRes(msg)
   }
 }
 
@@ -66,27 +71,6 @@ func (h *Handshake) handleReq(req connReq) {
   h.Lock()
   defer h.Unlock()
 
-  // I receive a request, but I sent a link.
-  // It must be a bidirectional connection.
-  if h.sent {
-    // We agree on using the link of the smallest id.
-    if h.from > h.to {
-      h.link = req.link
-    }
-  } else {
-    // I did not send a request, thus I will use the other's connection
-    h.link = req.link
-
-    // Let the intiator know handshake is done
-    h.Transport.ControlSend(h.to, connRes{h.from})
-  }
-
-  h.done = true
-}
-
-func (h *Handshake) handleRes(req connRes) {
-  h.Lock()
-  defer h.Unlock()
-
+  h.downlink = req.link
   h.done = true
 }

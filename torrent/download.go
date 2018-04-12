@@ -42,8 +42,8 @@ func (d *Download) Run() {
   // Watch the link to deliver the piece messages
   for {
     select {
-    case data, ok := <-d.handshake.Link().Download():
-      fmt.Println(d.me, len(d.handshake.Link().Download()))
+    case data, ok := <-d.handshake.Downlink().Download():
+      fmt.Println(d.me, len(d.handshake.Downlink().Download()))
       if !ok {
         runtime.Gosched()
         continue
@@ -86,7 +86,7 @@ func (d *Download) Recv(m interface {}) {
     // Redistribute the requests for lost pieces
     d.Choker.Lost()
     // Stop the download link as well
-    d.handshake.Link().Clear()
+    d.handshake.Downlink().Clear()
 
     // Since I am choked, I remove all activeRequests
     d.activeRequests = make(map[int]bool)
