@@ -188,7 +188,8 @@ func (p *Peer) RunRecv(m interface {}) {
    * is not needed and we can set OutPeers = 0.
    */
 
-  if _, ok := p.connectors[id]; !ok && len(p.connectors) < maxPeers {
+  // if _, ok := p.connectors[id]; !ok && len(p.connectors) < maxPeers {
+  if _, ok := p.connectors[id]; !ok {
     /*
      * This should not be reached when we having a perfect tracker.
      */
@@ -196,6 +197,8 @@ func (p *Peer) RunRecv(m interface {}) {
 
     p.connectors[id] = connector
     p.components.Choker.AddConnector(connector)
+
+    go connector.Run()
   }
 
   if connector, ok := p.connectors[id]; ok {
