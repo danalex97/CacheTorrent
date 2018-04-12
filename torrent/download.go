@@ -84,11 +84,20 @@ func (d *Download) Recv(m interface {}) {
     // Stop the download link as well
     d.handshake.Downlink().Clear()
 
+    // Handle control messages
+    if len(d.activeRequests) > 0 {
+      // Send interested message to node, since I am choked
+      d.interested(true)
+    } else {
+      // If there is no piece that I am interested in, then I am not
+      // interested any more.
+      _, ok := d.Picker.Next(d.from)
+      d.interested(ok)
+    }
+
     // Since I am choked, I remove all activeRequests
     d.activeRequests = make(map[int]bool)
 
-    // Send interested message to node, since I am choked
-    d.Transport.ControlSend(d.from, interested{d.me})
   case unchoke:
     // Request pieces from peer
     d.connector.choked = false
@@ -141,10 +150,7 @@ func (d *Download) RequestMore() {
     }
 
     // If I'm not interested, become interested
-    if !d.connector.interested {
-      d.connector.interested = true
-      d.Transport.ControlSend(d.from, interested{d.me})
-    }
+    d.interested(true)
 
     // Send request
     d.Transport.ControlSend(d.from, request{d.me, interest})
@@ -156,5 +162,18 @@ func (d *Download) RequestMore() {
 
     // Let Picker know active requests changed
     d.Picker.Active(interest)
+  }
+}
+
+func (d *Download) interested(now bool) {
+  before := d.connector.interested
+  d.connector.interested = now
+
+  if before != now {
+    if now == true {
+      d.Transport.ControlSend(d.from, interested{d.me})
+    } else {
+      d.Transport.ControlSend(d.from, notInterested{d.me})
+    }
   }
 }

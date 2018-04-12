@@ -4,7 +4,7 @@ import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
   "runtime"
-  // "reflect"
+  "reflect"
   "fmt"
 )
 
@@ -160,22 +160,22 @@ func (p *Peer) RunRecv(m interface {}) {
     // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case interested:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case notInterested:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case have:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case request:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case piece:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   case connReq:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
   }
 
   if id == "" {
