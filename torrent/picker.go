@@ -1,15 +1,17 @@
 package torrent
 
 /**
- This file follows the 'PiecePicker.py' file from BitTorrent 5.3.0 release.
-
- We follow the description in Bram Cohen's Incentives Build Robustness
- in BitTorrent, that is:
-  - the policy is rarest first
-  - first pieces are provided in random order rather than by rarest first policy
-
-  Some reponsibilities of the 'RequestManager.py' have been moved to this file,
-  that is the accounting of active requests.
+ * This file follows the 'PiecePicker.py' file from BitTorrent 5.3.0 release.
+ *
+ * We follow the description in Bram Cohen's Incentives Build Robustness
+ * in BitTorrent, that is:
+ * - the policy is rarest first
+ * - first pieces are provided in random order rather than by rarest first policy
+ *
+ * We do not model endgame mode.
+ *
+ * Some reponsibilities of the 'RequestManager.py' have been moved to this file,
+ * that is the accounting of active requests.
  */
 
 import (
@@ -144,7 +146,13 @@ func (p *Picker) Next(peer string) (int, bool) {
     }
   }
 
-  // [?] should I request the piece even through it was already requested
+  /**
+   * We do not request a piece that was already requested. This sould not
+   * increase the download time significantly assuming a small request queue
+   * size.
+   *
+   * To fully eliminate this effect we can use config.Backlog = 1.
+   */
 
   return 0, false
 }
