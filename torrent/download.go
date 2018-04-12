@@ -6,7 +6,6 @@ import (
   "github.com/danalex97/nfsTorrent/config"
   "strconv"
   "runtime"
-  "fmt"
 )
 
 const backlog int = config.Backlog
@@ -43,7 +42,6 @@ func (d *Download) Run() {
   for {
     select {
     case data, ok := <-d.handshake.Downlink().Download():
-      fmt.Println(d.me, len(d.handshake.Downlink().Download()))
       if !ok {
         runtime.Gosched()
         continue
@@ -60,8 +58,6 @@ func (d *Download) Run() {
         begin,
         data,
       }
-
-      fmt.Println(d.me, "download from ", d.from, data)
 
       // send message to myself
       d.Transport.ControlSend(d.me, piece)
@@ -106,11 +102,12 @@ func (d *Download) Recv(m interface {}) {
     // Let Picker know active requests changed
     d.Picker.Inactive(index)
 
-    // Request more pieces
-    d.RequestMore()
-
     // Store the piece
     d.Storage.Store(msg)
+
+    // We need to request more only after we stored the piece, so we don't
+    // request the same thing twice.
+    d.RequestMore()
   case have:
     index := msg.index
 
