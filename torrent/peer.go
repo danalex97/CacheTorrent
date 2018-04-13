@@ -52,7 +52,7 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.transport = util.Transport()
 
   peer.pieces     = []pieceMeta{}
-  peer.connectors    = make(map[string]Runner)
+  peer.connectors = make(map[string]Runner)
   peer.components = new(Components)
 
   peer.time = util.Time()
@@ -77,37 +77,59 @@ func (p *Peer) Init() {
 
 func (p *Peer) InitRecv() {
   for {
-    select {
-    case m, ok := <-p.transport.ControlRecv():
-      if !ok {
-        continue
-      }
+    messages := []interface{}{}
 
+    // Get all pending messages
+    empty := false
+    for !empty {
+      select {
+      case m := <-p.transport.ControlRecv():
+        messages = append(messages, m)
+      default:
+        empty = true
+      }
+    }
+
+    // No new messages, so we can let somebody else run
+    if len(messages) == 0 {
+      runtime.Gosched()
+      continue
+    }
+
+    // Process all pending messages
+    any := false
+    for _, m := range messages {
       switch msg := m.(type) {
       case trackerReq:
+        any = true
         p.transport.ControlSend(msg.from, trackerRes{p.tracker})
       case neighbours:
+        any = true
         p.ids = msg.ids
 
         // Find if I'm a seed
         p.transport.ControlSend(p.tracker, seedReq{p.id})
       case seedRes:
+        any = true
         p.pieces = msg.pieces
 
         // Since we do Run here, it must be that it will not hang
         p.Run()
       default:
-        // Wait for connectors to get initialized
         if len(p.connectors) > 0 {
+          any = true
+
+          // All initialized
           p.RunRecv(m)
         } else {
-          // Requeue the message if the connectors are not initialized
+          // Send message to myself
           p.transport.ControlSend(p.id, m)
         }
       }
+    }
 
-    default:
-      // allow other nodes in simulation run
+    // No useful work done
+    if !any {
       runtime.Gosched()
     }
   }
