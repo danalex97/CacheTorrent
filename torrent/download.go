@@ -3,9 +3,9 @@ package torrent
 // This file follows the 'download.py' file from BitTorrent 5.3.0 release.
 
 import (
+  . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
   "strconv"
-  // "runtime"
 )
 
 const backlog int = config.Backlog
@@ -40,26 +40,29 @@ func NewDownload(connector *Connector) *Download {
 func (d *Download) Run() {
   // Watch the link to deliver the piece messages
   for {
-    data, ok := <-d.handshake.Downlink().Download()
-    if !ok {
-      // channel closed
-      break
-    }
+    data := <-d.handshake.Downlink().Download()
+    piece := pieceFromDownload(d.from, data)
 
-    index, _ := strconv.Atoi(data.Id)
-    length   := data.Size
-    // assumes equal sized pieces
-    begin    := index * length
-
-    piece := piece{
-      d.from,
-      index,
-      begin,
-      data,
-    }
-
-    // send message to myself
+    // send message to myself (to avoid races)
     d.Transport.ControlSend(d.me, piece)
+  }
+}
+
+func (d *Download) handlePending() {
+  if !d.handshake.Done() {
+    return
+  }
+
+  // Handle pending downloads. We deliver pieces directly
+  // as we are in the Recv goroutine.
+  for {
+    select {
+    case data := <-d.handshake.Downlink().Download():
+      piece := pieceFromDownload(d.from, data)
+      d.gotPiece(piece)
+    default:
+      return
+    }
   }
 }
 
@@ -77,6 +80,9 @@ func (d *Download) Recv(m interface {}) {
 }
 
 func (d *Download) gotChoke(msg choke) {
+  // Handle all pending downloads
+  d.handlePending()
+
   // Make connection as choked
   d.connector.choked = true
 
@@ -87,7 +93,6 @@ func (d *Download) gotChoke(msg choke) {
   }
   // Redistribute the requests for lost pieces
   d.Choker.Lost()
-  // [TODO] race with download...
 
   // Handle control messages
   if len(d.activeRequests) > 0 {
@@ -184,5 +189,19 @@ func (d *Download) interested(now bool) {
     } else {
       d.Transport.ControlSend(d.from, notInterested{d.me})
     }
+  }
+}
+
+func pieceFromDownload(from string, data Data) piece {
+  index, _ := strconv.Atoi(data.Id)
+  length   := data.Size
+  // assumes equal sized pieces
+  begin    := index * length
+
+  return piece{
+    from,
+    index,
+    begin,
+    data,
   }
 }

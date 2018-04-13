@@ -74,3 +74,10 @@ func (h *Handshake) handleReq(req connReq) {
   h.downlink = req.link
   h.done = true
 }
+
+func (h *Handshake) Done() bool {
+  h.RLock()
+  defer h.RUnlock()
+
+  return h.done
+}
