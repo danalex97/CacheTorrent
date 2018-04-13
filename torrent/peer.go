@@ -96,6 +96,12 @@ func (p *Peer) InitRecv() {
       continue
     }
 
+    // fmt.Print("[")
+    // for _, m := range messages {
+    //   fmt.Print(m, reflect.TypeOf(m), ", ")
+    // }
+    // fmt.Println("]")
+
     // Process all pending messages
     any := false
     for _, m := range messages {

@@ -78,7 +78,7 @@ func (d *Download) Recv(m interface {}) {
     // Redistribute the requests for lost pieces
     d.Choker.Lost()
     // Stop the download link as well
-    d.handshake.Downlink().Clear()
+    // [TODO] d.handshake.Downlink().Clear()
 
     // Handle control messages
     if len(d.activeRequests) > 0 {

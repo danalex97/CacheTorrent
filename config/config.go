@@ -7,9 +7,9 @@ const MinNodes int = 10
 const Seeds    int = 1
 
 const PieceSize int = 10
-const Pieces    int = 3
+const Pieces    int = 10
 
-const Uploads     int = 10
+const Uploads     int = 0
 const Optimistics int = 1
 const Interval    int = 10000 // milliseconds
 
