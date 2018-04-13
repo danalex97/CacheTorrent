@@ -16,6 +16,9 @@ type Download struct {
   me   string // the node that downloads
   from string // the node that we download from
 
+  interested bool // if I am interested in uploader's pieces
+  choked     bool // if the peer that uploads to me chokes me
+
   activeRequests map[int]bool // requests that were made, but we still
   // did not received a piece back as a response
   handshake *Handshake
@@ -25,15 +28,18 @@ type Download struct {
 
 func NewDownload(connector *Connector) *Download {
   return &Download{
-    connector.components,
+    Components: connector.components,
 
-    connector.from,
-    connector.to,
+    me:   connector.from,
+    from: connector.to,
 
-    make(map[int]bool),
-    connector.handshake,
+    interested: false, // I am not interested in anything
+    choked:     true,  // everybody chokes us
 
-    connector,
+    activeRequests: make(map[int]bool),
+    handshake: connector.handshake,
+
+    connector: connector,
   }
 }
 
@@ -84,7 +90,7 @@ func (d *Download) gotChoke(msg choke) {
   d.handlePending()
 
   // Make connection as choked
-  d.connector.choked = true
+  d.choked = true
 
   // Request queued pieces that were lost from the peer that choked us
   for p, _ := range d.activeRequests {
@@ -97,12 +103,12 @@ func (d *Download) gotChoke(msg choke) {
   // Handle control messages
   if len(d.activeRequests) > 0 {
     // Send interested message to node, since I am choked
-    d.interested(true)
+    d.changeInterest(true)
   } else {
     // If there is no piece that I am interested in, then I am not
     // interested any more.
     _, ok := d.Picker.Next(d.from)
-    d.interested(ok)
+    d.changeInterest(ok)
   }
 
   // Since I am choked, I remove all activeRequests
@@ -111,7 +117,7 @@ func (d *Download) gotChoke(msg choke) {
 
 func (d *Download) gotUnchoke(msg unchoke) {
   // Request pieces from peer
-  d.connector.choked = false
+  d.choked = false
 
   d.RequestMore()
 }
@@ -139,11 +145,11 @@ func (d *Download) gotHave(msg have) {
   index := msg.index
 
   // send interested if I'm not interested and chocked
-  if d.connector.choked && !d.connector.interested {
+  if d.choked && !d.interested {
     // I need to be interested in the piece as well
     if _, ok := d.Storage.Have(index); !ok {
       // Send interested message to node
-      d.interested(true)
+      d.changeInterest(true)
     }
   }
 
@@ -166,7 +172,7 @@ func (d *Download) RequestMore() {
     }
 
     // If I'm not interested, become interested
-    d.interested(true)
+    d.changeInterest(true)
     d.Transport.ControlSend(d.from, request{d.me, interest})
 
     // Update active requests: since our network model is assumed
@@ -179,9 +185,9 @@ func (d *Download) RequestMore() {
   }
 }
 
-func (d *Download) interested(now bool) {
-  before := d.connector.interested
-  d.connector.interested = now
+func (d *Download) changeInterest(now bool) {
+  before := d.interested
+  d.interested = now
 
   if before != now {
     if now == true {

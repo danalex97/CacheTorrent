@@ -6,9 +6,6 @@ type Connector struct {
   from string
   to   string
 
-  interested bool 
-  choked     bool
-
   upload    *Upload
   download  *Download
   handshake *Handshake
@@ -26,9 +23,6 @@ func NewConnector(from, to string, components *Components) *Connector {
   connector.handshake  = NewHandshake(connector)
   connector.upload     = NewUpload(connector)
   connector.download   = NewDownload(connector)
-
-  connector.interested   = false
-  connector.choked     = true  // I am chocked by all peers
 
   return connector
 }
