@@ -35,28 +35,15 @@ type Choker struct {
   *sync.Mutex
 
   time      func() int
-  conns     []*Connector
+  manager    *Manager
 }
 
-func NewChoker(time func() int) *Choker {
+func NewChoker(manager *Manager, time func() int) *Choker {
   return &Choker{
-    new(sync.Mutex),
-    time,
-    []*Connector{},
-  }
-}
+    Mutex:    new(sync.Mutex),
 
-func (c *Choker) AddConnector(conn *Connector) {
-  c.Lock()
-  defer c.Unlock()
-
-  c.conns = append(c.conns, conn)
-
-  // Send haves at connection
-  s := conn.components.Storage
-  t := conn.components.Transport
-  for _, piece := range s.pieces {
-    t.ControlSend(conn.to, have{conn.from, piece.index})
+    time:     time,
+    manager:  manager,
   }
 }
 
@@ -64,10 +51,12 @@ func (c *Choker) rechoke() {
   c.Lock()
   defer c.Unlock()
 
+  conns := c.manager.Uploads()
+
   // We only upload to interested peers
-  interested := []*Connector{}
-  for _, conn := range c.conns {
-    if conn.upload.isInterested {
+  interested := []*Upload{}
+  for _, conn := range conns {
+    if conn.isInterested {
       interested = append(interested, conn)
     }
   }
@@ -104,14 +93,14 @@ func (c *Choker) rechoke() {
   }
 }
 
-func (c *Choker) Interested(conn *Connector) {
-  if !conn.upload.choke {
+func (c *Choker) Interested(conn *Upload) {
+  if !conn.choke {
     c.rechoke()
   }
 }
 
-func (c *Choker) NotInterested(conn *Connector) {
-  if !conn.upload.choke {
+func (c *Choker) NotInterested(conn *Upload) {
+  if !conn.choke {
     c.rechoke()
   }
 }
@@ -129,32 +118,5 @@ func (c *Choker) Run() {
       l = t
     }
     runtime.Gosched()
-  }
-}
-
-/**
- * We moved the responsibility of 'MultiDownload.py' to 'download.py'
- * and the functions below in the Choker as we only need a struct
- * which references the list of connections.
- */
-func (c *Choker) Lost() {
-  c.Lock()
-  defer c.Unlock()
-
-  for _, conn := range c.conns {
-    // We try to request more pieces only if the connection is not choked
-    if !conn.download.choked {
-      conn.RequestMore()
-    }
-  }
-}
-
-func (c *Choker) Have(index int) {
-  c.Lock()
-  defer c.Unlock()
-
-  for _, conn := range c.conns {
-    t := conn.components.Transport
-    t.ControlSend(conn.to, have{conn.from, index})
   }
 }

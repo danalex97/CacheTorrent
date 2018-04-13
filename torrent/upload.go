@@ -17,8 +17,6 @@ type Upload struct {
   choke        bool // If I choke to connection to that peer
 
   handshake *Handshake
-
-  connector  *Connector
 }
 
 func NewUpload(connector *Connector) *Upload {
@@ -27,7 +25,6 @@ func NewUpload(connector *Connector) *Upload {
 
     me:        connector.from,
     to:        connector.to,
-    connector: connector,
 
     isInterested: false, // initially, nobody is interested in my pieces
     choke:        true,  // initially, I choke all peers
@@ -75,8 +72,16 @@ func (u *Upload) interested(interested bool) {
   u.isInterested = interested
 
   if interested {
-    u.Choker.Interested(u.connector)
+    u.Choker.Interested(u)
   } else {
-    u.Choker.NotInterested(u.connector)
+    u.Choker.NotInterested(u)
   }
+}
+
+/*
+ * Returns the downoad rate of the connection.
+ */
+func (c *Upload) Rate() float64 {
+  // [TODO]
+  return 0
 }

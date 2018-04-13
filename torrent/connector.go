@@ -39,14 +39,6 @@ func (c *Connector) Recv(m interface {}) {
   c.download.Recv(m)
 }
 
-/*
- * Returns the downoad rate of the connection.
- */
-func (c *Connector) Rate() float64 {
-  // [TODO]
-  return 0
-}
-
 func (c *Connector) Choke() {
   c.upload.Choke()
 }

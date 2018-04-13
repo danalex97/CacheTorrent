@@ -98,7 +98,7 @@ func (d *Download) gotChoke(msg choke) {
     d.Picker.Inactive(p)
   }
   // Redistribute the requests for lost pieces
-  d.Choker.Lost()
+  d.Manager.Lost()
 
   // Handle control messages
   if len(d.activeRequests) > 0 {
@@ -134,7 +134,7 @@ func (d *Download) gotPiece(msg piece) {
   d.Storage.Store(msg)
 
   // Let the others know I have the piece
-  d.Choker.Have(index)
+  d.Manager.Have(index)
 
   // We need to request more only after we stored the piece, so we don't
   // request the same thing twice.

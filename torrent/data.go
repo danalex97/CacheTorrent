@@ -15,4 +15,5 @@ type Components struct {
   Storage       *Storage
   Transport     interfaces.Transport
   Choker        *Choker
+  Manager       *Manager
 }

@@ -150,12 +150,13 @@ func (p *Peer) Run() {
   p.components.Storage   = NewStorage(p.id, p.pieces)
   p.components.Picker    = NewPicker(p.components.Storage)
   p.components.Transport = p.transport
-  p.components.Choker    = NewChoker(p.time)
+  p.components.Manager   = NewManager()
+  p.components.Choker    = NewChoker(p.components.Manager, p.time)
 
   // make connectors
   for _, id := range p.ids {
     connector := NewConnector(p.id, id, p.components)
-    p.components.Choker.AddConnector(connector)
+    p.components.Manager.AddConnector(connector)
 
     p.connectors[id] = connector
   }
@@ -224,7 +225,7 @@ func (p *Peer) RunRecv(m interface {}) {
     connector := NewConnector(p.id, id, p.components)
 
     p.connectors[id] = connector
-    p.components.Choker.AddConnector(connector)
+    p.components.Manager.AddConnector(connector)
 
     go connector.Run()
   }
