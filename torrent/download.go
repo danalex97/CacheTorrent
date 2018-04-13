@@ -66,69 +66,84 @@ func (d *Download) Run() {
 func (d *Download) Recv(m interface {}) {
   switch msg := m.(type) {
   case choke:
-    // Make connection as choked
-    d.connector.choked = true
-
-    // Request queued pieces that were lost from the peer that choked us
-    for p, _ := range d.activeRequests {
-      // let picker know
-      d.Picker.Inactive(p)
-    }
-    // Redistribute the requests for lost pieces
-    d.Choker.Lost()
-    // [TODO] race with download...
-
-    // Handle control messages
-    if len(d.activeRequests) > 0 {
-      // Send interested message to node, since I am choked
-      d.interested(true)
-    } else {
-      // If there is no piece that I am interested in, then I am not
-      // interested any more.
-      _, ok := d.Picker.Next(d.from)
-      d.interested(ok)
-    }
-
-    // Since I am choked, I remove all activeRequests
-    d.activeRequests = make(map[int]bool)
-
+    d.gotChoke(msg)
   case unchoke:
-    // Request pieces from peer
-    d.connector.choked = false
-
-    d.RequestMore()
+    d.gotUnchoke(msg)
   case piece:
-    // Remove the request from activeRequests
-    index := msg.index
-    delete(d.activeRequests, index)
-
-    // Let Picker know active requests changed
-    d.Picker.Inactive(index)
-
-    // Store the piece
-    d.Storage.Store(msg)
-
-    // Let the others know I have the piece
-    d.Choker.Have(index)
-
-    // We need to request more only after we stored the piece, so we don't
-    // request the same thing twice.
-    d.RequestMore()
+    d.gotPiece(msg)
   case have:
-    index := msg.index
-
-    // send interested if I'm not interested and chocked
-    if d.connector.choked && !d.connector.interested {
-      // I need to be interested in the piece as well
-      if _, ok := d.Storage.Have(index); !ok {
-        // Send interested message to node
-        d.interested(true)
-      }
-    }
-
-    // let picker know I can get piece index
-    d.Picker.GotHave(d.from, index)
+    d.gotHave(msg)
   }
+}
+
+func (d *Download) gotChoke(msg choke) {
+  // Make connection as choked
+  d.connector.choked = true
+
+  // Request queued pieces that were lost from the peer that choked us
+  for p, _ := range d.activeRequests {
+    // let picker know
+    d.Picker.Inactive(p)
+  }
+  // Redistribute the requests for lost pieces
+  d.Choker.Lost()
+  // [TODO] race with download...
+
+  // Handle control messages
+  if len(d.activeRequests) > 0 {
+    // Send interested message to node, since I am choked
+    d.interested(true)
+  } else {
+    // If there is no piece that I am interested in, then I am not
+    // interested any more.
+    _, ok := d.Picker.Next(d.from)
+    d.interested(ok)
+  }
+
+  // Since I am choked, I remove all activeRequests
+  d.activeRequests = make(map[int]bool)
+}
+
+func (d *Download) gotUnchoke(msg unchoke) {
+  // Request pieces from peer
+  d.connector.choked = false
+
+  d.RequestMore()
+}
+
+func (d *Download) gotPiece(msg piece) {
+  // Remove the request from activeRequests
+  index := msg.index
+  delete(d.activeRequests, index)
+
+  // Let Picker know active requests changed
+  d.Picker.Inactive(index)
+
+  // Store the piece
+  d.Storage.Store(msg)
+
+  // Let the others know I have the piece
+  d.Choker.Have(index)
+
+  // We need to request more only after we stored the piece, so we don't
+  // request the same thing twice.
+  d.RequestMore()
+}
+
+func (d *Download) gotHave(msg have) {
+  index := msg.index
+
+  // send interested if I'm not interested and chocked
+  if d.connector.choked && !d.connector.interested {
+    // I need to be interested in the piece as well
+    if _, ok := d.Storage.Have(index); !ok {
+      // Send interested message to node
+      d.interested(true)
+    }
+  }
+
+  // let picker know I can get piece index
+  d.Picker.GotHave(d.from, index)
 }
 
 func (d *Download) RequestMore() {
