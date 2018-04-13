@@ -38,15 +38,3 @@ func (c *Connector) Recv(m interface {}) {
   c.upload.Recv(m)
   c.download.Recv(m)
 }
-
-func (c *Connector) Choke() {
-  c.upload.Choke()
-}
-
-func (c *Connector) Unchoke() {
-  c.upload.Unchoke()
-}
-
-func (c *Connector) RequestMore() {
-  c.download.RequestMore()
-}

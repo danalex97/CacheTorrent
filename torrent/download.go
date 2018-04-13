@@ -22,8 +22,6 @@ type Download struct {
   activeRequests map[int]bool // requests that were made, but we still
   // did not received a piece back as a response
   handshake *Handshake
-
-  connector *Connector
 }
 
 func NewDownload(connector *Connector) *Download {
@@ -38,8 +36,6 @@ func NewDownload(connector *Connector) *Download {
 
     activeRequests: make(map[int]bool),
     handshake: connector.handshake,
-
-    connector: connector,
   }
 }
 
@@ -98,7 +94,7 @@ func (d *Download) gotChoke(msg choke) {
     d.Picker.Inactive(p)
   }
   // Redistribute the requests for lost pieces
-  d.Manager.Lost()
+  d.Lost()
 
   // Handle control messages
   if len(d.activeRequests) > 0 {
@@ -134,7 +130,7 @@ func (d *Download) gotPiece(msg piece) {
   d.Storage.Store(msg)
 
   // Let the others know I have the piece
-  d.Manager.Have(index)
+  d.Have(index)
 
   // We need to request more only after we stored the piece, so we don't
   // request the same thing twice.
@@ -209,5 +205,25 @@ func pieceFromDownload(from string, data Data) piece {
     index,
     begin,
     data,
+  }
+}
+
+/**
+ * We moved some of the responsibility in 'MultiDownload.py',
+ * 'download.py' and 'RequestManager.py' in the downloader as we only
+ * need a struct which references the list of connections.
+ */
+func (d *Download) Lost() {
+  for _, conn := range d.Manager.Downloads() {
+    // We try to request more pieces only if the connection is not choked
+    if !conn.choked {
+      conn.RequestMore()
+    }
+  }
+}
+
+func (d *Download) Have(index int) {
+  for _, conn := range d.Manager.Downloads() {
+    d.Transport.ControlSend(conn.from, have{conn.me, index})
   }
 }

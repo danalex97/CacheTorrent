@@ -5,14 +5,13 @@ import (
 )
 
 type Manager struct {
-  *sync.Mutex
+  sync.RWMutex
 
   conns     []*Connector
 }
 
 func NewManager() *Manager {
   return &Manager{
-    Mutex : new(sync.Mutex),
     conns : []*Connector{},
   }
 }
@@ -32,8 +31,8 @@ func (m *Manager) AddConnector(conn *Connector) {
 }
 
 func (m *Manager) Uploads() (uploads []*Upload) {
-  m.Lock()
-  defer m.Unlock()
+  m.RLock()
+  defer m.RUnlock()
 
   for _, conn := range m.conns {
     uploads = append(uploads, conn.upload)
@@ -41,29 +40,12 @@ func (m *Manager) Uploads() (uploads []*Upload) {
   return
 }
 
-/**
- * We moved some of the responsibility in 'MultiDownload.py',
- * 'download.py' and 'RequestManager.py' in the Manager as we only
- * need a struct which references the list of connections.
- */
-func (m *Manager) Lost() {
-  m.Lock()
-  defer m.Unlock()
+func (m *Manager) Downloads() (downloads []*Download) {
+  m.RLock()
+  defer m.RUnlock()
 
   for _, conn := range m.conns {
-    // We try to request more pieces only if the connection is not choked
-    if !conn.download.choked {
-      conn.RequestMore()
-    }
+    downloads = append(downloads, conn.download)
   }
-}
-
-func (m *Manager) Have(index int) {
-  m.Lock()
-  defer m.Unlock()
-
-  for _, conn := range m.conns {
-    t := conn.components.Transport
-    t.ControlSend(conn.to, have{conn.from, index})
-  }
+  return
 }
