@@ -34,11 +34,9 @@ func (u *Upload) Run() {
 func (u *Upload) Recv(m interface {}) {
   switch msg := m.(type) {
   case notInterested:
-    u.connector.interested = false
-    u.interested(u.connector.interested)
+    u.interested(false)
   case interested:
-    u.connector.interested = true
-    u.interested(u.connector.interested)
+    u.interested(true)
   case request:
     meta ,_ := u.Storage.Have(msg.index)
 
@@ -53,6 +51,8 @@ func (u *Upload) Recv(m interface {}) {
 }
 
 func (u *Upload) interested(interested bool) {
+  u.connector.isInterested = interested
+
   if interested {
     u.Choker.Interested(u.connector)
   } else {

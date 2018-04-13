@@ -6,7 +6,8 @@ type Connector struct {
   from string
   to   string
 
-  interested bool
+  isInterested bool  // If the other peer is interested in my pieces
+  interested   bool  // If I'm interested in the other's upload
   choke      bool  // If I choke to connection to that peer
   choked     bool  // If I'm choked by that peer
 
@@ -28,7 +29,8 @@ func NewConnector(from, to string, components *Components) *Connector {
   connector.upload     = NewUpload(connector)
   connector.download   = NewDownload(connector)
 
-  connector.interested = false
+  connector.isInterested = false
+  connector.interested   = false
   connector.choked     = true  // I am chocked by all peers
   connector.choke      = true  // I choke all peers
 

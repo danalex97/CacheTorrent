@@ -64,24 +64,32 @@ func (c *Choker) rechoke() {
   c.Lock()
   defer c.Unlock()
 
+  // We only upload to interested peers
+  interested := []*Connector{}
+  for _, conn := range c.conns {
+    if conn.isInterested {
+      interested = append(interested, conn)
+    }
+  }
+
   // Sort the choked connections
-  sort.Slice(c.conns, func(i, j int) bool {
-    return c.conns[i].Rate() > c.conns[i].Rate()
+  sort.Slice(interested, func(i, j int) bool {
+    return interested[i].Rate() > interested[j].Rate()
   })
 
   // If we want to consider the seeds, we should use 2 separate lists.
 
   // Unchoke the pereferred connections
   unchoked := uploads
-  if unchoked > len(c.conns) {
-    unchoked = len(c.conns)
+  if unchoked > len(interested) {
+    unchoked = len(interested)
   }
   for i := 0; i < unchoked; i++ {
-    c.conns[i].Unchoke()
+    interested[i].Unchoke()
   }
 
   // Chocke the rest and handle optimistics
-  rest := c.conns[unchoked:]
+  rest := interested[unchoked:]
   unchoked = optimistics
   if unchoked > len(rest) {
     unchoked = len(rest)
@@ -97,13 +105,13 @@ func (c *Choker) rechoke() {
 }
 
 func (c *Choker) Interested(conn *Connector) {
-  if !conn.choke { // [TODO]
+  if !conn.choke {
     c.rechoke()
   }
 }
 
 func (c *Choker) NotInterested(conn *Connector) {
-  if !conn.choke { // [TODO]
+  if !conn.choke {
     c.rechoke()
   }
 }
