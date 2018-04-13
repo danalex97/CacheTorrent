@@ -6,7 +6,6 @@ import (
   "github.com/danalex97/nfsTorrent/config"
   "strconv"
   // "runtime"
-  // "fmt"
 )
 
 const backlog int = config.Backlog
@@ -77,8 +76,7 @@ func (d *Download) Recv(m interface {}) {
     }
     // Redistribute the requests for lost pieces
     d.Choker.Lost()
-    // Stop the download link as well
-    // [TODO] d.handshake.Downlink().Clear()
+    // [TODO] race with download...
 
     // Handle control messages
     if len(d.activeRequests) > 0 {

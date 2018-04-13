@@ -48,7 +48,7 @@ func NewChoker(time func() int) *Choker {
 
 func (c *Choker) AddConnector(conn *Connector) {
   c.Lock()
-  c.Unlock()
+  defer c.Unlock()
 
   c.conns = append(c.conns, conn)
 
@@ -62,7 +62,7 @@ func (c *Choker) AddConnector(conn *Connector) {
 
 func (c *Choker) rechoke() {
   c.Lock()
-  c.Unlock()
+  defer c.Unlock()
 
   // Sort the choked connections
   sort.Slice(c.conns, func(i, j int) bool {
@@ -97,14 +97,13 @@ func (c *Choker) rechoke() {
 }
 
 func (c *Choker) Interested(conn *Connector) {
-  // [TODO] Check
-  if !conn.choked {
+  if !conn.choke { // [TODO]
     c.rechoke()
   }
 }
 
 func (c *Choker) NotInterested(conn *Connector) {
-  if !conn.choked {
+  if !conn.choke { // [TODO]
     c.rechoke()
   }
 }
@@ -131,6 +130,9 @@ func (c *Choker) Run() {
  * which references the list of connections.
  */
 func (c *Choker) Lost() {
+  c.Lock()
+  defer c.Unlock()
+
   for _, conn := range c.conns {
     // We try to request more pieces only if the connection is not choked
     if !conn.choked {
@@ -140,6 +142,9 @@ func (c *Choker) Lost() {
 }
 
 func (c *Choker) Have(index int) {
+  c.Lock()
+  defer c.Unlock()
+
   for _, conn := range c.conns {
     t := conn.components.Transport
     t.ControlSend(conn.to, have{conn.from, index})

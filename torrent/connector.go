@@ -7,7 +7,8 @@ type Connector struct {
   to   string
 
   interested bool
-  choked     bool
+  choke      bool  // If I choke to connection to that peer
+  choked     bool  // If I'm choked by that peer
 
   upload    *Upload
   download  *Download
@@ -28,7 +29,8 @@ func NewConnector(from, to string, components *Components) *Connector {
   connector.download   = NewDownload(connector)
 
   connector.interested = false
-  connector.choked     = true
+  connector.choked     = true  // I am chocked by all peers
+  connector.choke      = true  // I choke all peers
 
   return connector
 }
@@ -54,11 +56,16 @@ func (c *Connector) Rate() float64 {
 }
 
 func (c *Connector) Choke() {
-  c.components.Transport.ControlSend(c.from, choke{c.to})
+  c.choke = true
+  c.components.Transport.ControlSend(c.to, choke{c.from})
+
+  // Refuse to transmit
+  c.handshake.uplink.Clear()
 }
 
 func (c *Connector) Unchoke() {
-  c.components.Transport.ControlSend(c.from, unchoke{c.to})
+  c.choke = false
+  c.components.Transport.ControlSend(c.to, unchoke{c.from})
 }
 
 func (c *Connector) RequestMore() {
