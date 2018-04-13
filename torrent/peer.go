@@ -11,6 +11,8 @@ import (
 const maxPeers int = config.InPeers + config.OutPeers
 
 type Peer struct {
+  *Components
+
   id      string
   tracker string
   ids     []string
@@ -23,7 +25,6 @@ type Peer struct {
 
   // BitTorrent components
   connectors  map[string]Runner // the connectors that were chosen by tracker
-  components *Components
 
   // used only to identify tracker
   join    string
@@ -53,7 +54,7 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
 
   peer.pieces     = []pieceMeta{}
   peer.connectors = make(map[string]Runner)
-  peer.components = new(Components)
+  peer.Components = new(Components)
 
   peer.time = util.Time()
 
@@ -147,18 +148,18 @@ func (p *Peer) Run() {
   fmt.Println(p.id, p.ids)
 
   // make per peer variables
-  p.components.Storage   = NewStorage(p.id, p.pieces)
-  p.components.Picker    = NewPicker(p.components.Storage)
-  p.components.Transport = p.transport
-  p.components.Manager   = NewManager()
-  p.components.Choker    = NewChoker(p.components.Manager, p.time)
+  p.Storage   = NewStorage(p.id, p.pieces)
+  p.Picker    = NewPicker(p.Storage)
+  p.Transport = p.transport
+  p.Manager   = NewManager()
+  p.Choker    = NewChoker(p.Manager, p.time)
 
   // make connectors
   for _, id := range p.ids {
     p.addConnector(id)
   }
 
-  go p.components.Choker.Run()
+  go p.Choker.Run()
 }
 
 func (p *Peer) RunRecv(m interface {}) {
@@ -223,10 +224,10 @@ func (p *Peer) RunRecv(m interface {}) {
 }
 
 func (p *Peer) addConnector(id string) {
-  connector := NewConnector(p.id, id, p.components)
+  connector := NewConnector(p.id, id, p.Components)
 
   p.connectors[id] = connector
-  p.components.Manager.AddConnector(connector)
+  p.Manager.AddConnector(connector)
 
   go connector.Run()
 }
