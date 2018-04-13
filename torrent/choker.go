@@ -67,7 +67,7 @@ func (c *Choker) rechoke() {
   // We only upload to interested peers
   interested := []*Connector{}
   for _, conn := range c.conns {
-    if conn.isInterested {
+    if conn.upload.isInterested {
       interested = append(interested, conn)
     }
   }
@@ -105,13 +105,13 @@ func (c *Choker) rechoke() {
 }
 
 func (c *Choker) Interested(conn *Connector) {
-  if !conn.choke {
+  if !conn.upload.choke {
     c.rechoke()
   }
 }
 
 func (c *Choker) NotInterested(conn *Connector) {
-  if !conn.choke {
+  if !conn.upload.choke {
     c.rechoke()
   }
 }

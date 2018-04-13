@@ -13,6 +13,9 @@ type Upload struct {
   me string
   to string
 
+  isInterested bool // If the other peer is interested in my pieces
+  choke        bool // If I choke to connection to that peer
+
   handshake *Handshake
 
   connector  *Connector
@@ -20,11 +23,16 @@ type Upload struct {
 
 func NewUpload(connector *Connector) *Upload {
   return &Upload{
-    connector.components,
-    connector.from,
-    connector.to,
-    connector.handshake,
-    connector,
+    Components: connector.components,
+
+    me:        connector.from,
+    to:        connector.to,
+    connector: connector,
+
+    isInterested: false, // initially, nobody is interested in my pieces
+    choke:        true,  // initially, I choke all peers
+
+    handshake: connector.handshake,
   }
 }
 
@@ -50,8 +58,21 @@ func (u *Upload) Recv(m interface {}) {
   }
 }
 
+func (u *Upload) Choke() {
+  u.choke = true
+  u.Transport.ControlSend(u.to, choke{u.me})
+
+  // Refuse to transmit
+  u.handshake.uplink.Clear()
+}
+
+func (u *Upload) Unchoke() {
+  u.choke = false
+  u.Transport.ControlSend(u.to, unchoke{u.me})
+}
+
 func (u *Upload) interested(interested bool) {
-  u.connector.isInterested = interested
+  u.isInterested = interested
 
   if interested {
     u.Choker.Interested(u.connector)
