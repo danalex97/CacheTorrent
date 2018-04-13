@@ -155,15 +155,7 @@ func (p *Peer) Run() {
 
   // make connectors
   for _, id := range p.ids {
-    connector := NewConnector(p.id, id, p.components)
-    p.components.Manager.AddConnector(connector)
-
-    p.connectors[id] = connector
-  }
-
-  // Run all connectors
-  for _, connector := range p.connectors {
-    go connector.Run()
+    p.addConnector(id)
   }
 
   go p.components.Choker.Run()
@@ -222,15 +214,19 @@ func (p *Peer) RunRecv(m interface {}) {
     /*
      * This should not be reached when we having a perfect tracker.
      */
-    connector := NewConnector(p.id, id, p.components)
-
-    p.connectors[id] = connector
-    p.components.Manager.AddConnector(connector)
-
-    go connector.Run()
+     p.addConnector(id)
   }
 
   if connector, ok := p.connectors[id]; ok {
     connector.Recv(m)
   }
+}
+
+func (p *Peer) addConnector(id string) {
+  connector := NewConnector(p.id, id, p.components)
+
+  p.connectors[id] = connector
+  p.components.Manager.AddConnector(connector)
+
+  go connector.Run()
 }
