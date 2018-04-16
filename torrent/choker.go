@@ -47,6 +47,12 @@ func NewChoker(manager *Manager, time func() int) *Choker {
   }
 }
 
+type byRate []*Upload
+
+func (a byRate) Len() int           { return len(a) }
+func (a byRate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byRate) Less(i, j int) bool { return a[i].Rate() > a[j].Rate() }
+
 func (c *Choker) rechoke() {
   c.Lock()
   defer c.Unlock()
@@ -62,9 +68,7 @@ func (c *Choker) rechoke() {
   }
 
   // Sort the choked connections
-  sort.Slice(interested, func(i, j int) bool {
-    return interested[i].Rate() > interested[j].Rate()
-  })
+  sort.Sort(byRate(interested))
 
   // If we want to consider the seeds, we should use 2 separate lists.
 
