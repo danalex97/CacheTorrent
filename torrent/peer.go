@@ -151,7 +151,7 @@ func (p *Peer) Run() {
   p.Storage   = NewStorage(p.id, p.pieces)
   p.Picker    = NewPicker(p.Storage)
   p.Transport = p.transport
-  p.Manager   = NewConnectioManager()
+  p.Manager   = NewConnectionManager()
   p.Choker    = NewChoker(p.Manager, p.time)
 
   // make connectors

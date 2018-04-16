@@ -16,7 +16,7 @@ type ConnectionManager struct {
   conns     []*Connector
 }
 
-func NewConnectioManager() Manager {
+func NewConnectionManager() Manager {
   return &ConnectionManager{
     conns : []*Connector{},
   }
@@ -29,8 +29,8 @@ func (m *ConnectionManager) AddConnector(conn *Connector) {
   m.conns = append(m.conns, conn)
 
   // Send haves at connection
-  s := conn.components.Storage
-  t := conn.components.Transport
+  s := conn.Storage
+  t := conn.Transport
   for _, index := range s.Pieces() {
     t.ControlSend(conn.to, have{conn.from, index})
   }

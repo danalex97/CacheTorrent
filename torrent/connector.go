@@ -3,23 +3,24 @@ package torrent
 // This file follows the 'Upload' BitTorrent 5.3.0 release
 
 type Connector struct {
+  *Components
+
   from string
   to   string
 
   upload    Upload
   download  *Download
   handshake Handshake
-
-  components *Components
 }
 
 func NewConnector(from, to string, components *Components) *Connector {
   connector := new(Connector)
 
+  connector.Components = components
+  
   connector.from  = from
   connector.to    = to
 
-  connector.components = components
   connector.handshake  = NewHandshake(connector)
   connector.upload     = NewUpload(connector)
   connector.download   = NewDownload(connector)

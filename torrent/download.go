@@ -26,7 +26,7 @@ type Download struct {
 
 func NewDownload(connector *Connector) *Download {
   return &Download{
-    Components: connector.components,
+    Components: connector.Components,
 
     me:   connector.from,
     from: connector.to,

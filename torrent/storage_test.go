@@ -6,6 +6,7 @@ import (
   "testing"
 )
 
+/* Tests. */
 func TestStorage(t *testing.T) {
   s := NewStorage("", []pieceMeta{})
 

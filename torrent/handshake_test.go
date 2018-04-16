@@ -31,6 +31,8 @@ func TestHandshakeBidir(t *testing.T) {
 
     assertEqual(t, h1.Uplink(), h0.Downlink())
     assertEqual(t, h0.Uplink(), h1.Downlink())
+    assertEqual(t, h1.Done(), true)
+    assertEqual(t, h0.Done(), true)
   }
 }
 
@@ -53,5 +55,7 @@ func TestHandshakeUnidir(t *testing.T) {
     go h1.Recv(<-h1.Transport.ControlRecv())
 
     assertEqual(t, h0.Uplink(), h1.Downlink())
+    assertEqual(t, h1.Done(), true)
+    assertEqual(t, h0.Done(), false)
   }
 }

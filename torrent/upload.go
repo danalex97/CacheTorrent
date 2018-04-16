@@ -32,7 +32,7 @@ type upload struct {
 
 func NewUpload(connector *Connector) Upload {
   return &upload{
-    Components: connector.components,
+    Components: connector.Components,
 
     me:        connector.from,
     to:        connector.to,
