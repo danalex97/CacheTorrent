@@ -4,6 +4,7 @@ import (
   "testing"
 )
 
+/* Tests. */
 func TestPickerChoosesRarestPiece(t *testing.T) {
   p := NewPicker(NewStorage("", []pieceMeta{}))
 
