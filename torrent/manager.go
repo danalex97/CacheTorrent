@@ -4,19 +4,25 @@ import (
   "sync"
 )
 
-type Manager struct {
+type Manager interface {
+  AddConnector(conn *Connector)
+  Uploads() []*Upload
+  Downloads() []*Download
+}
+
+type ConnectionManager struct {
   sync.RWMutex
 
   conns     []*Connector
 }
 
-func NewManager() *Manager {
-  return &Manager{
+func NewConnectioManager() Manager {
+  return &ConnectionManager{
     conns : []*Connector{},
   }
 }
 
-func (m *Manager) AddConnector(conn *Connector) {
+func (m *ConnectionManager) AddConnector(conn *Connector) {
   m.Lock()
   defer m.Unlock()
 
@@ -30,7 +36,7 @@ func (m *Manager) AddConnector(conn *Connector) {
   }
 }
 
-func (m *Manager) Uploads() (uploads []*Upload) {
+func (m *ConnectionManager) Uploads() (uploads []*Upload) {
   m.RLock()
   defer m.RUnlock()
 
@@ -40,7 +46,7 @@ func (m *Manager) Uploads() (uploads []*Upload) {
   return
 }
 
-func (m *Manager) Downloads() (downloads []*Download) {
+func (m *ConnectionManager) Downloads() (downloads []*Download) {
   m.RLock()
   defer m.RUnlock()
 

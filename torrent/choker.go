@@ -35,10 +35,10 @@ type Choker struct {
   *sync.Mutex
 
   time      func() int
-  manager    *Manager
+  manager   Manager
 }
 
-func NewChoker(manager *Manager, time func() int) *Choker {
+func NewChoker(manager Manager, time func() int) *Choker {
   return &Choker{
     Mutex:    new(sync.Mutex),
 
