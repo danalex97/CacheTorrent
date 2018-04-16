@@ -27,9 +27,10 @@ import (
   "sync"
 )
 
-const uploads     int = config.Uploads
-const optimistics int = config.Optimistics
-const interval    int = config.Interval
+// We use variables instead of constants to allow testing.
+var uploads     int = config.Uploads
+var optimistics int = config.Optimistics
+var interval    int = config.Interval
 
 type Choker struct {
   *sync.Mutex

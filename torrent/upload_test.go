@@ -13,14 +13,6 @@ type mockUpload struct {
   rate         float64
 }
 
-func NewMockUpload(rate float64) Upload {
-  return &mockUpload{
-    isInterested : false,
-    choke : true,
-    rate : rate,
-  }
-}
-
 func (m *mockUpload) Choke() {
   m.choke = true
 }
