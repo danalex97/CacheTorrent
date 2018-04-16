@@ -10,7 +10,19 @@ import (
 
 const backlog int = config.Backlog
 
-type Download struct {
+type Download interface {
+  Runner
+
+  Choked() bool
+  Interested() bool
+
+  Me()   string
+  From() string
+
+  RequestMore()
+}
+
+type download struct {
   *Components
 
   me   string // the node that downloads
@@ -24,8 +36,8 @@ type Download struct {
   handshake Handshake
 }
 
-func NewDownload(connector *Connector) *Download {
-  return &Download{
+func NewDownload(connector *Connector) Download {
+  return &download{
     Components: connector.Components,
 
     me:   connector.from,
@@ -39,7 +51,35 @@ func NewDownload(connector *Connector) *Download {
   }
 }
 
-func (d *Download) Run() {
+/*
+ *
+ */
+func (d *download) Choked() bool {
+  return d.choked
+}
+
+/*
+ *
+ */
+func (d *download) Interested() bool {
+  return d.interested
+}
+
+/*
+ *
+ */
+func (d *download) Me() string {
+  return d.me
+}
+
+/*
+ *
+ */
+func (d *download) From() string {
+  return d.from
+}
+
+func (d *download) Run() {
   // Watch the link to deliver the piece messages
   for {
     data := <-d.handshake.Downlink().Download()
@@ -50,7 +90,7 @@ func (d *Download) Run() {
   }
 }
 
-func (d *Download) handlePending() {
+func (d *download) handlePending() {
   if !d.handshake.Done() {
     return
   }
@@ -68,7 +108,7 @@ func (d *Download) handlePending() {
   }
 }
 
-func (d *Download) Recv(m interface {}) {
+func (d *download) Recv(m interface {}) {
   switch msg := m.(type) {
   case choke:
     d.gotChoke(msg)
@@ -81,7 +121,7 @@ func (d *Download) Recv(m interface {}) {
   }
 }
 
-func (d *Download) gotChoke(msg choke) {
+func (d *download) gotChoke(msg choke) {
   // Handle all pending downloads
   d.handlePending()
 
@@ -94,7 +134,7 @@ func (d *Download) gotChoke(msg choke) {
     d.Picker.Inactive(p)
   }
   // Redistribute the requests for lost pieces
-  d.Lost()
+  d.lost()
 
   // Handle control messages
   if len(d.activeRequests) > 0 {
@@ -111,14 +151,14 @@ func (d *Download) gotChoke(msg choke) {
   d.activeRequests = make(map[int]bool)
 }
 
-func (d *Download) gotUnchoke(msg unchoke) {
+func (d *download) gotUnchoke(msg unchoke) {
   // Request pieces from peer
   d.choked = false
 
   d.RequestMore()
 }
 
-func (d *Download) gotPiece(msg piece) {
+func (d *download) gotPiece(msg piece) {
   // Remove the request from activeRequests
   index := msg.index
   delete(d.activeRequests, index)
@@ -130,14 +170,14 @@ func (d *Download) gotPiece(msg piece) {
   d.Storage.Store(msg)
 
   // Let the others know I have the piece
-  d.Have(index)
+  d.have(index)
 
   // We need to request more only after we stored the piece, so we don't
   // request the same thing twice.
   d.RequestMore()
 }
 
-func (d *Download) gotHave(msg have) {
+func (d *download) gotHave(msg have) {
   index := msg.index
 
   // send interested if I'm not interested and chocked
@@ -153,7 +193,10 @@ func (d *Download) gotHave(msg have) {
   d.Picker.GotHave(d.from, index)
 }
 
-func (d *Download) RequestMore() {
+/*
+ *
+ */
+func (d *download) RequestMore() {
   size := backlog
   if len(d.activeRequests) >= size {
     return
@@ -181,7 +224,7 @@ func (d *Download) RequestMore() {
   }
 }
 
-func (d *Download) changeInterest(now bool) {
+func (d *download) changeInterest(now bool) {
   before := d.interested
   d.interested = now
 
@@ -213,17 +256,17 @@ func pieceFromDownload(from string, data Data) piece {
  * 'download.py' and 'RequestManager.py' in the downloader as we only
  * need a struct which references the list of connections.
  */
-func (d *Download) Lost() {
+func (d *download) lost() {
   for _, conn := range d.Manager.Downloads() {
     // We try to request more pieces only if the connection is not choked
-    if !conn.choked {
+    if !conn.Choked() {
       conn.RequestMore()
     }
   }
 }
 
-func (d *Download) Have(index int) {
+func (d *download) have(index int) {
   for _, conn := range d.Manager.Downloads() {
-    d.Transport.ControlSend(conn.from, have{conn.me, index})
+    d.Transport.ControlSend(conn.From(), have{conn.Me(), index})
   }
 }

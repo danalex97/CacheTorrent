@@ -9,7 +9,7 @@ type Connector struct {
   to   string
 
   upload    Upload
-  download  *Download
+  download  Download
   handshake Handshake
 }
 
@@ -17,7 +17,7 @@ func NewConnector(from, to string, components *Components) *Connector {
   connector := new(Connector)
 
   connector.Components = components
-  
+
   connector.from  = from
   connector.to    = to
 
