@@ -7,7 +7,18 @@ import (
   "strconv"
 )
 
-type Upload struct {
+type Upload interface {
+  Runner
+
+  Choke()    // Actions done when I choke a connection(upload)
+  Unchoke()  // Actions done when I unchoke a connection(upload)
+
+  Choking()      bool     // Returns if I'm choking the connection
+  IsInterested() bool     // Returns if the other peer is interested in my pieces
+  Rate()         float64  //
+}
+
+type upload struct {
   *Components
 
   me string
@@ -19,8 +30,8 @@ type Upload struct {
   handshake *Handshake
 }
 
-func NewUpload(connector *Connector) *Upload {
-  return &Upload{
+func NewUpload(connector *Connector) Upload {
+  return &upload{
     Components: connector.components,
 
     me:        connector.from,
@@ -33,10 +44,10 @@ func NewUpload(connector *Connector) *Upload {
   }
 }
 
-func (u *Upload) Run() {
+func (u *upload) Run() {
 }
 
-func (u *Upload) Recv(m interface {}) {
+func (u *upload) Recv(m interface {}) {
   switch msg := m.(type) {
   case notInterested:
     u.interested(false)
@@ -55,7 +66,7 @@ func (u *Upload) Recv(m interface {}) {
   }
 }
 
-func (u *Upload) Choke() {
+func (u *upload) Choke() {
   u.choke = true
   u.Transport.ControlSend(u.to, choke{u.me})
 
@@ -63,12 +74,12 @@ func (u *Upload) Choke() {
   u.handshake.uplink.Clear()
 }
 
-func (u *Upload) Unchoke() {
+func (u *upload) Unchoke() {
   u.choke = false
   u.Transport.ControlSend(u.to, unchoke{u.me})
 }
 
-func (u *Upload) interested(interested bool) {
+func (u *upload) interested(interested bool) {
   u.isInterested = interested
 
   if interested {
@@ -79,9 +90,23 @@ func (u *Upload) interested(interested bool) {
 }
 
 /*
+ * Return if I am choking the connection.
+ */
+func (u *upload) Choking() bool {
+  return u.choke
+}
+
+/*
+ * Return if the other peer is interested in my pieces.
+ */
+func (u *upload) IsInterested() bool {
+  return u.isInterested
+}
+
+/*
  * Returns the downoad rate of the connection.
  */
-func (c *Upload) Rate() float64 {
+func (u *upload) Rate() float64 {
   // [TODO]
   return 0
 }

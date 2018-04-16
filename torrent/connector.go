@@ -6,7 +6,7 @@ type Connector struct {
   from string
   to   string
 
-  upload    *Upload
+  upload    Upload
   download  *Download
   handshake *Handshake
 

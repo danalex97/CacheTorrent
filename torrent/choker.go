@@ -47,7 +47,7 @@ func NewChoker(manager Manager, time func() int) *Choker {
   }
 }
 
-type byRate []*Upload
+type byRate []Upload
 
 func (a byRate) Len() int           { return len(a) }
 func (a byRate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
@@ -60,9 +60,9 @@ func (c *Choker) rechoke() {
   conns := c.manager.Uploads()
 
   // We only upload to interested peers
-  interested := []*Upload{}
+  interested := []Upload{}
   for _, conn := range conns {
-    if conn.isInterested {
+    if conn.IsInterested() {
       interested = append(interested, conn)
     }
   }
@@ -97,14 +97,14 @@ func (c *Choker) rechoke() {
   }
 }
 
-func (c *Choker) Interested(conn *Upload) {
-  if !conn.choke {
+func (c *Choker) Interested(conn Upload) {
+  if !conn.Choking() {
     c.rechoke()
   }
 }
 
-func (c *Choker) NotInterested(conn *Upload) {
-  if !conn.choke {
+func (c *Choker) NotInterested(conn Upload) {
+  if !conn.Choking() {
     c.rechoke()
   }
 }

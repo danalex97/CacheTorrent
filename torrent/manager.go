@@ -6,7 +6,7 @@ import (
 
 type Manager interface {
   AddConnector(conn *Connector)
-  Uploads() []*Upload
+  Uploads() []Upload
   Downloads() []*Download
 }
 
@@ -36,7 +36,7 @@ func (m *ConnectionManager) AddConnector(conn *Connector) {
   }
 }
 
-func (m *ConnectionManager) Uploads() (uploads []*Upload) {
+func (m *ConnectionManager) Uploads() (uploads []Upload) {
   m.RLock()
   defer m.RUnlock()
 
