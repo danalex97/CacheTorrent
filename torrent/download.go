@@ -13,13 +13,13 @@ const backlog int = config.Backlog
 type Download interface {
   Runner
 
-  Choked() bool
-  Interested() bool
+  Choked() bool     // Returns if the peer that uploads to me chokes me.
+  Interested() bool // Returns if I'm interested in the uploader's piece.
 
-  Me()   string
-  From() string
+  Me()   string // The ID of the peer that I download from.
+  From() string // The ID of the peer that I download from.
 
-  RequestMore()
+  RequestMore() // Request more pieces from a the peer.
 }
 
 type download struct {
@@ -31,8 +31,12 @@ type download struct {
   interested bool // if I am interested in uploader's pieces
   choked     bool // if the peer that uploads to me chokes me
 
-  activeRequests map[int]bool // requests that were made, but we still
-  // did not received a piece back as a response
+  activeRequests map[int]bool
+  /*
+   * Requests that were made, but we still did not received a piece
+   * back as a response.
+   */
+
   handshake Handshake
 }
 
@@ -44,7 +48,7 @@ func NewDownload(connector *Connector) Download {
     from: connector.to,
 
     interested: false, // I am not interested in anything
-    choked:     true,  // everybody chokes us
+    choked:     true,  // everybody The ID of the peer that I download from.chokes us
 
     activeRequests: make(map[int]bool),
     handshake: connector.handshake,
@@ -52,28 +56,28 @@ func NewDownload(connector *Connector) Download {
 }
 
 /*
- *
+ * Returns if the peer that uploads to me chokes me.
  */
 func (d *download) Choked() bool {
   return d.choked
 }
 
 /*
- *
+ *  Returns if I'm interested in the uploader's piece.
  */
 func (d *download) Interested() bool {
   return d.interested
 }
 
 /*
- *
+ * The ID of the peer that downloads.
  */
 func (d *download) Me() string {
   return d.me
 }
 
 /*
- *
+ * The ID of the peer that I download from.
  */
 func (d *download) From() string {
   return d.from
@@ -194,7 +198,9 @@ func (d *download) gotHave(msg have) {
 }
 
 /*
+ * Request more pieces from a the peer.
  *
+ * The pieces are chosen using the Picker.
  */
 func (d *download) RequestMore() {
   size := backlog
