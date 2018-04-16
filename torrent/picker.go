@@ -18,7 +18,17 @@ import (
   "sync"
 )
 
-type Picker struct {
+/* See comments below for the interface. */
+type Picker interface {
+  GotHave(peer string, index int)
+
+  Active(index int)
+  Inactive(index int)
+
+  Next(peer string) (int, bool)
+}
+
+type picker struct {
   *sync.Mutex
 
   storage Storage
@@ -33,8 +43,8 @@ type Picker struct {
   bans   map[int]bool            // the pieces that I already have stored
 }
 
-func NewPicker(storage Storage) *Picker {
-  return &Picker{
+func NewPicker(storage Storage) Picker {
+  return &picker{
     new(sync.Mutex),
     storage,
     make(map[int]int),
@@ -45,7 +55,10 @@ func NewPicker(storage Storage) *Picker {
   }
 }
 
-func (p *Picker) GotHave(peer string, index int) {
+/*
+ * Handler for receiving a `have` message.
+ */
+func (p *picker) GotHave(peer string, index int) {
   p.Lock()
   defer p.Unlock()
 
@@ -76,7 +89,11 @@ func (p *Picker) GotHave(peer string, index int) {
   }
 }
 
-func (p *Picker) Active(index int) {
+/*
+ * Mark a certain pice as being in an active request -- that is the transfer
+ * has been scheduled, but it is not yet finished.
+ */
+func (p *picker) Active(index int) {
   p.Lock()
   defer p.Unlock()
 
@@ -86,14 +103,21 @@ func (p *Picker) Active(index int) {
   p.active[index] = p.active[index] + 1
 }
 
-func (p *Picker) Inactive(index int) {
+/*
+ * Mark a piece as inactive -- that is the request has been eliminated or
+ * the piece transfer has finished. (see `download.go`)
+ */
+func (p *picker) Inactive(index int) {
   p.Lock()
   defer p.Unlock()
 
   p.active[index] = p.active[index] - 1
 }
 
-func (p *Picker) Next(peer string) (int, bool) {
+/*
+ * Return the next piece for a certain peer.
+ */
+func (p *picker) Next(peer string) (int, bool) {
   p.Lock()
   defer p.Unlock()
 
@@ -157,7 +181,7 @@ func (p *Picker) Next(peer string) (int, bool) {
   return 0, false
 }
 
-func (p *Picker) isBanned(index int) bool {
+func (p *picker) isBanned(index int) bool {
   if _, ok := p.bans[index]; ok {
     return ok
   }
