@@ -66,16 +66,25 @@ func (u *upload) Recv(m interface {}) {
   }
 }
 
+/*
+ * Function called when we want to choke the upload connection.
+ */
 func (u *upload) Choke() {
   u.choke = true
+  // Let the other node know
   u.Transport.ControlSend(u.to, choke{u.me})
 
   // Refuse to transmit
   u.handshake.Uplink().Clear()
 }
 
+/*
+ * Function called when we want to unchoke an upload.
+ */
 func (u *upload) Unchoke() {
   u.choke = false
+
+  // Let the other node know
   u.Transport.ControlSend(u.to, unchoke{u.me})
 }
 

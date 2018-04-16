@@ -21,7 +21,7 @@ import (
 type Picker struct {
   *sync.Mutex
 
-  storage *Storage
+  storage Storage
 
   freq    map[int]int // map from index to frequency
   buckets map[int]map[int]bool // map from frequency to bucket
@@ -33,7 +33,7 @@ type Picker struct {
   bans   map[int]bool            // the pieces that I already have stored
 }
 
-func NewPicker(storage *Storage) *Picker {
+func NewPicker(storage Storage) *Picker {
   return &Picker{
     new(sync.Mutex),
     storage,

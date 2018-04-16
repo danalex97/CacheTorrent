@@ -8,7 +8,14 @@ import (
 
 const pieceNumber int = config.Pieces
 
-type Storage struct {
+type Storage interface {
+  Have(index int) (pieceMeta, bool)
+  Store(piece)
+
+  Pieces() []int
+}
+
+type storage struct {
   sync.RWMutex
 
   id        string
@@ -16,8 +23,8 @@ type Storage struct {
   completed bool
 }
 
-func NewStorage(id string, pieces []pieceMeta) *Storage {
-  storage := new(Storage)
+func NewStorage(id string, pieces []pieceMeta) Storage {
+  storage := new(storage)
 
   storage.id = id
   storage.completed = false
@@ -32,7 +39,10 @@ func NewStorage(id string, pieces []pieceMeta) *Storage {
   return storage
 }
 
-func (s *Storage) Have(index int) (pieceMeta, bool) {
+/*
+ * Returns if I have a piece(I have it downloaded and stored).
+ */
+func (s *storage) Have(index int) (pieceMeta, bool) {
   s.RLock()
   defer s.RUnlock()
 
@@ -40,7 +50,10 @@ func (s *Storage) Have(index int) (pieceMeta, bool) {
   return p, ok
 }
 
-func (s *Storage) Store(p piece) {
+/*
+ * Store a piece from a `piece` message.
+ */
+func (s *storage) Store(p piece) {
   s.Lock()
   defer s.Unlock()
 
@@ -53,7 +66,22 @@ func (s *Storage) Store(p piece) {
   s.checkCompleted()
 }
 
-func (s *Storage) checkCompleted() {
+/*
+ * Return a list of all indexes of the pieces currently stored.
+ */
+func (s *storage) Pieces() []int {
+  s.RLock()
+  defer s.RUnlock()
+
+  pieces := []int{}
+  for _, piece := range s.pieces {
+    pieces = append(pieces, piece.index)
+  }
+
+  return pieces
+}
+
+func (s *storage) checkCompleted() {
   if len(s.pieces) == pieceNumber && !s.completed {
     fmt.Println(s.id, "Completed")
     s.completed = true

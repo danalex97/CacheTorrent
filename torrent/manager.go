@@ -31,8 +31,8 @@ func (m *ConnectionManager) AddConnector(conn *Connector) {
   // Send haves at connection
   s := conn.components.Storage
   t := conn.components.Transport
-  for _, piece := range s.pieces {
-    t.ControlSend(conn.to, have{conn.from, piece.index})
+  for _, index := range s.Pieces() {
+    t.ControlSend(conn.to, have{conn.from, index})
   }
 }
 

@@ -12,7 +12,7 @@ type pieceMeta struct {
 
 type Components struct {
   Picker        *Picker
-  Storage       *Storage
+  Storage       Storage
   Transport     interfaces.Transport
   Choker        Choker
   Manager       Manager
