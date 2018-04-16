@@ -27,7 +27,7 @@ type upload struct {
   isInterested bool // If the other peer is interested in my pieces
   choke        bool // If I choke to connection to that peer
 
-  handshake *Handshake
+  handshake Handshake
 }
 
 func NewUpload(connector *Connector) Upload {
@@ -71,7 +71,7 @@ func (u *upload) Choke() {
   u.Transport.ControlSend(u.to, choke{u.me})
 
   // Refuse to transmit
-  u.handshake.uplink.Clear()
+  u.handshake.Uplink().Clear()
 }
 
 func (u *upload) Unchoke() {

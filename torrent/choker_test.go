@@ -4,10 +4,10 @@ import (
   "testing"
 )
 
-func makeChoker(uploads []Upload) ([]Upload, *Choker) {
+func makeChoker(uploads []Upload) ([]Upload, *choker) {
   return uploads, NewChoker(&mockManager{
     uploads : uploads,
-  }, func() int {return 0} )
+  }, func() int {return 0} ).(*choker)
 }
 
 func TestRechokingDecreasingByRate(t *testing.T) {

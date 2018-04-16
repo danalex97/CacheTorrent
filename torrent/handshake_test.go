@@ -20,8 +20,8 @@ func TestHandshakeBidir(t *testing.T) {
       Transport : NewTransferEngine(10, 10, "1"),
     })
 
-    h0 := NewHandshake(conn0)
-    h1 := NewHandshake(conn1)
+    h0 := NewHandshake(conn0).(*handshake)
+    h1 := NewHandshake(conn1).(*handshake)
 
     go h0.Run()
     go h1.Run()
@@ -43,8 +43,8 @@ func TestHandshakeUnidir(t *testing.T) {
       Transport : NewTransferEngine(10, 10, "1"),
     })
 
-    h0 := NewHandshake(conn0)
-    h1 := NewHandshake(conn1)
+    h0 := NewHandshake(conn0).(*handshake)
+    h1 := NewHandshake(conn1).(*handshake)
 
     // start h0 handshake
     go h0.Run()

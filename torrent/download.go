@@ -21,7 +21,7 @@ type Download struct {
 
   activeRequests map[int]bool // requests that were made, but we still
   // did not received a piece back as a response
-  handshake *Handshake
+  handshake Handshake
 }
 
 func NewDownload(connector *Connector) *Download {

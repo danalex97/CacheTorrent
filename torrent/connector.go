@@ -8,7 +8,7 @@ type Connector struct {
 
   upload    Upload
   download  *Download
-  handshake *Handshake
+  handshake Handshake
 
   components *Components
 }

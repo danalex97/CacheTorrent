@@ -6,7 +6,15 @@ import (
   "sync"
 )
 
-type Handshake struct {
+type Handshake interface {
+  Runner
+
+  Uplink()   Link
+  Downlink() Link
+  Done()     bool
+}
+
+type handshake struct {
   sync.RWMutex
   *Components
 
@@ -19,11 +27,11 @@ type Handshake struct {
   uplink   Link
 }
 
-func NewHandshake(connector *Connector) *Handshake {
+func NewHandshake(connector *Connector) Handshake {
   t    := connector.components.Transport
   link := t.Connect(connector.to)
 
-  return &Handshake{
+  return &handshake{
     Components: connector.components,
     from:       connector.from,
     to:         connector.to,
@@ -33,11 +41,11 @@ func NewHandshake(connector *Connector) *Handshake {
   }
 }
 
-func (h *Handshake) Uplink() Link {
+func (h *handshake) Uplink() Link {
   return h.uplink
 }
 
-func (h *Handshake) Downlink() Link {
+func (h *handshake) Downlink() Link {
   h.wait()
 
   h.RLock()
@@ -46,7 +54,7 @@ func (h *Handshake) Downlink() Link {
   return h.downlink
 }
 
-func (h *Handshake) wait() {
+func (h *handshake) wait() {
   h.RLock()
   for !h.done {
     h.RUnlock()
@@ -56,18 +64,18 @@ func (h *Handshake) wait() {
   h.RUnlock()
 }
 
-func (h *Handshake) Run() {
+func (h *handshake) Run() {
   h.Transport.ControlSend(h.to, connReq{h.from, h.uplink})
 }
 
-func (h *Handshake) Recv(m interface {}) {
+func (h *handshake) Recv(m interface {}) {
   switch msg := m.(type) {
   case connReq:
     h.handleReq(msg)
   }
 }
 
-func (h *Handshake) handleReq(req connReq) {
+func (h *handshake) handleReq(req connReq) {
   h.Lock()
   defer h.Unlock()
 
@@ -75,7 +83,7 @@ func (h *Handshake) handleReq(req connReq) {
   h.done = true
 }
 
-func (h *Handshake) Done() bool {
+func (h *handshake) Done() bool {
   h.RLock()
   defer h.RUnlock()
 
