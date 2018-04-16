@@ -32,15 +32,22 @@ var uploads     int = config.Uploads
 var optimistics int = config.Optimistics
 var interval    int = config.Interval
 
-type Choker struct {
+type Choker interface {
+  Interested(conn Upload)
+  NotInterested(conn Upload)
+
+  Run()
+}
+
+type choker struct {
   *sync.Mutex
 
   time      func() int
   manager   Manager
 }
 
-func NewChoker(manager Manager, time func() int) *Choker {
-  return &Choker{
+func NewChoker(manager Manager, time func() int) Choker {
+  return &choker{
     Mutex:    new(sync.Mutex),
 
     time:     time,
@@ -54,7 +61,7 @@ func (a byRate) Len() int           { return len(a) }
 func (a byRate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a byRate) Less(i, j int) bool { return a[i].Rate() > a[j].Rate() }
 
-func (c *Choker) rechoke() {
+func (c *choker) rechoke() {
   c.Lock()
   defer c.Unlock()
 
@@ -98,19 +105,19 @@ func (c *Choker) rechoke() {
   }
 }
 
-func (c *Choker) Interested(conn Upload) {
+func (c *choker) Interested(conn Upload) {
   if !conn.Choking() {
     c.rechoke()
   }
 }
 
-func (c *Choker) NotInterested(conn Upload) {
+func (c *choker) NotInterested(conn Upload) {
   if !conn.Choking() {
     c.rechoke()
   }
 }
 
-func (c *Choker) Run() {
+func (c *choker) Run() {
   c.rechoke()
   t := c.time()
   l := t
