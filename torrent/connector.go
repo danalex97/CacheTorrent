@@ -1,7 +1,10 @@
 package torrent
 
-// This file follows the 'Upload' BitTorrent 5.3.0 release
-
+/**
+ * This file follows the 'Upload' BitTorrent 5.3.0 release.
+ *
+ * The connector is only an interface towards upload and download.
+ */
 type Connector struct {
   *Components
 

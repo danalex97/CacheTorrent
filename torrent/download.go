@@ -1,6 +1,11 @@
 package torrent
 
-// This file follows the 'download.py' file from BitTorrent 5.3.0 release.
+/**
+ * This file follows the 'download.py' file from BitTorrent 5.3.0 release.
+ *
+ * We moved here some of the responsibility of 'MultiDownload.py'
+ * and 'RequestManager.py'.
+ */
 
 import (
   . "github.com/danalex97/Speer/interfaces"

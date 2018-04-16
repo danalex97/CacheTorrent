@@ -4,6 +4,17 @@ import (
   "testing"
 )
 
+/* Mocks. */
+type mockChoker struct {
+  interestedCalled    bool
+  notInterestedCalled bool
+}
+
+func (c *mockChoker) Interested(conn Upload) { c.interestedCalled = true }
+func (c *mockChoker) NotInterested(conn Upload) { c.notInterestedCalled = true }
+func (c *mockChoker) Run() {}
+
+/* Testing. */
 func makeChoker(uploads []Upload) ([]Upload, *choker) {
   return uploads, NewChoker(&mockManager{
     uploads : uploads,
