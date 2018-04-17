@@ -218,6 +218,11 @@ func (d *download) RequestMore() {
     interest, ok := d.Picker.Next(d.from)
     if !ok {
       // We can't find any useful piece to request
+      if len(d.activeRequests) == 0 {
+        // If we can't find any useful piece and the length of active requests
+        // is 0, then we are no longer interested.
+        d.changeInterest(false)
+      }
       break
     }
 
