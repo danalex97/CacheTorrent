@@ -54,11 +54,11 @@ func (u *upload) Recv(m interface {}) {
   case Interested:
     u.interested(true)
   case Request:
-    meta ,_ := u.Storage.Have(msg.index)
+    meta ,_ := u.Storage.Have(msg.Index)
 
     toUpload := Data{
-      strconv.Itoa(meta.index),
-      meta.length,
+      strconv.Itoa(meta.Index),
+      meta.Length,
     }
 
     // When we receive a request we can upload the piece.

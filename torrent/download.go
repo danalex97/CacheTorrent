@@ -169,7 +169,7 @@ func (d *download) gotUnchoke(msg Unchoke) {
 
 func (d *download) gotPiece(msg Piece) {
   // Remove the request from activeRequests
-  index := msg.index
+  index := msg.Index
   delete(d.activeRequests, index)
 
   // Let Picker know active requests changed
@@ -187,7 +187,7 @@ func (d *download) gotPiece(msg Piece) {
 }
 
 func (d *download) gotHave(msg Have) {
-  index := msg.index
+  index := msg.Index
 
   // send interested if I'm not interested and chocked
   if d.choked && !d.interested {

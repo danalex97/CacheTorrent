@@ -5,9 +5,9 @@ import (
 )
 
 type PieceMeta struct {
-  index  int
-  begin  int
-  length int
+  Index  int
+  Begin  int
+  Length int
 }
 
 type Components struct {

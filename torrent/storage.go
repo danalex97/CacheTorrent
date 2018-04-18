@@ -31,7 +31,7 @@ func NewStorage(id string, pieces []PieceMeta) Storage {
 
   storage.pieces = make(map[int]PieceMeta)
   for _, p := range pieces {
-    storage.pieces[p.index] = p
+    storage.pieces[p.Index] = p
   }
 
   storage.checkCompleted()
@@ -57,10 +57,10 @@ func (s *storage) Store(p Piece) {
   s.Lock()
   defer s.Unlock()
 
-  s.pieces[p.index] = PieceMeta{
-    p.index,
-    p.begin,
-    p.piece.Size,
+  s.pieces[p.Index] = PieceMeta{
+    p.Index,
+    p.Begin,
+    p.Piece.Size,
   }
 
   s.checkCompleted()
@@ -75,7 +75,7 @@ func (s *storage) Pieces() []int {
 
   pieces := []int{}
   for _, piece := range s.pieces {
-    pieces = append(pieces, piece.index)
+    pieces = append(pieces, piece.Index)
   }
 
   return pieces

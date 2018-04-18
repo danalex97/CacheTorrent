@@ -66,7 +66,7 @@ func (p *Peer) Init() {
   p.Transport.ControlSend(p.join, TrackerReq{p.Id})
 
   msg := <-p.Transport.ControlRecv()
-  p.Tracker = msg.(TrackerRes).id
+  p.Tracker = msg.(TrackerRes).Id
 
   // The peer should be initialized
   fmt.Printf("Node %s started with tracker %s\n", p.Id, p.Tracker)
@@ -115,16 +115,16 @@ func (p *Peer) Bind(m interface {}) (any bool) {
   switch msg := m.(type) {
   case TrackerReq:
     any = true
-    p.Transport.ControlSend(msg.from, TrackerRes{p.Tracker})
+    p.Transport.ControlSend(msg.From, TrackerRes{p.Tracker})
   case Neighbours:
     any = true
-    p.Ids = msg.ids
+    p.Ids = msg.Ids
 
     // Find if I'm a seed
     p.Transport.ControlSend(p.Tracker, SeedReq{p.Id})
   case SeedRes:
     any = true
-    p.Pieces = msg.pieces
+    p.Pieces = msg.Pieces
 
     // Since we do Run here, it must be that it will not hang
     p.Run()
@@ -168,28 +168,28 @@ func (p *Peer) RunRecv(m interface {}) {
   // Redirect the message to the connector
   switch msg := m.(type) {
   case Choke:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Unchoke:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Interested:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case NotInterested:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Have:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Request:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Piece:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case ConnReq:
-    id = msg.id
+    id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   }
 

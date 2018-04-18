@@ -79,7 +79,7 @@ func (h *handshake) handleReq(req ConnReq) {
   h.Lock()
   defer h.Unlock()
 
-  h.downlink = req.link
+  h.downlink = req.Link
   h.done = true
 }
 

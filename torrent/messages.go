@@ -5,52 +5,52 @@ import (
 )
 
 /* Original BitTorrent protocol messages. */
-type Choke struct { id string }
-type Unchoke struct { id string }
-type Interested struct { id string }
-type NotInterested struct { id string }
+type Choke struct { Id string }
+type Unchoke struct { Id string }
+type Interested struct { Id string }
+type NotInterested struct { Id string }
 
 // A have message is sent to neighbours whenever a peer
 // obtains a new piece.
 type Have struct {
-  id    string
-  index int // Index of the piece that I have
+  Id    string
+  Index int // Index of the piece that I have
 }
 
 type Request struct {
-  id string
+  Id string
 
-  index  int
+  Index  int
   // We only use the index for requests instead of specifying
   // the begin and length of the data.
 }
 
 // The actual piece as a response to a `request` message
 type Piece struct {
-  id string
+  Id string
 
-  index  int
-  begin  int
-  piece  Data
+  Index  int
+  Begin  int
+  Piece  Data
 }
 
 // We do not model endgame mode, so we have no `cancel` message
 
 /* Tracker control messages. */
 type Join struct {
-  id string
+  Id string
 }
 
 type Neighbours struct {
-  ids []string
+  Ids []string
 }
 
 type TrackerReq struct {
-  from string
+  From string
 }
 
 type TrackerRes struct {
-  id string
+  Id string
 }
 
 /* Used to model seeds:
@@ -58,16 +58,16 @@ type TrackerRes struct {
     - in seed response finds if its a seed how many pieces it has
  */
 type SeedReq struct {
-  from string
+  From string
 }
 
 type SeedRes struct {
-  pieces []PieceMeta
+  Pieces []PieceMeta
 }
 
 /* Connections */
 
 type ConnReq struct {
-  id   string
-  link Link
+  Id   string
+  Link Link
 }
