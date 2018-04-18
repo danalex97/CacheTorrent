@@ -7,32 +7,32 @@ import (
   "math/rand"
 )
 
-const minNodes       int = config.MinNodes
-const peerNeighbours int = config.OutPeers
-const seeds          int = config.Seeds
-const pieces         int = config.Pieces
-const pieceSize      int = config.PieceSize
+const MinNodes       int = config.MinNodes
+const PeerNeighbours int = config.OutPeers
+const Seeds          int = config.Seeds
+const Pieces         int = config.Pieces
+const PieceSize      int = config.PieceSize
 
 type Tracker struct {
-  ids       []string
+  Ids       []string
 
-  limit int
-  neigh int
-  id    string
+  Limit int
+  Neigh int
+  Id    string
 
-  transport Transport
+  Transport Transport
 }
 
 func (t *Tracker) New(util TorrentNodeUtil) TorrentNode {
   tracker := new(Tracker)
 
-  tracker.ids       = []string{}
+  tracker.Ids       = []string{}
 
-  tracker.limit = minNodes
-  tracker.neigh = peerNeighbours
-  tracker.id     = util.Id()
+  tracker.Limit = MinNodes
+  tracker.Neigh = PeerNeighbours
+  tracker.Id    = util.Id()
 
-  tracker.transport = util.Transport()
+  tracker.Transport = util.Transport()
 
   return tracker
 }
@@ -47,7 +47,7 @@ func (t *Tracker) OnLeave() {
 func (t *Tracker) CheckMessages(process func(interface {})) {
   for {
     select {
-    case m, ok := <-t.transport.ControlRecv():
+    case m, ok := <-t.Transport.ControlRecv():
       if !ok {
         // Channel closed
         break
@@ -66,29 +66,29 @@ func (t *Tracker) Recv(m interface {}) {
   case Join:
     t.join(msg)
   case TrackerReq:
-    t.transport.ControlSend(msg.From, TrackerRes{t.id})
+    t.Transport.ControlSend(msg.From, TrackerRes{t.Id})
   case SeedReq:
-    t.transport.ControlSend(msg.From, t.seedRequest(msg))
+    t.Transport.ControlSend(msg.From, t.seedRequest(msg))
   }
 }
 
 func (t *Tracker) join(msg Join) {
   // Add the new peer
-  t.ids = append(t.ids, msg.Id)
+  t.Ids = append(t.Ids, msg.Id)
 
   // We need to let all pending nodes know the
   // neighbour list
-  if len(t.ids) == t.limit {
-    for _, id := range t.ids {
-      t.transport.ControlSend(id, t.neighbours(id))
+  if len(t.Ids) == t.Limit {
+    for _, id := range t.Ids {
+      t.Transport.ControlSend(id, t.neighbours(id))
     }
   }
 
   // We need to let the current node know the
   // neighbour list
-  if len(t.ids) > t.limit {
+  if len(t.Ids) > t.Limit {
     id := msg.Id
-    t.transport.ControlSend(id, t.neighbours(id))
+    t.Transport.ControlSend(id, t.neighbours(id))
   }
 }
 
@@ -104,23 +104,23 @@ func newNeigh(allIds, ids []string) string {
 
 func (t *Tracker) neighbours(id string) Neighbours {
   neighbours := Neighbours{[]string{}}
-  for i := 0; i < t.neigh; i++ {
-    id := newNeigh(t.ids, append(neighbours.Ids, id))
+  for i := 0; i < t.Neigh; i++ {
+    id := newNeigh(t.Ids, append(neighbours.Ids, id))
     neighbours.Ids = append(neighbours.Ids, id)
   }
   return neighbours
 }
 
 func (t *Tracker) seedRequest(req SeedReq) SeedRes {
-  for i, id := range t.ids {
+  for i, id := range t.Ids {
     if id == req.From {
-      if i < seeds {
+      if i < Seeds {
         // It's a seed
         ps     := []PieceMeta{}
         begin  := 0
-        length := pieceSize
+        length := PieceSize
 
-        for j := 0; j < pieces; j++ {
+        for j := 0; j < Pieces; j++ {
           ps    = append(ps, PieceMeta{j, begin, length})
           begin = begin + length
         }
