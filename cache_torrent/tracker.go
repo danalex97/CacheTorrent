@@ -3,6 +3,7 @@ package cache_torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/torrent"
+  "strings"
 )
 
 type Tracker struct {
@@ -37,6 +38,17 @@ func (t *Tracker) Neighbours(id string) interface {} {
   }
 }
 
+func getAS(id string) string {
+  // We assume that ID is of form [AS].[NBR]
+  return strings.Split(id, ".")[0]
+}
+
 func (t *Tracker) Local(id string) []string {
-  return []string{}
+  local := []string{}
+  for _, nid := range t.Ids {
+    if getAS(id) == getAS(nid) && id != nid {
+      local = append(local, nid)
+    }
+  }
+  return local
 }
