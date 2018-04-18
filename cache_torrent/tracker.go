@@ -14,7 +14,7 @@ type Tracker struct {
 func (t *Tracker) New(util TorrentNodeUtil) TorrentNode {
   tracker := new(Tracker)
   tracker.Tracker  = (tracker.Tracker.New(util)).(*torrent.Tracker)
-  tracker.election = NewElection(tracker.Limit)
+  tracker.election = NewElection(tracker.Limit, tracker.Transport)
   return tracker
 }
 

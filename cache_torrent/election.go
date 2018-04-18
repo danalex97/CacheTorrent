@@ -1,10 +1,10 @@
 package cache_torrent
 
 import (
+  . "github.com/danalex97/Speer/interfaces"
   "sync"
   "sort"
   "strings"
-  "fmt"
 )
 
 const MaxLeaders int = 1
@@ -17,14 +17,19 @@ type Election struct {
 
   camera      map[string][]string
   candidates  map[string][]Candidate
+
+  elected     map[string][]string
+  transport   Transport
 }
 
-func NewElection(limit int) *Election {
+func NewElection(limit int, transport Transport) *Election {
   return &Election{
     camera     : make(map[string][]string),
     candidates : make(map[string][]Candidate),
+    elected    : make(map[string][]string),
     limit      : limit,
     nodes      : 0,
+    transport  : transport,
   }
 }
 
@@ -42,19 +47,37 @@ func (e *Election) RegisterCandidate(candidate Candidate) {
   e.Lock()
   defer e.Unlock()
 
+  e.nodes++
+
   /* Add candidate to candidate list. */
   as := getAS(candidate.Id)
   if _, ok := e.candidates[as]; !ok {
     e.candidates[as] = []Candidate{}
   }
   e.candidates[as] = append(e.candidates[as], candidate)
+
+  // When we reach the node limit, we run the full elections.
+  if e.nodes == e.limit {
+    e.Unlock()
+    e.RunElection()
+    e.Lock()
+  }
+
+  // For ulterior joins, we only respond with the Leader messages.
+  if e.nodes > e.limit {
+    elected, ok := e.elected[as]
+    if !ok {
+      // If there are no leaders, we designate the requester as a leader.
+      // i.e. the node will, thus, follow the original BitTorrent protocol
+      elected = []string{candidate.Id}
+    }
+    e.transport.ControlSend(candidate.Id, Leaders{elected})
+  }
 }
 
 func (e *Election) NewJoin(id string) {
   e.Lock()
   defer e.Unlock()
-
-  e.nodes++
 
   /* Add id to camera. */
   as := getAS(id)
@@ -62,17 +85,6 @@ func (e *Election) NewJoin(id string) {
     e.camera[as] = []string{}
   }
   e.camera[as] = append(e.camera[as], id)
-
-  // For ulterior joins, we only respond with the Leader messages.
-  if e.nodes == e.limit {
-    e.Unlock()
-    e.RunElection()
-    e.Lock()
-  }
-
-  if e.nodes > e.limit {
-    // [TODO]
-  }
 }
 
 /* Run elections for all ASes. */
@@ -80,7 +92,19 @@ func (e *Election) RunElection() {
   e.Lock()
   defer e.Unlock()
 
-  fmt.Println("Running full election.")
+  for as, _ := range e.camera {
+    e.Unlock()
+    e.elected[as] = e.Elect(as)
+    e.Lock()
+  }
+
+  // Send Leader messages
+  for as, camera := range e.camera {
+    elected := e.elected[as]
+    for _, node := range camera {
+      e.transport.ControlSend(node, Leaders{elected})
+    }
+  }
 }
 
 type byId []Candidate
@@ -94,13 +118,22 @@ func (e *Election) Elect(as string) []string {
   e.Lock()
   defer e.Unlock()
 
-  candidates := e.candidates[as]
+  candidates, ok := e.candidates[as]
+  if !ok {
+    // If there are no candidates, we designate all nodes as leaders,
+    // i.e. each node will be able to communicate with the exterior
+    return e.camera[as]
+  }
 
   // Sort the candidates by a criteria
   sort.Sort(byId(candidates))
 
-  leaders := []string{}
-  for i := 0; i < MaxLeaders; i++ {
+  leaders    := []string{}
+  maxLeaders := MaxLeaders
+  if len(candidates) < maxLeaders {
+    maxLeaders = len(candidates)
+  }
+  for i := 0; i < maxLeaders; i++ {
     leaders = append(leaders, candidates[i].Id)
   }
 
