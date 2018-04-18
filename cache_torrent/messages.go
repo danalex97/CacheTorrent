@@ -5,6 +5,16 @@ package cache_torrent
  */
 
 type Neighbours struct {
-  Ids   []string
-  Local []string
+  Ids []string
+}
+
+type Candidate struct {
+  Id string
+
+  Up   int
+  Down int
+}
+
+type Leaders struct {
+  Ids []string
 }

@@ -9,7 +9,7 @@ import (
 type Peer struct {
   *torrent.Peer
 
-  Local []string
+  Leaders []string
 }
 
 func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
@@ -40,12 +40,19 @@ func (p *Peer) Bind(m interface {}) (any bool) {
   case Neighbours:
     // Location awareness extension
     any = true
-    p.Ids   = msg.Ids
-    p.Local = msg.Local
+    p.Ids = msg.Ids
 
-    fmt.Println("Local:", p.Local)
+    // Candidate in the Leader Election
+    p.Transport.ControlSend(p.Tracker, Candidate{
+      Id   : p.Id,
+      Up   : p.Transport.Up(),
+      Down : p.Transport.Down(),
+    })
+  case Leaders:
+    p.Leaders = msg.Ids
+    fmt.Println(p.Id, "has Leaders", p.Leaders)
 
-    // Find if I'm a seed
+    // Check if I am a seed
     p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
   default:
     any = p.Peer.Bind(m)
