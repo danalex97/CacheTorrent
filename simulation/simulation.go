@@ -14,7 +14,8 @@ func SmallTorrentSimulation() Simulation {
   nodeTemplate := new(simulatedCachedNode)
   return sdk.NewDHTSimulationBuilder(nodeTemplate).
     WithPoissonProcessModel(2, 2).
-    WithInternetworkUnderlay(10, 50, 20, 50).
+    // WithInternetworkUnderlay(10, 50, 20, 50).
+    WithInternetworkUnderlay(10, 50, 2, 50). 
     WithDefaultQueryGenerator().
     WithLimitedNodes(config.MinNodes + 1).
     // WithMetrics().
