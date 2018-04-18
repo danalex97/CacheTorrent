@@ -22,7 +22,7 @@ type simulatedCachedNode struct {
 
 func (s *simulatedCachedNode) New(util TorrentNodeUtil) TorrentNode {
   if util.Join() == "" {
-    return new(torrent.Tracker).New(util)
+    return new(cache_torrent.Tracker).New(util)
   } else {
     return new(cache_torrent.Peer).New(util)
   }
