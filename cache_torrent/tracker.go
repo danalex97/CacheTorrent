@@ -20,9 +20,23 @@ func (t *Tracker) OnJoin() {
 }
 
 func (t *Tracker) Recv(m interface {}) {
-  switch m.(type) {
+  switch msg := m.(type) {
+  /* New Protocol. */
+  case torrent.Join:
+    t.Join(msg, t.Neighbours)
   default:
     /* Backward compatibility. */
     t.Tracker.Recv(m)
   }
+}
+
+func (t *Tracker) Neighbours(id string) interface {} {
+  return Neighbours{
+    Ids   : (t.Tracker.Neighbours(id)).(torrent.Neighbours).Ids,
+    Local : t.Local(id),
+  }
+}
+
+func (t *Tracker) Local(id string) []string {
+  return []string{}
 }

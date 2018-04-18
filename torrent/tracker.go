@@ -64,7 +64,7 @@ func (t *Tracker) CheckMessages(process func(interface {})) {
 func (t *Tracker) Recv(m interface {}) {
   switch msg := m.(type) {
   case Join:
-    t.join(msg)
+    t.Join(msg, t.Neighbours)
   case TrackerReq:
     t.Transport.ControlSend(msg.From, TrackerRes{t.Id})
   case SeedReq:
@@ -72,7 +72,7 @@ func (t *Tracker) Recv(m interface {}) {
   }
 }
 
-func (t *Tracker) join(msg Join) {
+func (t *Tracker) Join(msg Join, getNeighbours func(string) interface {}) {
   // Add the new peer
   t.Ids = append(t.Ids, msg.Id)
 
@@ -80,7 +80,7 @@ func (t *Tracker) join(msg Join) {
   // neighbour list
   if len(t.Ids) == t.Limit {
     for _, id := range t.Ids {
-      t.Transport.ControlSend(id, t.neighbours(id))
+      t.Transport.ControlSend(id, getNeighbours(id))
     }
   }
 
@@ -88,7 +88,7 @@ func (t *Tracker) join(msg Join) {
   // neighbour list
   if len(t.Ids) > t.Limit {
     id := msg.Id
-    t.Transport.ControlSend(id, t.neighbours(id))
+    t.Transport.ControlSend(id, getNeighbours(id))
   }
 }
 
@@ -102,7 +102,7 @@ func newNeigh(allIds, ids []string) string {
   return n
 }
 
-func (t *Tracker) neighbours(id string) Neighbours {
+func (t *Tracker) Neighbours(id string) interface {} {
   neighbours := Neighbours{[]string{}}
   for i := 0; i < t.Neigh; i++ {
     id := newNeigh(t.Ids, append(neighbours.Ids, id))

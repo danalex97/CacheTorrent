@@ -3,6 +3,7 @@ package cache_torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/torrent"
+  "fmt"
 )
 
 type Peer struct {
@@ -41,6 +42,8 @@ func (p *Peer) Bind(m interface {}) (any bool) {
     any = true
     p.Ids   = msg.Ids
     p.Local = msg.Local
+
+    fmt.Println("Local:", p.Local)
 
     // Find if I'm a seed
     p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
