@@ -1,12 +1,10 @@
 package cache_torrent
 
 /**
- * Used for location awareness.
+ * Location awareness extension.
  */
-type LocalReq struct {
-  Id string
-}
 
-type LocalRes struct {
-  Ids []string
+type Neighbours struct {
+  Ids   []string
+  Local []string
 }

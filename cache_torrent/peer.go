@@ -7,6 +7,8 @@ import (
 
 type Peer struct {
   *torrent.Peer
+
+  Local []string
 }
 
 func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
@@ -25,13 +27,23 @@ func (p *Peer) OnJoin() {
 }
 
 func (p *Peer) Bind(m interface {}) (any bool) {
-  switch m.(type) {
+  switch msg := m.(type) {
+  /* Backward compatible. */
   case torrent.TrackerReq:
     any = p.Peer.Bind(m)
   case torrent.Neighbours:
     any = p.Peer.Bind(m)
   case torrent.SeedRes:
     any = p.Peer.Bind(m)
+  /* New Protocol. */
+  case Neighbours:
+    // Location awareness extension
+    any = true
+    p.Ids   = msg.Ids
+    p.Local = msg.Local
+
+    // Find if I'm a seed
+    p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
   default:
     any = p.Peer.Bind(m)
   }
@@ -39,5 +51,9 @@ func (p *Peer) Bind(m interface {}) (any bool) {
 }
 
 func (p *Peer) RunRecv(m interface {}) {
+  /* Backward compatible. */
   p.Peer.RunRecv(m)
+
+  /* New Protocol. */
+  // [TODO]
 }
