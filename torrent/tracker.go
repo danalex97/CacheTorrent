@@ -26,7 +26,7 @@ type Tracker struct {
 func (t *Tracker) New(util TorrentNodeUtil) TorrentNode {
   tracker := new(Tracker)
 
-  tracker.Ids       = []string{}
+  tracker.Ids   = []string{}
 
   tracker.Limit = MinNodes
   tracker.Neigh = PeerNeighbours
