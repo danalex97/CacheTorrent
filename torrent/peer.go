@@ -17,7 +17,6 @@ type Peer struct {
   tracker string
   ids     []string
 
-  transport Transport
   time      func() int
 
   // BitTorrent protocol
@@ -32,14 +31,14 @@ type Peer struct {
 
 /* Implementation of Torrent Node interface. */
 func (p *Peer) OnJoin() {
-  // If the transport is missing, it must be we are
+  // If the Transport is missing, it must be we are
   // on torrent-less node
-  if p.transport == nil {
+  if p.Transport == nil {
     return
   }
 
   p.Init()
-  go p.InitRecv()
+  go p.InitRecv(p.RunRecv)
 }
 
 func (p *Peer) OnLeave() {
@@ -50,11 +49,11 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
 
   peer.id        = util.Id()
   peer.join      = util.Join()
-  peer.transport = util.Transport()
+  peer.Components = new(Components)
+  peer.Transport  = util.Transport()
 
   peer.pieces     = []pieceMeta{}
   peer.connectors = make(map[string]Runner)
-  peer.Components = new(Components)
 
   peer.time = util.Time()
 
@@ -64,19 +63,19 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
 /* Internal functions. */
 func (p *Peer) Init() {
   // Find out who the tracker is
-  p.transport.ControlSend(p.join, trackerReq{p.id})
+  p.Transport.ControlSend(p.join, trackerReq{p.id})
 
-  msg := <-p.transport.ControlRecv()
+  msg := <-p.Transport.ControlRecv()
   p.tracker = msg.(trackerRes).id
 
   // The peer should be initialized
   fmt.Printf("Node %s started with tracker %s\n", p.id, p.tracker)
 
   // Send join message to the tracker
-  p.transport.ControlSend(p.tracker, join{p.id})
+  p.Transport.ControlSend(p.tracker, join{p.id})
 }
 
-func (p *Peer) InitRecv() {
+func (p *Peer) InitRecv(receiver func(interface {})) {
   for {
     messages := []interface{}{}
 
@@ -84,7 +83,7 @@ func (p *Peer) InitRecv() {
     empty := false
     for !empty {
       select {
-      case m := <-p.transport.ControlRecv():
+      case m := <-p.Transport.ControlRecv():
         messages = append(messages, m)
       default:
         empty = true
@@ -109,13 +108,13 @@ func (p *Peer) InitRecv() {
       switch msg := m.(type) {
       case trackerReq:
         any = true
-        p.transport.ControlSend(msg.from, trackerRes{p.tracker})
+        p.Transport.ControlSend(msg.from, trackerRes{p.tracker})
       case neighbours:
         any = true
         p.ids = msg.ids
 
         // Find if I'm a seed
-        p.transport.ControlSend(p.tracker, seedReq{p.id})
+        p.Transport.ControlSend(p.tracker, seedReq{p.id})
       case seedRes:
         any = true
         p.pieces = msg.pieces
@@ -127,10 +126,10 @@ func (p *Peer) InitRecv() {
           any = true
 
           // All initialized
-          p.RunRecv(m)
+          receiver(m)
         } else {
           // Send message to myself
-          p.transport.ControlSend(p.id, m)
+          p.Transport.ControlSend(p.id, m)
         }
       }
     }
@@ -150,7 +149,7 @@ func (p *Peer) Run() {
   // make per peer variables
   p.Storage   = NewStorage(p.id, p.pieces)
   p.Picker    = NewPicker(p.Storage)
-  p.Transport = p.transport
+  p.Transport = p.Transport
   p.Manager   = NewConnectionManager()
   p.Choker    = NewChoker(p.Manager, p.time)
 
