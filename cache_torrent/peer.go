@@ -21,7 +21,21 @@ func (p *Peer) OnJoin() {
   }
 
   p.Init()
-  go p.InitRecv(p.RunRecv)
+  go p.CheckMessages(p.Bind)
+}
+
+func (p *Peer) Bind(m interface {}) (any bool) {
+  switch m.(type) {
+  case torrent.TrackerReq:
+    p.Peer.Bind(m)
+  case torrent.Neighbours:
+    p.Peer.Bind(m)
+  case torrent.SeedRes:
+    p.Peer.Bind(m)
+  default:
+    p.Peer.Bind(m)
+  }
+  return
 }
 
 func (p *Peer) RunRecv(m interface {}) {

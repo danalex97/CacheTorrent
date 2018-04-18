@@ -65,17 +65,17 @@ func (h *handshake) wait() {
 }
 
 func (h *handshake) Run() {
-  h.Transport.ControlSend(h.to, connReq{h.from, h.uplink})
+  h.Transport.ControlSend(h.to, ConnReq{h.from, h.uplink})
 }
 
 func (h *handshake) Recv(m interface {}) {
   switch msg := m.(type) {
-  case connReq:
+  case ConnReq:
     h.handleReq(msg)
   }
 }
 
-func (h *handshake) handleReq(req connReq) {
+func (h *handshake) handleReq(req ConnReq) {
   h.Lock()
   defer h.Unlock()
 

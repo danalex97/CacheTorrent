@@ -22,7 +22,7 @@ func TestManagerConcurrent(t *testing.T) {
     m := NewConnectionManager()
     s := NewStorage("", []pieceMeta{})
 
-    s.Store(piece{"", 0, 0, Data{"0", 10}})
+    s.Store(Piece{"", 0, 0, Data{"0", 10}})
 
     conns := []*Connector{
       NewConnector("0", "1", &Components{
@@ -48,8 +48,8 @@ func TestManagerConcurrent(t *testing.T) {
     }
 
     // Check have messages gets sent
-    assertEqual(t, <-conns[0].Transport.ControlRecv(), have{"1", 0})
-    assertEqual(t, <-conns[1].Transport.ControlRecv(), have{"0", 0})
+    assertEqual(t, <-conns[0].Transport.ControlRecv(), Have{"1", 0})
+    assertEqual(t, <-conns[1].Transport.ControlRecv(), Have{"0", 0})
 
     // Check the number of connections is 2
     go assertEqual(t, len(m.Uploads()), 2)

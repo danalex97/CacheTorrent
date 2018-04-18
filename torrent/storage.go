@@ -10,7 +10,7 @@ const pieceNumber int = config.Pieces
 
 type Storage interface {
   Have(index int) (pieceMeta, bool)
-  Store(piece)
+  Store(Piece)
 
   Pieces() []int
 }
@@ -53,7 +53,7 @@ func (s *storage) Have(index int) (pieceMeta, bool) {
 /*
  * Store a piece from a `piece` message.
  */
-func (s *storage) Store(p piece) {
+func (s *storage) Store(p Piece) {
   s.Lock()
   defer s.Unlock()
 

@@ -32,7 +32,7 @@ func (m *ConnectionManager) AddConnector(conn *Connector) {
   s := conn.Storage
   t := conn.Transport
   for _, index := range s.Pieces() {
-    t.ControlSend(conn.to, have{conn.from, index})
+    t.ControlSend(conn.to, Have{conn.from, index})
   }
 }
 

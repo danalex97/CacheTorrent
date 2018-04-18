@@ -10,15 +10,15 @@ import (
 func TestStorage(t *testing.T) {
   s := NewStorage("", []pieceMeta{})
 
-  s.Store(piece{"", 0, 0, Data{"0", 10}})
+  s.Store(Piece{"", 0, 0, Data{"0", 10}})
   val, _ := s.Have(0)
   assertEqual(t, val, pieceMeta{0, 0, 10})
 
-  s.Store(piece{"", 1, 0, Data{"1", 10}})
+  s.Store(Piece{"", 1, 0, Data{"1", 10}})
   val, _ = s.Have(1)
   assertEqual(t, val, pieceMeta{1, 0, 10})
 
-  s.Store(piece{"", 2, 0, Data{"2", 10}})
+  s.Store(Piece{"", 2, 0, Data{"2", 10}})
   val, _ = s.Have(2)
   assertEqual(t, val, pieceMeta{2, 0, 10})
 
@@ -38,7 +38,7 @@ func TestStorageConcurrent(t *testing.T) {
 
     done := make(chan bool)
     store := func (idx int) {
-      s.Store(piece{"", idx, 0, Data{"", 10}})
+      s.Store(Piece{"", idx, 0, Data{"", 10}})
       done <- true
     }
 

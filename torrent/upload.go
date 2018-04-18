@@ -49,11 +49,11 @@ func (u *upload) Run() {
 
 func (u *upload) Recv(m interface {}) {
   switch msg := m.(type) {
-  case notInterested:
+  case NotInterested:
     u.interested(false)
-  case interested:
+  case Interested:
     u.interested(true)
-  case request:
+  case Request:
     meta ,_ := u.Storage.Have(msg.index)
 
     toUpload := Data{
@@ -72,7 +72,7 @@ func (u *upload) Recv(m interface {}) {
 func (u *upload) Choke() {
   u.choke = true
   // Let the other node know
-  u.Transport.ControlSend(u.to, choke{u.me})
+  u.Transport.ControlSend(u.to, Choke{u.me})
 
   // Refuse to transmit
   u.handshake.Uplink().Clear()
@@ -85,7 +85,7 @@ func (u *upload) Unchoke() {
   u.choke = false
 
   // Let the other node know
-  u.Transport.ControlSend(u.to, unchoke{u.me})
+  u.Transport.ControlSend(u.to, Unchoke{u.me})
 }
 
 func (u *upload) interested(interested bool) {

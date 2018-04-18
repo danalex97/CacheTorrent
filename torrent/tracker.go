@@ -47,11 +47,11 @@ func (t *Tracker) OnJoin() {
         }
 
         switch msg := m.(type) {
-        case join:
+        case Join:
           t.join(msg)
-        case trackerReq:
-          t.transport.ControlSend(msg.from, trackerRes{t.id})
-        case seedReq:
+        case TrackerReq:
+          t.transport.ControlSend(msg.from, TrackerRes{t.id})
+        case SeedReq:
           t.transport.ControlSend(msg.from, t.seedRequest(msg))
         }
 
@@ -66,7 +66,7 @@ func (t *Tracker) OnJoin() {
 func (t *Tracker) OnLeave() {
 }
 
-func (t *Tracker) join(msg join) {
+func (t *Tracker) join(msg Join) {
   // Add the new peer
   t.ids = append(t.ids, msg.id)
 
@@ -96,8 +96,8 @@ func newNeigh(allIds, ids []string) string {
   return n
 }
 
-func (t *Tracker) neighbours(id string) neighbours {
-  neighbours := neighbours{[]string{}}
+func (t *Tracker) neighbours(id string) Neighbours {
+  neighbours := Neighbours{[]string{}}
   for i := 0; i < t.neigh; i++ {
     id := newNeigh(t.ids, append(neighbours.ids, id))
     neighbours.ids = append(neighbours.ids, id)
@@ -105,7 +105,7 @@ func (t *Tracker) neighbours(id string) neighbours {
   return neighbours
 }
 
-func (t *Tracker) seedRequest(req seedReq) seedRes {
+func (t *Tracker) seedRequest(req SeedReq) SeedRes {
   for i, id := range t.ids {
     if id == req.from {
       if i < seeds {
@@ -119,9 +119,9 @@ func (t *Tracker) seedRequest(req seedReq) seedRes {
           begin = begin + length
         }
 
-        return seedRes{ps}
+        return SeedRes{ps}
       } else {
-        return seedRes{[]pieceMeta{}}
+        return SeedRes{[]pieceMeta{}}
       }
     }
   }

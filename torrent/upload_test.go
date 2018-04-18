@@ -63,22 +63,22 @@ func TestChokeSendsMessageToPeer(t *testing.T) {
 
   u.Unchoke()
   assertEqual(t, u.Choking(), false)
-  assertEqual(t, <-t1.ControlRecv(), unchoke{"0"})
+  assertEqual(t, <-t1.ControlRecv(), Unchoke{"0"})
 
   u.Choke()
   assertEqual(t, u.Choking(), true)
-  assertEqual(t, <-t1.ControlRecv(), choke{"0"})
+  assertEqual(t, <-t1.ControlRecv(), Choke{"0"})
 }
 
 func TestInterestedLetsChokerKnow(t *testing.T) {
   u, _, _, c := makeUpload()
 
   assertEqual(t, c.Choker.(*mockChoker).interestedCalled, false)
-  u.Recv(interested{"0"})
+  u.Recv(Interested{"0"})
   assertEqual(t, c.Choker.(*mockChoker).interestedCalled, true)
 
   assertEqual(t, c.Choker.(*mockChoker).notInterestedCalled, false)
-  u.Recv(notInterested{"0"})
+  u.Recv(NotInterested{"0"})
   assertEqual(t, c.Choker.(*mockChoker).notInterestedCalled, true)
 }
 

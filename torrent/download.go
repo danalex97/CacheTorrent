@@ -119,18 +119,18 @@ func (d *download) handlePending() {
 
 func (d *download) Recv(m interface {}) {
   switch msg := m.(type) {
-  case choke:
+  case Choke:
     d.gotChoke(msg)
-  case unchoke:
+  case Unchoke:
     d.gotUnchoke(msg)
-  case piece:
+  case Piece:
     d.gotPiece(msg)
-  case have:
+  case Have:
     d.gotHave(msg)
   }
 }
 
-func (d *download) gotChoke(msg choke) {
+func (d *download) gotChoke(msg Choke) {
   // Handle all pending downloads
   d.handlePending()
 
@@ -160,14 +160,14 @@ func (d *download) gotChoke(msg choke) {
   d.activeRequests = make(map[int]bool)
 }
 
-func (d *download) gotUnchoke(msg unchoke) {
+func (d *download) gotUnchoke(msg Unchoke) {
   // Request pieces from peer
   d.choked = false
 
   d.RequestMore()
 }
 
-func (d *download) gotPiece(msg piece) {
+func (d *download) gotPiece(msg Piece) {
   // Remove the request from activeRequests
   index := msg.index
   delete(d.activeRequests, index)
@@ -186,7 +186,7 @@ func (d *download) gotPiece(msg piece) {
   d.RequestMore()
 }
 
-func (d *download) gotHave(msg have) {
+func (d *download) gotHave(msg Have) {
   index := msg.index
 
   // send interested if I'm not interested and chocked
@@ -228,7 +228,7 @@ func (d *download) RequestMore() {
 
     // If I'm not interested, become interested
     d.changeInterest(true)
-    d.Transport.ControlSend(d.from, request{d.me, interest})
+    d.Transport.ControlSend(d.from, Request{d.me, interest})
 
     // Update active requests: since our network model is assumed
     // to be perfect, we assume the requests that we make to be active.
@@ -246,20 +246,20 @@ func (d *download) changeInterest(now bool) {
 
   if before != now {
     if now == true {
-      d.Transport.ControlSend(d.from, interested{d.me})
+      d.Transport.ControlSend(d.from, Interested{d.me})
     } else {
-      d.Transport.ControlSend(d.from, notInterested{d.me})
+      d.Transport.ControlSend(d.from, NotInterested{d.me})
     }
   }
 }
 
-func pieceFromDownload(from string, data Data) piece {
+func pieceFromDownload(from string, data Data) Piece {
   index, _ := strconv.Atoi(data.Id)
   length   := data.Size
   // assumes equal sized pieces
   begin    := index * length
 
-  return piece{
+  return Piece{
     from,
     index,
     begin,
@@ -283,6 +283,6 @@ func (d *download) lost() {
 
 func (d *download) have(index int) {
   for _, conn := range d.Manager.Downloads() {
-    d.Transport.ControlSend(conn.From(), have{conn.Me(), index})
+    d.Transport.ControlSend(conn.From(), Have{conn.Me(), index})
   }
 }
