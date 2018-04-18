@@ -38,32 +38,38 @@ func (t *Tracker) New(util TorrentNodeUtil) TorrentNode {
 }
 
 func (t *Tracker) OnJoin() {
-  go func() {
-    for {
-      select {
-      case m, ok := <-t.transport.ControlRecv():
-        if !ok {
-          continue
-        }
-
-        switch msg := m.(type) {
-        case Join:
-          t.join(msg)
-        case TrackerReq:
-          t.transport.ControlSend(msg.From, TrackerRes{t.id})
-        case SeedReq:
-          t.transport.ControlSend(msg.From, t.seedRequest(msg))
-        }
-
-      default:
-        // allow other nodes in simulation run
-        runtime.Gosched()
-      }
-    }
-  }()
+  go t.CheckMessages(t.Recv)
 }
 
 func (t *Tracker) OnLeave() {
+}
+
+func (t *Tracker) CheckMessages(process func(interface {})) {
+  for {
+    select {
+    case m, ok := <-t.transport.ControlRecv():
+      if !ok {
+        // Channel closed
+        break
+      }
+
+      process(m)
+    default:
+      // allow other nodes in simulation run
+      runtime.Gosched()
+    }
+  }
+}
+
+func (t *Tracker) Recv(m interface {}) {
+  switch msg := m.(type) {
+  case Join:
+    t.join(msg)
+  case TrackerReq:
+    t.transport.ControlSend(msg.From, TrackerRes{t.id})
+  case SeedReq:
+    t.transport.ControlSend(msg.From, t.seedRequest(msg))
+  }
 }
 
 func (t *Tracker) join(msg Join) {
