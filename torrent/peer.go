@@ -8,22 +8,22 @@ import (
   "fmt"
 )
 
-const maxPeers int = config.InPeers + config.OutPeers
+const MaxPeers int = config.InPeers + config.OutPeers
 
 type Peer struct {
   *Components
 
-  id      string
-  tracker string
-  ids     []string
+  Id      string
+  Tracker string
+  Ids     []string
 
-  time      func() int
+  Time      func() int
 
   // BitTorrent protocol
-  pieces []PieceMeta
+  Pieces []PieceMeta
 
   // BitTorrent components
-  connectors  map[string]Runner // the connectors that were chosen by tracker
+  Connectors  map[string]Runner // the connectors that were chosen by tracker
 
   // used only to identify tracker
   join    string
@@ -47,15 +47,15 @@ func (p *Peer) OnLeave() {
 func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer := new(Peer)
 
-  peer.id        = util.Id()
+  peer.Id        = util.Id()
   peer.join      = util.Join()
   peer.Components = new(Components)
   peer.Transport  = util.Transport()
 
-  peer.pieces     = []PieceMeta{}
-  peer.connectors = make(map[string]Runner)
+  peer.Pieces     = []PieceMeta{}
+  peer.Connectors = make(map[string]Runner)
 
-  peer.time = util.Time()
+  peer.Time = util.Time()
 
   return peer
 }
@@ -63,16 +63,16 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
 /* Internal functions. */
 func (p *Peer) Init() {
   // Find out who the tracker is
-  p.Transport.ControlSend(p.join, TrackerReq{p.id})
+  p.Transport.ControlSend(p.join, TrackerReq{p.Id})
 
   msg := <-p.Transport.ControlRecv()
-  p.tracker = msg.(TrackerRes).id
+  p.Tracker = msg.(TrackerRes).id
 
   // The peer should be initialized
-  fmt.Printf("Node %s started with tracker %s\n", p.id, p.tracker)
+  fmt.Printf("Node %s started with tracker %s\n", p.Id, p.Tracker)
 
   // Send join message to the tracker
-  p.Transport.ControlSend(p.tracker, Join{p.id})
+  p.Transport.ControlSend(p.Tracker, Join{p.Id})
 }
 
 func (p *Peer) CheckMessages(process func(interface {}) bool) {
@@ -115,28 +115,28 @@ func (p *Peer) Bind(m interface {}) (any bool) {
   switch msg := m.(type) {
   case TrackerReq:
     any = true
-    p.Transport.ControlSend(msg.from, TrackerRes{p.tracker})
+    p.Transport.ControlSend(msg.from, TrackerRes{p.Tracker})
   case Neighbours:
     any = true
-    p.ids = msg.ids
+    p.Ids = msg.ids
 
     // Find if I'm a seed
-    p.Transport.ControlSend(p.tracker, SeedReq{p.id})
+    p.Transport.ControlSend(p.Tracker, SeedReq{p.Id})
   case SeedRes:
     any = true
-    p.pieces = msg.pieces
+    p.Pieces = msg.pieces
 
     // Since we do Run here, it must be that it will not hang
     p.Run()
   default:
-    if len(p.connectors) > 0 {
+    if len(p.Connectors) > 0 {
       any = true
 
       // All initialized
       p.RunRecv(m)
     } else {
       // Send message to myself
-      p.Transport.ControlSend(p.id, m)
+      p.Transport.ControlSend(p.Id, m)
     }
   }
   return
@@ -145,17 +145,17 @@ func (p *Peer) Bind(m interface {}) (any bool) {
 func (p *Peer) Run() {
   // We want to bind all these variables here, so
   // we don't need any synchroization.
-  fmt.Println(p.id, p.ids)
+  fmt.Println(p.Id, p.Ids)
 
   // make per peer variables
-  p.Storage   = NewStorage(p.id, p.pieces)
+  p.Storage   = NewStorage(p.Id, p.Pieces)
   p.Picker    = NewPicker(p.Storage)
   p.Transport = p.Transport
   p.Manager   = NewConnectionManager()
-  p.Choker    = NewChoker(p.Manager, p.time)
+  p.Choker    = NewChoker(p.Manager, p.Time)
 
   // make connectors
-  for _, id := range p.ids {
+  for _, id := range p.Ids {
     p.addConnector(id)
   }
 
@@ -169,28 +169,28 @@ func (p *Peer) RunRecv(m interface {}) {
   switch msg := m.(type) {
   case Choke:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Unchoke:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Interested:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case NotInterested:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Have:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Request:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Piece:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case ConnReq:
     id = msg.id
-    // fmt.Println("Msg:", p.id, reflect.TypeOf(msg), msg)
+    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   }
 
   if id == "" {
@@ -210,23 +210,23 @@ func (p *Peer) RunRecv(m interface {}) {
    * is not needed and we can set OutPeers = 0.
    */
 
-  // if _, ok := p.connectors[id]; !ok && len(p.connectors) < maxPeers {
-  if _, ok := p.connectors[id]; !ok {
+  // if _, ok := p.Connectors[id]; !ok && len(p.Connectors) < maxPeers {
+  if _, ok := p.Connectors[id]; !ok {
     /*
      * This should not be reached when we having a perfect tracker.
      */
      p.addConnector(id)
   }
 
-  if connector, ok := p.connectors[id]; ok {
+  if connector, ok := p.Connectors[id]; ok {
     connector.Recv(m)
   }
 }
 
 func (p *Peer) addConnector(id string) {
-  connector := NewConnector(p.id, id, p.Components)
+  connector := NewConnector(p.Id, id, p.Components)
 
-  p.connectors[id] = connector
+  p.Connectors[id] = connector
   p.Manager.AddConnector(connector)
 
   go connector.Run()
