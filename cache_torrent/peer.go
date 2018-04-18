@@ -27,13 +27,13 @@ func (p *Peer) OnJoin() {
 func (p *Peer) Bind(m interface {}) (any bool) {
   switch m.(type) {
   case torrent.TrackerReq:
-    p.Peer.Bind(m)
+    any = p.Peer.Bind(m)
   case torrent.Neighbours:
-    p.Peer.Bind(m)
+    any = p.Peer.Bind(m)
   case torrent.SeedRes:
-    p.Peer.Bind(m)
+    any = p.Peer.Bind(m)
   default:
-    p.Peer.Bind(m)
+    any = p.Peer.Bind(m)
   }
   return
 }
