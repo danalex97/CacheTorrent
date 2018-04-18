@@ -20,7 +20,7 @@ type Peer struct {
   time      func() int
 
   // BitTorrent protocol
-  pieces []pieceMeta
+  pieces []PieceMeta
 
   // BitTorrent components
   connectors  map[string]Runner // the connectors that were chosen by tracker
@@ -52,7 +52,7 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.Components = new(Components)
   peer.Transport  = util.Transport()
 
-  peer.pieces     = []pieceMeta{}
+  peer.pieces     = []PieceMeta{}
   peer.connectors = make(map[string]Runner)
 
   peer.time = util.Time()

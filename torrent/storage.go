@@ -9,7 +9,7 @@ import (
 const pieceNumber int = config.Pieces
 
 type Storage interface {
-  Have(index int) (pieceMeta, bool)
+  Have(index int) (PieceMeta, bool)
   Store(Piece)
 
   Pieces() []int
@@ -19,17 +19,17 @@ type storage struct {
   sync.RWMutex
 
   id        string
-  pieces    map[int]pieceMeta // the pieces that I have
+  pieces    map[int]PieceMeta // the pieces that I have
   completed bool
 }
 
-func NewStorage(id string, pieces []pieceMeta) Storage {
+func NewStorage(id string, pieces []PieceMeta) Storage {
   storage := new(storage)
 
   storage.id = id
   storage.completed = false
 
-  storage.pieces = make(map[int]pieceMeta)
+  storage.pieces = make(map[int]PieceMeta)
   for _, p := range pieces {
     storage.pieces[p.index] = p
   }
@@ -42,7 +42,7 @@ func NewStorage(id string, pieces []pieceMeta) Storage {
 /*
  * Returns if I have a piece(I have it downloaded and stored).
  */
-func (s *storage) Have(index int) (pieceMeta, bool) {
+func (s *storage) Have(index int) (PieceMeta, bool) {
   s.RLock()
   defer s.RUnlock()
 
@@ -57,7 +57,7 @@ func (s *storage) Store(p Piece) {
   s.Lock()
   defer s.Unlock()
 
-  s.pieces[p.index] = pieceMeta{
+  s.pieces[p.index] = PieceMeta{
     p.index,
     p.begin,
     p.piece.Size,

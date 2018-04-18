@@ -62,7 +62,7 @@ type SeedReq struct {
 }
 
 type SeedRes struct {
-  pieces []pieceMeta
+  pieces []PieceMeta
 }
 
 /* Connections */

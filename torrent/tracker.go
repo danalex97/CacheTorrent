@@ -110,18 +110,18 @@ func (t *Tracker) seedRequest(req SeedReq) SeedRes {
     if id == req.from {
       if i < seeds {
         // It's a seed
-        ps     := []pieceMeta{}
+        ps     := []PieceMeta{}
         begin  := 0
         length := pieceSize
 
         for j := 0; j < pieces; j++ {
-          ps    = append(ps, pieceMeta{j, begin, length})
+          ps    = append(ps, PieceMeta{j, begin, length})
           begin = begin + length
         }
 
         return SeedRes{ps}
       } else {
-        return SeedRes{[]pieceMeta{}}
+        return SeedRes{[]PieceMeta{}}
       }
     }
   }

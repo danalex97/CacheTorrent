@@ -12,7 +12,7 @@ func makeDownload() (Download, Transport, Transport, *Components) {
   t0 := NewTransferEngine(10, 10, "0")
   t1 := NewTransferEngine(10, 10, "1")
 
-  s := NewStorage("", []pieceMeta{})
+  s := NewStorage("", []PieceMeta{})
   c := &Components{
     Storage   : s,
     Picker    : NewPicker(s),

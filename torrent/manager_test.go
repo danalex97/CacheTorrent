@@ -20,7 +20,7 @@ func (m *mockManager) Downloads() []Download { return m.downloads }
 func TestManagerConcurrent(t *testing.T) {
   for i := 0; i < 10; i++ {
     m := NewConnectionManager()
-    s := NewStorage("", []pieceMeta{})
+    s := NewStorage("", []PieceMeta{})
 
     s.Store(Piece{"", 0, 0, Data{"0", 10}})
 

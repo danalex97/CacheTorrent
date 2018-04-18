@@ -8,19 +8,19 @@ import (
 
 /* Tests. */
 func TestStorage(t *testing.T) {
-  s := NewStorage("", []pieceMeta{})
+  s := NewStorage("", []PieceMeta{})
 
   s.Store(Piece{"", 0, 0, Data{"0", 10}})
   val, _ := s.Have(0)
-  assertEqual(t, val, pieceMeta{0, 0, 10})
+  assertEqual(t, val, PieceMeta{0, 0, 10})
 
   s.Store(Piece{"", 1, 0, Data{"1", 10}})
   val, _ = s.Have(1)
-  assertEqual(t, val, pieceMeta{1, 0, 10})
+  assertEqual(t, val, PieceMeta{1, 0, 10})
 
   s.Store(Piece{"", 2, 0, Data{"2", 10}})
   val, _ = s.Have(2)
-  assertEqual(t, val, pieceMeta{2, 0, 10})
+  assertEqual(t, val, PieceMeta{2, 0, 10})
 
   _, ok := s.Have(3)
   assertEqual(t, ok, false)
@@ -34,7 +34,7 @@ func TestStorage(t *testing.T) {
 
 func TestStorageConcurrent(t *testing.T) {
   for i := 0; i < 10; i++ {
-    s := NewStorage("", []pieceMeta{})
+    s := NewStorage("", []PieceMeta{})
 
     done := make(chan bool)
     store := func (idx int) {
@@ -62,7 +62,7 @@ func TestStorageConcurrent(t *testing.T) {
     for j := 0; j < 10; j++ {
       go func(idx int) {
         val, _ := s.Have(idx)
-        assertEqual(t, val, pieceMeta{idx, 0, 10})
+        assertEqual(t, val, PieceMeta{idx, 0, 10})
       }(j)
     }
   }

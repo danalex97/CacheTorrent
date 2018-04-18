@@ -4,7 +4,7 @@ import (
   "github.com/danalex97/Speer/interfaces"
 )
 
-type pieceMeta struct {
+type PieceMeta struct {
   index  int
   begin  int
   length int
