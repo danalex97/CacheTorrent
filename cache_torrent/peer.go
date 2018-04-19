@@ -91,7 +91,6 @@ func (p *Peer) AddConnector(id string) {
     p.Peer.AddConnector(id)
   } else {
     // Connection in different AS
-
     leader := p.Leaders[rand.Intn(len(p.Leaders))]
     connector := torrent.
       NewConnector(p.Id, leader, p.Components).
@@ -121,31 +120,43 @@ func (p *Peer) AddLeaderConnector(local, remote string) {
    * So far a leader is unable to accept connections.
    */
 
-  // Add a usual connection between Leader and Local peer
-  p.Peer.AddConnector(local)
-
-  if _, ok := p.Connectors[remote]; !ok {
+  // Add connection between Leader and Local peer
+  func () {
     connector := Extend(torrent.
-      NewConnector(p.Id, remote, p.Components).
-      WithHandshake()).
-      WithDownloadWithRedirect()
-    p.Connectors[remote] = connector.Strip()
-
+      NewConnector(p.Id, local, p.Components).
+      WithHandshake().
+      WithDownload()).
+      WithUploadWithRedirect()
     p.Manager.AddConnector(connector.Strip())
+    p.Connectors[local] = connector.Strip()
     go connector.Run()
+  }()
 
-    // Start the Remote connection
-    p.Transport.ControlSend(remote, RemoteStart{p.Id})
-  }
+  // Add connection between leader and remote
+  func () {
+    if _, ok := p.Connectors[remote]; !ok {
+      connector := Extend(torrent.
+        NewConnector(p.Id, remote, p.Components).
+        WithHandshake()).
+        WithDownloadWithRedirect()
+      p.Connectors[remote] = connector.Strip()
 
-  connector := p.Connectors[remote].(*torrent.Connector)
+      p.Manager.AddConnector(connector.Strip())
+      go connector.Run()
 
-  /* Add redirects. */
-  switch download := connector.Download.(type) {
-  case *download:
-    download.AddRedirect(local)
-  default:
-    connector.Download = NewDownloadWithRedirect(Extend(connector)).
-      AddRedirect(local)
-  }
+      // Start the Remote connection
+      p.Transport.ControlSend(remote, RemoteStart{p.Id})
+    }
+
+    connector := p.Connectors[remote].(*torrent.Connector)
+
+    /* Add redirects. */
+    switch download := connector.Download.(type) {
+    case *download:
+      download.AddRedirect(local)
+    default:
+      connector.Download = NewDownloadWithRedirect(Extend(connector)).
+        AddRedirect(local)
+    }
+  }()
 }

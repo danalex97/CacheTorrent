@@ -19,6 +19,11 @@ func (c *Connector) WithDownloadWithRedirect() *Connector {
   return c
 }
 
+func (c *Connector) WithUploadWithRedirect() *Connector {
+  c.Upload = NewUploadWithRedirect(c)
+  return c
+}
+
 func (c *Connector) Strip() *torrent.Connector {
   return c.Connector
 }
