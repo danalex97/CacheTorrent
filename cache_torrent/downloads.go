@@ -8,23 +8,30 @@ import (
 type download struct {
   torrent.Download
 
-  redirectId string
+  redirects  []string
   transport  Transport
 }
 
-func NewDownloadWithRedirect(c *Connector, redirectId string) torrent.Download {
+func NewDownloadWithRedirect(c *Connector) *download {
   return &download{
     Download : torrent.NewDownload(c.Connector),
 
-    redirectId : redirectId,
-    transport  : c.Transport,
+    redirects : []string{},
+    transport : c.Transport,
   }
+}
+
+func (d *download) AddRedirect(id string) *download {
+  d.redirects = append(d.redirects, id)
+  return d
 }
 
 func (d *download) Recv(m interface {}) {
   switch m.(type) {
   case torrent.Have:
-    d.transport.ControlSend(d.redirectId, m)
+    for _, id := range d.redirects {
+      d.transport.ControlSend(id, m)
+    }
   }
 
   d.Download.Recv(m)

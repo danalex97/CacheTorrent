@@ -89,8 +89,6 @@ func (p *Peer) AddConnector(id string) {
   if getAS(p.Id) == getAS(id) {
     // Connection within the same AS
     p.Peer.AddConnector(id)
-  } else if p.amLeader() {
-    // Hmm? [TODO]
   } else {
     // Connection in different AS
 
@@ -119,22 +117,35 @@ func (p *Peer) AddConnector(id string) {
 }
 
 func (p *Peer) AddLeaderConnector(local, remote string) {
+  /*
+   * So far a leader is unable to accept connections.
+   */
+
   // Add a usual connection between Leader and Local peer
   p.Peer.AddConnector(local)
 
-  // Add a connection that does redirection as well between
-  // remote peer and local peer.
-  connector := Extend(torrent.
-    NewConnector(p.Id, remote, p.Components).
-    WithHandshake()).
-    WithDownloadWithRedirect(local).
-    Strip()
+  if _, ok := p.Connectors[remote]; !ok {
+    connector := Extend(torrent.
+      NewConnector(p.Id, remote, p.Components).
+      WithHandshake()).
+      WithDownloadWithRedirect()
+    p.Connectors[remote] = connector.Strip()
 
-  p.Connectors[remote] = connector
-  p.Manager.AddConnector(connector)
+    p.Manager.AddConnector(connector.Strip())
+    go connector.Run()
 
-  go connector.Run()
+    // Start the Remote connection
+    p.Transport.ControlSend(remote, RemoteStart{p.Id})
+  }
 
-  // Start the Remote connection
-  p.Transport.ControlSend(remote, RemoteStart{p.Id})
+  connector := p.Connectors[remote].(*torrent.Connector)
+
+  /* Add redirects. */
+  switch download := connector.Download.(type) {
+  case *download:
+    download.AddRedirect(local)
+  default:
+    connector.Download = NewDownloadWithRedirect(Extend(connector)).
+      AddRedirect(local)
+  }
 }

@@ -14,8 +14,8 @@ func Extend(c *torrent.Connector) *Connector {
   }
 }
 
-func (c *Connector) WithDownloadWithRedirect(redirectId string) *Connector {
-  c.Download = NewDownloadWithRedirect(c, redirectId)
+func (c *Connector) WithDownloadWithRedirect() *Connector {
+  c.Download = NewDownloadWithRedirect(c)
   return c
 }
 
