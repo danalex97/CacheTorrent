@@ -93,5 +93,15 @@ func (p *Peer) AddConnector(id string) {
     // Connection in different AS
 
     // leader := p.Leaders[rand.Intn(len(p.Leaders))]
+    connector := Extend(torrent.
+      NewConnector(p.Id, id, p.Components).
+      WithHandshake()).
+      WithLocalUpload().
+      WithLocalDownload()
+
+    p.Manager.AddConnector(connector.Connector)
+    p.Connectors[id] = connector
+
+    go connector.Run()
   }
 }
