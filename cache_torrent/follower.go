@@ -24,10 +24,17 @@ func NewFollower(p *Peer) *Follower {
 
 func (f *Follower) Run() {
   fmt.Println("Follower running.")
+  f.Peer.Run(f.outgoingConnection)
 }
 
 func (f *Follower) Recv(m interface {}) {
-  f.RunRecv(m, f.incomingConnection)
+  f.Peer.RunRecv(m, f.incomingConnection)
+}
+
+func (f *Follower) outgoingConnection(id string) {
+  // Outgoing connections are handled similarly to incoming
+  // connections.
+  f.incomingConnection(id)
 }
 
 func (f *Follower) incomingConnection(id string) {
