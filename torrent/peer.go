@@ -29,6 +29,16 @@ type Peer struct {
   join    string
 }
 
+type Binder    func(m interface {}) int
+type Processor func(m interface {}, state int)
+
+const (
+  BindNone = iota
+  BindDone = iota
+  BindRecv = iota
+  BindRun  = iota
+)
+
 /* Implementation of Torrent Node interface. */
 func (p *Peer) OnJoin() {
   // If the Transport is missing, it must be we are
@@ -38,7 +48,7 @@ func (p *Peer) OnJoin() {
   }
 
   p.Init()
-  go p.CheckMessages(p.Bind)
+  go p.CheckMessages(p.Bind, p.Process)
 }
 
 func (p *Peer) OnLeave() {
@@ -75,7 +85,7 @@ func (p *Peer) Init() {
   p.Transport.ControlSend(p.Tracker, Join{p.Id})
 }
 
-func (p *Peer) CheckMessages(process func(interface {}) bool) {
+func (p *Peer) CheckMessages(bind Binder, process Processor) {
   for {
     messages := []interface{}{}
 
@@ -99,9 +109,11 @@ func (p *Peer) CheckMessages(process func(interface {}) bool) {
     // Process all pending messages
     any := false
     for _, m := range messages {
-      if process(m) {
+      state := bind(m)
+      if state != BindNone {
         any = true
       }
+      process(m, state)
     }
 
     // No useful work done
@@ -111,34 +123,44 @@ func (p *Peer) CheckMessages(process func(interface {}) bool) {
   }
 }
 
-func (p *Peer) Bind(m interface {}) (any bool) {
+func (p *Peer) Process(m interface {}, state int) {
+  switch state {
+  case BindRun:
+    p.Run()
+  case BindRecv:
+    p.RunRecv(m)
+  }
+}
+
+func (p *Peer) Bind(m interface {}) (state int) {
+  state = BindNone
+
   switch msg := m.(type) {
   case TrackerReq:
-    any = true
+    state = BindDone
+
     p.Transport.ControlSend(msg.From, TrackerRes{p.Tracker})
   case Neighbours:
-    any = true
+    state = BindDone
     p.Ids = msg.Ids
 
     // Find if I'm a seed
     p.Transport.ControlSend(p.Tracker, SeedReq{p.Id})
   case SeedRes:
-    any = true
-    p.Pieces = msg.Pieces
+    state = BindRun
 
-    // Since we do Run here, it must be that it will not hang
-    p.Run()
+    p.Pieces = msg.Pieces
   default:
     if len(p.Connectors) > 0 {
-      any = true
-
-      // All initialized
-      p.RunRecv(m)
+      state = BindRecv
     } else {
+      state = BindNone
+
       // Send message to myself
       p.Transport.ControlSend(p.Id, m)
     }
   }
+
   return
 }
 

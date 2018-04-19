@@ -36,9 +36,13 @@ func (p *Peer) Bind(m interface {}) (any bool) {
     any = p.Peer.Bind(m)
   case torrent.Neighbours:
     any = p.Peer.Bind(m)
-  case torrent.SeedRes:
-    any = p.Peer.Bind(m)
   /* New Protocol. */
+  case torrent.SeedRes:
+    any = true
+    p.Pieces = msg.Pieces
+
+    // Since we do Run here, it must be that it will not hang
+    p.Run()
   case Neighbours:
     // Location awareness extension
     any = true
@@ -57,7 +61,15 @@ func (p *Peer) Bind(m interface {}) (any bool) {
     // Check if I am a seed
     p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
   default:
-    any = p.Peer.Bind(m)
+    if len(p.Connectors) > 0 {
+      any = true
+
+      // All initialized
+      p.RunRecv(m)
+    } else {
+      // Send message to myself
+      p.Transport.ControlSend(p.Id, m)
+    }
   }
   return
 }
