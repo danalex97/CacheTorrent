@@ -3,19 +3,22 @@ package cache_torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/torrent"
-  "math/rand"
   "fmt"
 )
 
 type Peer struct {
   *torrent.Peer
 
-  Leaders []string
+  Leaders  []string
+  amLeader bool
+
+  node   torrent.Runner
 }
 
 func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer := new(Peer)
-  peer.Peer = (peer.Peer.New(util)).(*torrent.Peer)
+  peer.Peer     = (peer.Peer.New(util)).(*torrent.Peer)
+  peer.amLeader = false
   return peer
 }
 
@@ -31,9 +34,14 @@ func (p *Peer) OnJoin() {
 func (p *Peer) Process(m interface {}, state int) {
   switch state {
   case torrent.BindRun:
-    p.Run(p.AddConnector)
+    if p.amLeader {
+      p.node = NewLeader(p)
+    } else {
+      p.node = NewFollower(p)
+    }
+    p.node.Run()
   case torrent.BindRecv:
-    p.RunRecv(m, p.AddConnector)
+    p.node.Recv(m)
   }
 }
 
@@ -56,6 +64,9 @@ func (p *Peer) Bind(m interface {}) (state int) {
     p.Leaders = msg.Ids
     fmt.Println(p.Id, "has Leaders", p.Leaders)
 
+    if isLeader(p) {
+      p.amLeader = true
+    }
     // Check if I am a seed
     p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
   /* Backward compatible. */
@@ -63,100 +74,4 @@ func (p *Peer) Bind(m interface {}) (state int) {
     state = p.Peer.Bind(m)
   }
   return
-}
-
-func (p *Peer) RunRecv(m interface {}, connAdd torrent.ConnAdder) {
-  switch msg := m.(type) {
-  case LeaderStart:
-    p.AddLeaderConnector(msg.Id, msg.Dest)
-  case RemoteStart:
-    connAdd(msg.Id)
-  default:
-    p.Peer.RunRecv(m, connAdd)
-  }
-}
-
-func (p *Peer) amLeader() bool {
-  for _, id := range p.Leaders {
-    if id == p.Id {
-      return true
-    }
-  }
-  return false
-}
-
-func (p *Peer) AddConnector(id string) {
-  if getAS(p.Id) == getAS(id) {
-    // Connection within the same AS
-    p.Peer.AddConnector(id)
-  } else {
-    // Connection in different AS
-    leader := p.Leaders[rand.Intn(len(p.Leaders))]
-    connector := torrent.
-      NewConnector(p.Id, leader, p.Components).
-      WithHandshake().
-      WithUpload().
-      WithDownload()
-
-    // Wire the connector
-    p.Manager.AddConnector(connector)
-    // We register the connection for the distant peer, so
-    // we need to overwrite the sender at the Border node
-    p.Connectors[id] = connector
-
-    go connector.Run()
-
-    // Start Indirect Connection with remote Peer id through
-    // the Leader leader
-    p.Transport.ControlSend(leader, LeaderStart{
-      Id   : p.Id,
-      Dest : id,
-    })
-  }
-}
-
-func (p *Peer) AddLeaderConnector(local, remote string) {
-  /*
-   * So far a leader is unable to accept connections.
-   */
-
-  // Add connection between Leader and Local peer
-  func () {
-    connector := Extend(torrent.
-      NewConnector(p.Id, local, p.Components).
-      WithHandshake().
-      WithDownload()).
-      WithUploadWithRedirect()
-    p.Manager.AddConnector(connector.Strip())
-    p.Connectors[local] = connector.Strip()
-    go connector.Run()
-  }()
-
-  // Add connection between leader and remote
-  func () {
-    if _, ok := p.Connectors[remote]; !ok {
-      connector := Extend(torrent.
-        NewConnector(p.Id, remote, p.Components).
-        WithHandshake()).
-        WithDownloadWithRedirect()
-      p.Connectors[remote] = connector.Strip()
-
-      p.Manager.AddConnector(connector.Strip())
-      go connector.Run()
-
-      // Start the Remote connection
-      p.Transport.ControlSend(remote, RemoteStart{p.Id})
-    }
-
-    connector := p.Connectors[remote].(*torrent.Connector)
-
-    /* Add redirects. */
-    switch download := connector.Download.(type) {
-    case *download:
-      download.AddRedirect(local)
-    default:
-      connector.Download = NewDownloadWithRedirect(Extend(connector)).
-        AddRedirect(local)
-    }
-  }()
 }
