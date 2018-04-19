@@ -14,7 +14,11 @@ func Extend(c *torrent.Connector) *Connector {
   }
 }
 
-func (c *Connector) WithIndirectDownload() *Connector {
-  c.Download = NewIndirectDownload(c)
+func (c *Connector) WithDownloadWithRedirect(redirectId string) *Connector {
+  c.Download = NewDownloadWithRedirect(c, redirectId)
   return c
+}
+
+func (c *Connector) Strip() *torrent.Connector {
+  return c.Connector
 }

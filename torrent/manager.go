@@ -41,7 +41,9 @@ func (m *ConnectionManager) Uploads() (uploads []Upload) {
   defer m.RUnlock()
 
   for _, conn := range m.conns {
-    uploads = append(uploads, conn.Upload)
+    if conn.Upload != nil {
+      uploads = append(uploads, conn.Upload)
+    }
   }
   return
 }
@@ -51,7 +53,9 @@ func (m *ConnectionManager) Downloads() (downloads []Download) {
   defer m.RUnlock()
 
   for _, conn := range m.conns {
-    downloads = append(downloads, conn.Download)
+    if conn.Download != nil {
+      downloads = append(downloads, conn.Download)
+    }
   }
   return
 }

@@ -11,13 +11,13 @@ type Peer struct {
   *torrent.Peer
 
   Leaders []string
-
-  IndirectConnectors map[string]torrent.Runner
+  RemoteConnectors map[string]torrent.Runner
 }
 
 func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer := new(Peer)
   peer.Peer = (peer.Peer.New(util)).(*torrent.Peer)
+  peer.RemoteConnectors = make(map[string]torrent.Runner)
   return peer
 }
 
@@ -67,6 +67,17 @@ func (p *Peer) Bind(m interface {}) (state int) {
   return
 }
 
+func (p *Peer) RunRecv(m interface {}, connAdd torrent.ConnAdder) {
+  switch msg := m.(type) {
+  case LeaderStart:
+    p.AddLeaderConnector(msg.Id, msg.Dest)
+  case RemoteStart:
+    connAdd(msg.Id)
+  default:
+    p.Peer.RunRecv(m, connAdd)
+  }
+}
+
 func (p *Peer) amLeader() bool {
   for _, id := range p.Leaders {
     if id == p.Id {
@@ -77,31 +88,55 @@ func (p *Peer) amLeader() bool {
 }
 
 func (p *Peer) AddConnector(id string) {
-  if getAS(p.Id) == getAS(id) || p.amLeader() {
+  if getAS(p.Id) == getAS(id) {
     // Connection within the same AS
     p.Peer.AddConnector(id)
+  } else if p.amLeader() {
+    // Hmm? [TODO]
   } else {
     // Connection in different AS
 
     leader := p.Leaders[rand.Intn(len(p.Leaders))]
-    connector := Extend(torrent.
+    connector := torrent.
       NewConnector(p.Id, leader, p.Components).
       WithHandshake().
-      WithUpload()).
-      WithIndirectDownload()
+      WithUpload().
+      WithDownload()
 
     // Wire the connector
-    p.Manager.AddConnector(connector.Connector)
+    p.Manager.AddConnector(connector)
     // We register the connection for the distant peer, so
     // we need to overwrite the sender at the Border node
     p.Connectors[id] = connector
 
     go connector.Run()
 
-    // Start Inidirect Connection
+    // Start Indirect Connection with remote Peer id through
+    // the Leader leader
     p.Transport.ControlSend(leader, LeaderStart{
       Id   : p.Id,
       Dest : id,
     })
   }
+}
+
+func (p *Peer) AddLeaderConnector(local, remote string) {
+  // Add a usual connection between Leader and Local peer
+  p.Peer.AddConnector(local)
+
+  // Add a connection that does redirection as well between
+  // remote peer and local peer.
+  connector := Extend(torrent.
+    NewConnector(p.Id, remote, p.Components).
+    WithHandshake()).
+    WithDownloadWithRedirect(local).
+    Strip()
+
+  p.RemoteConnectors[remote] = connector
+  p.Manager.AddConnector(connector)
+
+  go connector.Run()
+
+  // Start the Remote connection
+  p.Transport.ControlSend(remote, RemoteStart{p.Id})
 }
