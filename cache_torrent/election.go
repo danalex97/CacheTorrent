@@ -4,7 +4,6 @@ import (
   . "github.com/danalex97/Speer/interfaces"
   "sync"
   "sort"
-  "strings"
 )
 
 const MaxLeaders int = 1
@@ -138,14 +137,4 @@ func (e *Election) Elect(as string) []string {
   }
 
   return leaders
-}
-
-func getNBR(id string) string {
-  // We assume that ID is of form [AS].[NBR]
-  return strings.Split(id, ".")[0]
-}
-
-func getAS(id string) string {
-  // We assume that ID is of form [AS].[NBR]
-  return strings.Split(id, ".")[0]
 }

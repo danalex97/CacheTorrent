@@ -3,6 +3,7 @@ package cache_torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/torrent"
+  // "math/rand"
   "fmt"
 )
 
@@ -66,64 +67,31 @@ func (p *Peer) Bind(m interface {}) (state int) {
   return
 }
 
-func (p *Peer) RunRecv(m interface {}, connAdd torrent.ConnAdder) {
-  /* Backward compatible. */
-  p.Peer.RunRecv(m, connAdd)
-
-  /* New Protocol. */
-  switch msg := m.(type) {
-  case IndirectReq:
-    from := msg.From
-    dest := msg.Dest
-
-    // Start connection from Leader to Peer.
-    if _, ok := p.IndirectConnectors[dest]; !ok {
-      p.AddLeaderPeerConnector(dest)
-    }
-
-    // Start connection from Leader to Local.
-    if _, ok := p.IndirectConnectors[from]; !ok {
-      p.AddLeaderLocalConnector(from)
-    }
-
-    // Forward request to Leader-Peer connector
-    if connector, ok := p.IndirectConnectors[dest]; ok {
-      connector.Recv(m)
+func (p *Peer) amLeader() bool {
+  for _, id := range p.Leaders {
+    if id == p.Id {
+      return true
     }
   }
+  return false
 }
 
 func (p *Peer) AddConnector(id string) {
-  connector := torrent.
-    NewConnector(p.Id, id, p.Components).
-    WithHandshake().
-    WithUpload().
-    WithDownload()
+  if getAS(p.Id) == getAS(id) || p.amLeader() {
+    // Connection within the same AS
+    connector := torrent.
+      NewConnector(p.Id, id, p.Components).
+      WithHandshake().
+      WithUpload().
+      WithDownload()
 
-  p.Connectors[id] = connector
-  p.Manager.AddConnector(connector)
+    p.Manager.AddConnector(connector)
+    p.Connectors[id] = connector
 
-  go connector.Run()
-}
+    go connector.Run()
+  } else {
+    // Connection in different AS
 
-func (p *Peer) AddLeaderLocalConnector(id string) {
-  connector := torrent.
-    NewConnector(p.Id, id, p.Components).
-    WithHandshake().
-    WithUpload().
-    WithDownload()
-
-  p.IndirectConnectors[id] = connector
-  go connector.Run()
-}
-
-func (p *Peer) AddLeaderPeerConnector(id string) {
-  connector := torrent.
-    NewConnector(p.Id, id, p.Components).
-    WithHandshake().
-    WithUpload().
-    WithDownload()
-
-  p.IndirectConnectors[id] = connector
-  go connector.Run()
+    // leader := p.Leaders[rand.Intn(len(p.Leaders))]
+  }
 }
