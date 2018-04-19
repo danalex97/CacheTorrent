@@ -31,6 +31,7 @@ type Peer struct {
 
 type Binder    func(m interface {}) int
 type Processor func(m interface {}, state int)
+type ConnAdder func(id string)
 
 const (
   BindNone = iota
@@ -126,9 +127,9 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
 func (p *Peer) Process(m interface {}, state int) {
   switch state {
   case BindRun:
-    p.Run()
+    p.Run(p.AddConnector)
   case BindRecv:
-    p.RunRecv(m)
+    p.RunRecv(m, p.AddConnector)
   }
 }
 
@@ -164,7 +165,7 @@ func (p *Peer) Bind(m interface {}) (state int) {
   return
 }
 
-func (p *Peer) Run() {
+func (p *Peer) Run(connAdd ConnAdder) {
   // We want to bind all these variables here, so
   // we don't need any synchroization.
   fmt.Println(p.Id, p.Ids)
@@ -178,13 +179,13 @@ func (p *Peer) Run() {
 
   // make connectors
   for _, id := range p.Ids {
-    p.AddConnector(id)
+    connAdd(id)
   }
 
   go p.Choker.Run()
 }
 
-func (p *Peer) RunRecv(m interface {}) {
+func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
   id   := ""
 
   // Redirect the message to the connector
@@ -237,7 +238,7 @@ func (p *Peer) RunRecv(m interface {}) {
     /*
      * This should not be reached when we having a perfect tracker.
      */
-     p.AddConnector(id)
+     connAdd(id)
   }
 
   if connector, ok := p.Connectors[id]; ok {
