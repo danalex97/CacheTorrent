@@ -20,7 +20,7 @@ func makeDownload() (Download, Transport, Transport, *Components) {
     Transport : t0,
     Choker    : &mockChoker{},
   }
-  d := NewDownload(NewConnector("0", "1", c))
+  d := NewDownload(NewConnector("0", "1", c).WithHandshake())
   return d, t0, t1, c
 }
 
