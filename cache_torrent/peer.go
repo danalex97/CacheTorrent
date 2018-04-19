@@ -26,26 +26,31 @@ func (p *Peer) OnJoin() {
   }
 
   p.Init()
-  go p.CheckMessages(p.Bind)
+  go p.CheckMessages(p.Bind, p.Process)
 }
 
-func (p *Peer) Bind(m interface {}) (any bool) {
+func (p *Peer) Process(m interface {}, state int) {
+  switch state {
+  case torrent.BindRun:
+    p.Run(p.AddConnector)
+  case torrent.BindRecv:
+    p.RunRecv(m, p.AddConnector)
+  }
+}
+
+func (p *Peer) Bind(m interface {}) (state int) {
   switch msg := m.(type) {
   /* Backward compatible. */
   case torrent.TrackerReq:
-    any = p.Peer.Bind(m)
+    state = p.Peer.Bind(m)
   case torrent.Neighbours:
-    any = p.Peer.Bind(m)
-  /* New Protocol. */
+    state = p.Peer.Bind(m)
   case torrent.SeedRes:
-    any = true
-    p.Pieces = msg.Pieces
-
-    // Since we do Run here, it must be that it will not hang
-    p.Run()
+    state = p.Peer.Bind(m)
+  /* New Protocol. */
   case Neighbours:
     // Location awareness extension
-    any = true
+    state = torrent.BindDone
     p.Ids = msg.Ids
 
     // Candidate in the Leader Election
@@ -55,28 +60,21 @@ func (p *Peer) Bind(m interface {}) (any bool) {
       Down : p.Transport.Down(),
     })
   case Leaders:
+    state = torrent.BindDone
     p.Leaders = msg.Ids
     fmt.Println(p.Id, "has Leaders", p.Leaders)
 
     // Check if I am a seed
     p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
   default:
-    if len(p.Connectors) > 0 {
-      any = true
-
-      // All initialized
-      p.RunRecv(m)
-    } else {
-      // Send message to myself
-      p.Transport.ControlSend(p.Id, m)
-    }
+    state = p.Peer.Bind(m)
   }
   return
 }
 
-func (p *Peer) RunRecv(m interface {}) {
+func (p *Peer) RunRecv(m interface {}, connAdd torrent.ConnAdder) {
   /* Backward compatible. */
-  p.Peer.RunRecv(m)
+  p.Peer.RunRecv(m, connAdd)
 
   /* New Protocol. */
   switch msg := m.(type) {
