@@ -246,14 +246,9 @@ func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
 }
 
 func (p *Peer) AddConnector(id string) {
-  connector :=
-    NewConnector(p.Id, id, p.Components).
-    WithHandshake().
-    WithUpload().
-    WithDownload()
-
-  p.Connectors[id] = connector
-  p.Manager.AddConnector(connector)
-
-  go connector.Run()
+  NewConnector(p.Id, id, p.Components).
+  WithHandshake().
+  WithUpload().
+  WithDownload().
+  Register(p)
 }

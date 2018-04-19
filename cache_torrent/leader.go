@@ -1,5 +1,11 @@
 package cache_torrent
 
+/**
+ * A leader can:
+ *  - download from anybody
+ *  - upload only to the same AS
+ */
+
 import (
   "fmt"
 )

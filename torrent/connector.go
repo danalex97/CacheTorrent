@@ -42,6 +42,14 @@ func (c *Connector) WithDownload() *Connector {
   return c
 }
 
+func (c *Connector) Register(p *Peer) *Connector {
+  p.Connectors[c.To] = c
+  p.Manager.AddConnector(c)
+
+  go c.Run()
+  return c
+}
+
 func (c *Connector) Run() {
   if c.Handshake != nil {
     go c.Handshake.Run()

@@ -1,6 +1,13 @@
 package cache_torrent
 
+/**
+ * A follower can:
+ *   - upload to anybody
+ *   - download only from same AS
+ */
+
 import (
+  "github.com/danalex97/nfsTorrent/torrent"
   "fmt"
 )
 
@@ -19,4 +26,19 @@ func (l *Follower) Run() {
 }
 
 func (l *Follower) Recv(m interface {}) {
+  l.RunRecv(m, l.incomingConnection)
+}
+
+func (l *Follower) incomingConnection(id string) {
+  if getAS(id) == getAS(l.Id) {
+    // We make a bidirectional connection.
+    torrent.
+      NewConnector(l.Id, id, l.Components).
+      WithHandshake().
+      WithUpload().
+      WithDownload().
+      Register(l.Peer.Peer)
+  } else {
+    
+  }
 }
