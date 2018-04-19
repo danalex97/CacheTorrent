@@ -24,21 +24,44 @@ func NewConnector(from, to string, components *Components) *Connector {
   connector.From = from
   connector.To   = to
 
-  connector.Handshake  = NewHandshake(connector)
-  connector.Upload     = NewUpload(connector)
-  connector.Download   = NewDownload(connector)
-
   return connector
 }
 
+func (c *Connector) WithHandshake() *Connector {
+  c.Handshake = NewHandshake(c)
+  return c
+}
+
+func (c *Connector) WithUpload() *Connector {
+  c.Upload = NewUpload(c)
+  return c
+}
+
+func (c *Connector) WithDownload() *Connector {
+  c.Download = NewDownload(c)
+  return c
+}
+
 func (c *Connector) Run() {
-  go c.Handshake.Run()
-  go c.Upload.Run()
-  go c.Download.Run()
+  if c.Handshake != nil {
+    go c.Handshake.Run()
+  }
+  if c.Upload != nil {
+    go c.Upload.Run()
+  }
+  if c.Download != nil {
+    go c.Download.Run()
+  }
 }
 
 func (c *Connector) Recv(m interface {}) {
-  c.Handshake.Recv(m)
-  c.Upload.Recv(m)
-  c.Download.Recv(m)
+  if c.Handshake != nil {
+    c.Handshake.Recv(m)
+  }
+  if c.Upload != nil {
+    c.Upload.Recv(m)
+  }
+  if c.Download != nil {
+    c.Download.Recv(m)
+  }
 }

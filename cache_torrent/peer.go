@@ -40,13 +40,6 @@ func (p *Peer) Process(m interface {}, state int) {
 
 func (p *Peer) Bind(m interface {}) (state int) {
   switch msg := m.(type) {
-  /* Backward compatible. */
-  case torrent.TrackerReq:
-    state = p.Peer.Bind(m)
-  case torrent.Neighbours:
-    state = p.Peer.Bind(m)
-  case torrent.SeedRes:
-    state = p.Peer.Bind(m)
   /* New Protocol. */
   case Neighbours:
     // Location awareness extension
@@ -66,6 +59,7 @@ func (p *Peer) Bind(m interface {}) (state int) {
 
     // Check if I am a seed
     p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
+  /* Backward compatible. */
   default:
     state = p.Peer.Bind(m)
   }
