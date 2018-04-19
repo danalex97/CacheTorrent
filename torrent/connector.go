@@ -14,6 +14,8 @@ type Connector struct {
   Upload    Upload
   Download  Download
   Handshake Handshake
+
+  runHandshake bool
 }
 
 func NewConnector(from, to string, components *Components) *Connector {
@@ -51,7 +53,7 @@ func (c *Connector) Register(p *Peer) *Connector {
 }
 
 func (c *Connector) Run() {
-  if c.Handshake != nil {
+  if c.Handshake != nil && c.runHandshake {
     go c.Handshake.Run()
   }
   if c.Upload != nil {
