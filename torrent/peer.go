@@ -184,10 +184,7 @@ func (p *Peer) Run(connAdd ConnAdder) {
   go p.Choker.Run()
 }
 
-func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
-  id   := ""
-
-  // Redirect the message to the connector
+func (p *Peer) GetId(m interface {}) (id string){
   switch msg := m.(type) {
   case Choke:
     id = msg.Id
@@ -214,6 +211,11 @@ func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
     id = msg.Id
     // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   }
+  return
+}
+
+func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
+  id := p.GetId(m)
 
   if id == "" {
     return

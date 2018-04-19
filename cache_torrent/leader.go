@@ -34,6 +34,15 @@ func (l *Leader) Run() {
   l.Peer.Run(l.outgoingConnection)
 }
 
+func (l *Leader) GetId(m interface {}) string {
+  switch msg := m.(type) {
+  case LeaderStart:
+    return msg.Id
+  default:
+    return l.Peer.GetId(m)
+  }
+}
+
 func (l *Leader) Recv(m interface {}) {
   switch msg := m.(type) {
   case LeaderStart:
@@ -59,20 +68,42 @@ func (l *Leader) Recv(m interface {}) {
     }
 
     // Once the connections are made, we only need to register the forwarder
-    fwd := NewForwarder(follower, peer)
-
-    if _, ok := l.followerFwd[follower]; !ok {
-       l.followerFwd[follower] = []*Forwarder{}
-    }
-    l.followerFwd[follower] = append(l.followerFwd[follower], fwd)
-
-    if _, ok := l.peerFwd[peer]; !ok {
-       l.peerFwd[peer] = []*Forwarder{}
-    }
-    l.peerFwd[peer] = append(l.peerFwd[peer], fwd)
+    l.registerForwarder(follower, peer)
   }
 
+  // Send the messages to corresponding forwarders
+  l.forward(m)
+
   l.Peer.RunRecv(m, l.incomingConnection)
+}
+
+func (l *Leader) forward(m interface {}) {
+  id := l.GetId(m)
+
+  forward := func(mp map[string][]*Forwarder) {
+    if _, ok := mp[id]; ok {
+      for _, fwd := range mp[id] {
+        fwd.Recv(m)
+      }
+    }
+  }
+
+  forward(l.followerFwd)
+  forward(l.peerFwd)
+}
+
+func (l *Leader) registerForwarder(follower, peer string) {
+  fwd := NewForwarder(follower, peer)
+
+  if _, ok := l.followerFwd[follower]; !ok {
+     l.followerFwd[follower] = []*Forwarder{}
+  }
+  l.followerFwd[follower] = append(l.followerFwd[follower], fwd)
+
+  if _, ok := l.peerFwd[peer]; !ok {
+     l.peerFwd[peer] = []*Forwarder{}
+  }
+  l.peerFwd[peer] = append(l.peerFwd[peer], fwd)
 }
 
 func (l *Leader) outgoingConnection(id string) {
