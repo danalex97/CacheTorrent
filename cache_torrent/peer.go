@@ -94,13 +94,23 @@ func (p *Peer) RunRecv(m interface {}, connAdd torrent.ConnAdder) {
 }
 
 func (p *Peer) AddLeaderLocalConnector(id string) {
-  connector := NewLeaderLocalConnector(p.Id, id, p.Components)
+  connector := torrent.
+    NewConnector(p.Id, id, p.Components).
+    WithHandshake().
+    WithUpload().
+    WithDownload()
+
   p.IndirectConnectors[id] = connector
   go connector.Run()
 }
 
 func (p *Peer) AddLeaderPeerConnector(id string) {
-  connector := NewLeaderPeerConnector(p.Id, id, p.Components)
+  connector := torrent.
+    NewConnector(p.Id, id, p.Components).
+    WithHandshake().
+    WithUpload().
+    WithDownload()
+
   p.IndirectConnectors[id] = connector
   go connector.Run()
 }
