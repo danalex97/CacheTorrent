@@ -32,7 +32,7 @@ func (m *ConnectionManager) AddConnector(conn *Connector) {
   s := conn.Storage
   t := conn.Transport
   for _, index := range s.Pieces() {
-    t.ControlSend(conn.to, Have{conn.from, index})
+    t.ControlSend(conn.To, Have{conn.From, index})
   }
 }
 
@@ -41,7 +41,7 @@ func (m *ConnectionManager) Uploads() (uploads []Upload) {
   defer m.RUnlock()
 
   for _, conn := range m.conns {
-    uploads = append(uploads, conn.upload)
+    uploads = append(uploads, conn.Upload)
   }
   return
 }
@@ -51,7 +51,7 @@ func (m *ConnectionManager) Downloads() (downloads []Download) {
   defer m.RUnlock()
 
   for _, conn := range m.conns {
-    downloads = append(downloads, conn.download)
+    downloads = append(downloads, conn.Download)
   }
   return
 }

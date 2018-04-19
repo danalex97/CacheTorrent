@@ -1,6 +1,17 @@
 package cache_torrent
 
 /**
+ * Indirect requests extension.
+ */
+
+type IndirectReq struct {
+  From string
+  Dest string
+
+  Index int
+}
+
+/**
  * Location awareness extension.
  */
 

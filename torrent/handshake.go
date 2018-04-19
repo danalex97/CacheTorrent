@@ -29,12 +29,12 @@ type handshake struct {
 
 func NewHandshake(connector *Connector) Handshake {
   t    := connector.Transport
-  link := t.Connect(connector.to)
+  link := t.Connect(connector.To)
 
   return &handshake{
     Components: connector.Components,
-    from:       connector.from,
-    to:         connector.to,
+    from:       connector.From,
+    to:         connector.To,
     done:       false,
     downlink:   (Link)(nil),
     uplink:     link,

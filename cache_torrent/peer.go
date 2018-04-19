@@ -10,6 +10,8 @@ type Peer struct {
   *torrent.Peer
 
   Leaders []string
+
+  IndirectConnectors map[string]torrent.Runner
 }
 
 func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
@@ -65,5 +67,36 @@ func (p *Peer) RunRecv(m interface {}) {
   p.Peer.RunRecv(m)
 
   /* New Protocol. */
-  // [TODO]
+  switch msg := m.(type) {
+  case IndirectReq:
+    from := msg.From
+    dest := msg.Dest
+
+    // Start connection from Leader to Peer.
+    if _, ok := p.IndirectConnectors[dest]; !ok {
+      p.AddLeaderPeerConnector(dest)
+    }
+
+    // Start connection from Leader to Local.
+    if _, ok := p.IndirectConnectors[from]; !ok {
+      p.AddLeaderLocalConnector(from)
+    }
+
+    // Forward request to Leader-Peer connector
+    if connector, ok := p.IndirectConnectors[dest]; ok {
+      connector.Recv(m)
+    }
+  }
+}
+
+func (p *Peer) AddLeaderLocalConnector(id string) {
+  connector := NewLeaderLocalConnector(p.Id, id, p.Components)
+  p.IndirectConnectors[id] = connector
+  go connector.Run()
+}
+
+func (p *Peer) AddLeaderPeerConnector(id string) {
+  connector := NewLeaderPeerConnector(p.Id, id, p.Components)
+  p.IndirectConnectors[id] = connector
+  go connector.Run()
 }

@@ -49,14 +49,14 @@ func NewDownload(connector *Connector) Download {
   return &download{
     Components: connector.Components,
 
-    me:   connector.from,
-    from: connector.to,
+    me:   connector.From,
+    from: connector.To,
 
     interested: false, // I am not interested in anything
     choked:     true,  // everybody The ID of the peer that I download from.chokes us
 
     activeRequests: make(map[int]bool),
-    handshake: connector.handshake,
+    handshake: connector.Handshake,
   }
 }
 

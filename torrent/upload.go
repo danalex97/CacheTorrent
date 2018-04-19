@@ -34,13 +34,13 @@ func NewUpload(connector *Connector) Upload {
   return &upload{
     Components: connector.Components,
 
-    me:        connector.from,
-    to:        connector.to,
+    me:        connector.From,
+    to:        connector.To,
 
     isInterested: false, // initially, nobody is interested in my pieces
     choke:        true,  // initially, I choke all peers
 
-    handshake: connector.handshake,
+    handshake: connector.Handshake,
   }
 }
 
