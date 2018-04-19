@@ -8,7 +8,7 @@ type download struct {
   torrent.Download
 }
 
-func NewLocalDownload(c *Connector) torrent.Download {
+func NewIndirectDownload(c *Connector) torrent.Download {
   return &download{
     Download : torrent.NewDownload(c.Connector),
   }

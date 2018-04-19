@@ -3,7 +3,7 @@ package cache_torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/torrent"
-  // "math/rand"
+  "math/rand"
   "fmt"
 )
 
@@ -79,29 +79,29 @@ func (p *Peer) amLeader() bool {
 func (p *Peer) AddConnector(id string) {
   if getAS(p.Id) == getAS(id) || p.amLeader() {
     // Connection within the same AS
-    connector := torrent.
-      NewConnector(p.Id, id, p.Components).
-      WithHandshake().
-      WithUpload().
-      WithDownload()
-
-    p.Manager.AddConnector(connector)
-    p.Connectors[id] = connector
-
-    go connector.Run()
+    p.Peer.AddConnector(id)
   } else {
     // Connection in different AS
 
-    // leader := p.Leaders[rand.Intn(len(p.Leaders))]
+    leader := p.Leaders[rand.Intn(len(p.Leaders))]
     connector := Extend(torrent.
-      NewConnector(p.Id, id, p.Components).
-      WithHandshake()).
-      WithLocalUpload().
-      WithLocalDownload()
+      NewConnector(p.Id, leader, p.Components).
+      WithHandshake().
+      WithUpload()).
+      WithIndirectDownload()
 
+    // Wire the connector
     p.Manager.AddConnector(connector.Connector)
+    // We register the connection for the distant peer, so
+    // we need to overwrite the sender at the Border node
     p.Connectors[id] = connector
 
     go connector.Run()
+
+    // Start Inidirect Connection
+    p.Transport.ControlSend(leader, LeaderStart{
+      Id   : p.Id,
+      Dest : id,
+    })
   }
 }

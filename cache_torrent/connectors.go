@@ -14,12 +14,7 @@ func Extend(c *torrent.Connector) *Connector {
   }
 }
 
-func (c *Connector) WithLocalUpload() *Connector {
-  c.Upload = NewLocalUpload(c)
-  return c
-}
-
-func (c *Connector) WithLocalDownload() *Connector {
-  c.Download = NewLocalDownload(c)
+func (c *Connector) WithIndirectDownload() *Connector {
+  c.Download = NewIndirectDownload(c)
   return c
 }
