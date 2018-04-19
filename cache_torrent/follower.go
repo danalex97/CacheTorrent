@@ -8,6 +8,7 @@ package cache_torrent
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
+  "math/rand"
   "fmt"
 )
 
@@ -21,24 +22,53 @@ func NewFollower(p *Peer) *Follower {
   }
 }
 
-func (l *Follower) Run() {
+func (f *Follower) Run() {
   fmt.Println("Follower running.")
 }
 
-func (l *Follower) Recv(m interface {}) {
-  l.RunRecv(m, l.incomingConnection)
+func (f *Follower) Recv(m interface {}) {
+  f.RunRecv(m, f.incomingConnection)
 }
 
-func (l *Follower) incomingConnection(id string) {
-  if getAS(id) == getAS(l.Id) {
+func (f *Follower) incomingConnection(id string) {
+  if getAS(id) == getAS(f.Id) {
     // We make a bidirectional connection.
     torrent.
-      NewConnector(l.Id, id, l.Components).
+      NewConnector(f.Id, id, f.Components).
       WithHandshake().
       WithUpload().
       WithDownload().
-      Register(l.Peer.Peer)
+      Register(f.Peer.Peer)
   } else {
-    
+    // We receive an incoming connection from a diffrent AS
+
+    // 1. Open an upload connection towards that node
+    torrent.
+      NewConnector(f.Id, id, f.Components).
+      WithHandshake().
+      WithUpload().
+      Register(f.Peer.Peer)
+
+    // 2. Open an indirect connection
+    leader := f.Leaders[rand.Intn(len(f.Leaders))]
+    f.openIndirect(leader, id)
   }
+}
+
+func (f *Follower) openIndirect(leader, target string) {
+  if _, ok := f.Connectors[leader]; !ok {
+    // We have no direct connection with the leader, so we make one
+    torrent.
+      NewConnector(f.Id, leader, f.Components).
+      WithHandshake().
+      WithUpload().
+      WithDownload().
+      Register(f.Peer.Peer)
+  }
+
+  // Now we let the Leader know we want an indirect connection.
+  f.Transport.ControlSend(leader, LeaderStart{
+    Id   : f.Id,
+    Dest : target,
+  })
 }
