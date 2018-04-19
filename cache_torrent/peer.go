@@ -11,13 +11,11 @@ type Peer struct {
   *torrent.Peer
 
   Leaders []string
-  RemoteConnectors map[string]torrent.Runner
 }
 
 func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer := new(Peer)
   peer.Peer = (peer.Peer.New(util)).(*torrent.Peer)
-  peer.RemoteConnectors = make(map[string]torrent.Runner)
   return peer
 }
 
@@ -132,7 +130,7 @@ func (p *Peer) AddLeaderConnector(local, remote string) {
     WithDownloadWithRedirect(local).
     Strip()
 
-  p.RemoteConnectors[remote] = connector
+  p.Connectors[remote] = connector
   p.Manager.AddConnector(connector)
 
   go connector.Run()
