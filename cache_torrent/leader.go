@@ -15,11 +15,17 @@ import (
 
 type Leader struct {
   *Peer
+
+  followerFwd map[string][]*Forwarder
+  peerFwd     map[string][]*Forwarder
 }
 
 func NewLeader(p *Peer) *Leader {
   return &Leader{
     Peer : p,
+
+    followerFwd : make(map[string][]*Forwarder),
+    peerFwd     : make(map[string][]*Forwarder),
   }
 }
 
@@ -35,7 +41,9 @@ func (l *Leader) Recv(m interface {}) {
     peer     := msg.Dest
 
     // Make bidirectional connection to follower
-    l.outgoingConnection(follower)
+    if _, ok := l.Connectors[follower]; !ok {
+      l.outgoingConnection(follower)
+    }
 
     // Like this some connections from Leader to Leader may become
     // unidirectional [Race]
@@ -44,10 +52,24 @@ func (l *Leader) Recv(m interface {}) {
       // only connection. That is, we do no handshake and send a message
       // to the peer.
 
-
+      torrent.
+        NewConnector(l.Id, peer, l.Components).
+        WithDownload().
+        Register(l.Peer.Peer)
     }
 
+    // Once the connections are made, we only need to register the forwarder
+    fwd := NewForwarder(follower, peer)
 
+    if _, ok := l.followerFwd[follower]; !ok {
+       l.followerFwd[follower] = []*Forwarder{}
+    }
+    l.followerFwd[follower] = append(l.followerFwd[follower], fwd)
+
+    if _, ok := l.peerFwd[peer]; !ok {
+       l.peerFwd[peer] = []*Forwarder{}
+    }
+    l.peerFwd[peer] = append(l.peerFwd[peer], fwd)
   }
 
   l.Peer.RunRecv(m, l.incomingConnection)
