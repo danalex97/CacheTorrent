@@ -23,15 +23,12 @@ func NewConnector(from, to string, components *Components) *Connector {
 
   connector.Components = components
 
-  connector.From = from
-  connector.To   = to
+  connector.From      = from
+  connector.To        = to
+
+  connector.Handshake = NewHandshake(connector)
 
   return connector
-}
-
-func (c *Connector) WithHandshake() *Connector {
-  c.Handshake = NewHandshake(c)
-  return c
 }
 
 func (c *Connector) WithUpload() *Connector {
@@ -53,11 +50,9 @@ func (c *Connector) Register(p *Peer) *Connector {
 }
 
 func (c *Connector) Run() {
-  if c.Handshake != nil && c.runHandshake {
-    go c.Handshake.Run()
-  }
   if c.Upload != nil {
     go c.Upload.Run()
+    go c.Handshake.Run()
   }
   if c.Download != nil {
     go c.Download.Run()
@@ -65,13 +60,11 @@ func (c *Connector) Run() {
 }
 
 func (c *Connector) Recv(m interface {}) {
-  if c.Handshake != nil {
-    c.Handshake.Recv(m)
-  }
   if c.Upload != nil {
     c.Upload.Recv(m)
   }
   if c.Download != nil {
     c.Download.Recv(m)
+    c.Handshake.Recv(m)
   }
 }

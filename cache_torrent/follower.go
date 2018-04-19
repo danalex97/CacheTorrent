@@ -42,7 +42,6 @@ func (f *Follower) incomingConnection(id string) {
     // We make a bidirectional connection.
     torrent.
       NewConnector(f.Id, id, f.Components).
-      WithHandshake().
       WithUpload().
       WithDownload().
       Register(f.Peer.Peer)
@@ -52,7 +51,6 @@ func (f *Follower) incomingConnection(id string) {
     // 1. Open an upload connection towards that node
     torrent.
       NewConnector(f.Id, id, f.Components).
-      WithHandshake().
       WithUpload().
       Register(f.Peer.Peer)
 
@@ -67,7 +65,6 @@ func (f *Follower) openIndirect(leader, target string) {
     // We have no direct connection with the leader, so we make one
     torrent.
       NewConnector(f.Id, leader, f.Components).
-      WithHandshake().
       WithUpload().
       WithDownload().
       Register(f.Peer.Peer)

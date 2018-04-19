@@ -58,7 +58,6 @@ func (l *Leader) outgoingConnection(id string) {
   // it's able to upload to anybody for outgoing connections.
   torrent.
     NewConnector(l.Id, id, l.Components).
-    WithHandshake().
     WithUpload().
     WithDownload().
     Register(l.Peer.Peer)

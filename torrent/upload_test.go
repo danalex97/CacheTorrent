@@ -52,7 +52,7 @@ func makeUpload() (Upload, Transport, Transport, *Components) {
     Transport : t0,
     Choker    : &mockChoker{},
   }
-  u := NewUpload(NewConnector("0", "1", c).WithHandshake())
+  u := NewUpload(NewConnector("0", "1", c))
   return u, t0, t1, c
 }
 
