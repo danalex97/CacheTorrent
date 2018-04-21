@@ -2,7 +2,6 @@ package cache_torrent
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
-  "fmt"
 )
 
 type Forwarder struct {
@@ -27,7 +26,7 @@ func (f *Forwarder) Recv(m interface {}) {
   // follower <-> leader <- peer
 
   if id == f.from {
-    // follower --> peer
+    // follower -> leader
 
     switch msg := m.(type) {
     case torrent.Request:
@@ -41,11 +40,9 @@ func (f *Forwarder) Recv(m interface {}) {
       }
     }
   } else {
-    // peer --> follower
-
+    // leader <- peer
     switch msg := m.(type) {
     case torrent.Have:
-      fmt.Println(f.Id, "got have", m)
       f.Transport.ControlSend(f.from, torrent.Have{
         Id    : f.Id,
         Index : msg.Index,

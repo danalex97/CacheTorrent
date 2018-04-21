@@ -4,6 +4,7 @@ import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
   "runtime"
+  // "reflect"
   "fmt"
 )
 
@@ -185,31 +186,25 @@ func (p *Peer) Run(connAdd ConnAdder) {
 }
 
 func (p *Peer) GetId(m interface {}) (id string){
+  // fmt.Println("Msg:", p.Id, reflect.TypeOf(m), m)
+
   switch msg := m.(type) {
   case Choke:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Unchoke:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Interested:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case NotInterested:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Have:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Request:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case Piece:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   case ConnReq:
     id = msg.Id
-    // fmt.Println("Msg:", p.Id, reflect.TypeOf(msg), msg)
   }
   return
 }

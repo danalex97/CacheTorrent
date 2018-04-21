@@ -14,6 +14,9 @@ type Upload interface {
   Choke()    // Actions done when I choke a connection(upload)
   Unchoke()  // Actions done when I unchoke a connection(upload)
 
+  Me() string
+  To() string
+
   Choking()      bool     // Returns if I'm choking the connection
   IsInterested() bool     // Returns if the other peer is interested in my pieces
   Rate()         float64  //
@@ -102,6 +105,20 @@ func (u *upload) interested(interested bool) {
   } else {
     u.Choker.NotInterested(u)
   }
+}
+
+/*
+ * The ID of the peer that uploads.
+ */
+func (u *upload) Me() string {
+  return u.me
+}
+
+/*
+ * The ID of the peer that I upload to.
+ */
+func (u *upload) To() string {
+  return u.to
 }
 
 /*
