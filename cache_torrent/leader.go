@@ -54,16 +54,18 @@ func (l *Leader) Recv(m interface {}) {
       l.outgoingConnection(follower)
     }
 
-    // Like this some connections from Leader to Leader may become
-    // unidirectional [Race]
     if _, ok := l.Connectors[peer]; !ok {
       // If there is no connection with the Peer, we make a download
       // only connection. That is, we do no handshake and send a message
       // to the peer.
 
+      // We can add the upload component since the other peer does
+      // upload only if it's a follower, so our Upload will do nothing
+      // since it will be always choked.
       torrent.
         NewConnector(l.Id, peer, l.Components).
         WithDownload().
+        WithUpload().
         Register(l.Peer.Peer)
     }
 
@@ -93,7 +95,7 @@ func (l *Leader) forward(m interface {}) {
 }
 
 func (l *Leader) registerForwarder(follower, peer string) {
-  fwd := NewForwarder(follower, peer)
+  fwd := NewForwarder(l, follower, peer)
 
   if _, ok := l.followerFwd[follower]; !ok {
      l.followerFwd[follower] = []*Forwarder{}
