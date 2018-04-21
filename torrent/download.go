@@ -11,6 +11,7 @@ import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
   "strconv"
+  "fmt"
 )
 
 const backlog int = config.Backlog
@@ -168,6 +169,8 @@ func (d *download) gotUnchoke(msg Unchoke) {
 }
 
 func (d *download) gotPiece(msg Piece) {
+  fmt.Println(d.me, "got piece", msg)
+
   // Remove the request from activeRequests
   index := msg.Index
   delete(d.activeRequests, index)

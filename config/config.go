@@ -7,7 +7,7 @@ const MinNodes int = 10
 const Seeds    int = 1
 
 const PieceSize int = 10
-const Pieces    int = 10
+const Pieces    int = 1
 
 const Uploads     int = 0
 const Optimistics int = 1

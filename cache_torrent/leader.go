@@ -59,13 +59,15 @@ func (l *Leader) Recv(m interface {}) {
       // only connection. That is, we do no handshake and send a message
       // to the peer.
 
+      fmt.Println(l.Id, "<-", peer)
+
       // We can add the upload component since the other peer does
       // upload only if it's a follower, so our Upload will do nothing
-      // since it will be always choked.
+      // since it will be   always choked.
       torrent.
         NewConnector(l.Id, peer, l.Components).
         WithDownload().
-        WithUpload().
+        // WithUpload().
         Register(l.Peer.Peer)
     }
 
@@ -109,6 +111,7 @@ func (l *Leader) registerForwarder(follower, peer string) {
 }
 
 func (l *Leader) outgoingConnection(id string) {
+  fmt.Println(l.Id, "<->", id)
   // A leader has the initial protocol capabilities, that is
   // it's able to upload to anybody for outgoing connections.
   torrent.
