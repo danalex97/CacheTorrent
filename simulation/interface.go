@@ -6,10 +6,10 @@ import (
   "github.com/danalex97/nfsTorrent/cache_torrent"
 )
 
-type simulatedNode struct {
+type SimulatedNode struct {
 }
 
-func (s *simulatedNode) New(util TorrentNodeUtil) TorrentNode {
+func (s *SimulatedNode) New(util TorrentNodeUtil) TorrentNode {
   if util.Join() == "" {
     return new(torrent.Tracker).New(util)
   } else {
@@ -17,10 +17,10 @@ func (s *simulatedNode) New(util TorrentNodeUtil) TorrentNode {
   }
 }
 
-type simulatedCachedNode struct {
+type SimulatedCachedNode struct {
 }
 
-func (s *simulatedCachedNode) New(util TorrentNodeUtil) TorrentNode {
+func (s *SimulatedCachedNode) New(util TorrentNodeUtil) TorrentNode {
   if util.Join() == "" {
     return new(cache_torrent.Tracker).New(util)
   } else {

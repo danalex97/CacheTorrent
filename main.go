@@ -11,7 +11,10 @@ import (
 func main() {
   rand.Seed(time.Now().UTC().UnixNano())
 
-  s := simulation.SmallTorrentSimulation()
+  s := simulation.SmallTorrentSimulation(
+    new(simulation.SimulatedCachedNode),
+    nil,
+  )
   s.Run()
 
   time.Sleep(time.Duration(float64(time.Second) * 10))

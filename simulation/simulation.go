@@ -9,10 +9,12 @@ import (
 
 type Simulation interfaces.ISimulation
 
-func SmallTorrentSimulation() Simulation {
-  // nodeTemplate := new(simulatedNode)
-  nodeTemplate := new(simulatedCachedNode)
-  return sdk.NewDHTSimulationBuilder(nodeTemplate).
+func SmallTorrentSimulation(template interface {}, newConfig *config.Conf) Simulation {
+  if newConfig != nil {
+    config.Config = newConfig
+  }
+
+  return sdk.NewDHTSimulationBuilder(template).
     WithPoissonProcessModel(2, 2).
     // WithInternetworkUnderlay(10, 50, 20, 50).
     WithInternetworkUnderlay(10, 50, 2, 50).
