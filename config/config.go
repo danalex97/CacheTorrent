@@ -14,7 +14,10 @@ type Conf struct {
   Optimistics int // number of Optimistics chosen by a Choker
   Interval    int // milliseconds
 
-  Backlog     int // number of pieces requested at a time
+  Backlog        int // number of pieces requested at a time
+
+  Shared         interface {}
+  SharedCallback func(interface {})
 }
 
 func NewConf() *Conf {
@@ -32,7 +35,10 @@ func NewConf() *Conf {
     Optimistics : 1,
     Interval    : 10000,
 
-    Backlog     : 10,
+    Backlog : 10,
+
+    Shared         : nil,
+    SharedCallback : func(interface {}) {},
   }
 }
 
