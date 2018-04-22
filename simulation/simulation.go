@@ -49,3 +49,49 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
     WithCapacityNodes(config.Config.MinNodes + 1, 10, 20).
     Build()
 }
+
+
+/**
+ * We want to do a similar simulation to the ones done in:
+ * [R. Bindal et al., "Improving Traffic Locality in BitTorrent via
+ * Biased Neighbor Selection," 26th IEEE International Conference on
+ * Distributed Computing Systems (ICDCS'06), 2006, pp. 66-66]
+ *
+ * - topology:
+ *   - 700 peers
+ *   - 14 ISPs
+ *   - around 50 peers/ISP
+ * - links:
+ *   - unit of measure: b/ms
+ *   - uplink:   400Kb/s = 0.4Kb/ms = 400 b/ms
+ *   - downlink: 1.5Mb/s = 1,500Kb/s = 1.5Kb/ms = 1,500 b/ms
+ * - BitTorrent configuration:
+ *   - out peers: 35
+ *   - rechoking interval: 10s = 10,000ms
+ *   - 5 unchoked connections with 1 optimistic
+ *   - piece size: 245KB = 245,000B = 1,960,000b
+ *
+ *   - pieces: 1000 (default)
+ *   - backlog: 10 (default)
+ */
+func ITLConfig() *config.Conf {
+ return &config.Conf{
+   OutPeers : 35,
+   InPeers  : 35,
+
+   MinNodes : 700,
+   Seeds    : 1,
+
+   PieceSize : 1960000,
+   Pieces    : 1000,
+
+   Uploads     : 4,
+   Optimistics : 1,
+   Interval    : 10000,
+
+   Backlog : 10,
+
+   SharedInit     : func() {},
+   SharedCallback : func() {},
+ }
+}
