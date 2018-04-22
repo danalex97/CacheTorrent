@@ -7,11 +7,11 @@ import (
   "math/rand"
 )
 
-const MinNodes       int = config.MinNodes
-const PeerNeighbours int = config.OutPeers
-const Seeds          int = config.Seeds
-const Pieces         int = config.Pieces
-const PieceSize      int = config.PieceSize
+var MinNodes       int = config.Config.MinNodes
+var PeerNeighbours int = config.Config.OutPeers
+var Seeds          int = config.Config.Seeds
+var Pieces         int = config.Config.Pieces
+var PieceSize      int = config.Config.PieceSize
 
 type Tracker struct {
   Ids       []string

@@ -28,9 +28,9 @@ import (
 )
 
 // We use variables instead of constants to allow testing.
-var uploads     int = config.Uploads
-var optimistics int = config.Optimistics
-var interval    int = config.Interval
+var uploads     int = config.Config.Uploads
+var optimistics int = config.Config.Optimistics
+var interval    int = config.Config.Interval
 
 type Choker interface {
   Interested(conn Upload)

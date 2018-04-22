@@ -6,7 +6,7 @@ import (
   "fmt"
 )
 
-const pieceNumber int = config.Pieces
+var pieceNumber int = config.Config.Pieces
 
 type Storage interface {
   Have(index int) (PieceMeta, bool)

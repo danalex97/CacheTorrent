@@ -8,7 +8,7 @@ import (
   "fmt"
 )
 
-const MaxPeers int = config.InPeers + config.OutPeers
+var MaxPeers int = config.Config.InPeers + config.Config.OutPeers
 
 type Peer struct {
   *Components
@@ -217,7 +217,7 @@ func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
   }
 
   /**
-   * The peer can have up to at most config.OutPeers connections
+   * The peer can have up to at most config.Config.OutPeers connections
    * initiated by it.
    *
    * A perfect tracker would not keep "one-way" connections, that

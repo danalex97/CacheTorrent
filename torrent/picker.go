@@ -175,7 +175,7 @@ func (p *picker) Next(peer string) (int, bool) {
    * increase the download time significantly assuming a small request queue
    * size.
    *
-   * To fully eliminate this effect we can use config.Backlog = 1.
+   * To fully eliminate this effect we can use config.Config.Backlog = 1.
    */
 
   return 0, false

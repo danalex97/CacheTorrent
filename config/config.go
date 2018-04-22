@@ -1,16 +1,39 @@
 package config
 
-const OutPeers int = 3
-const InPeers  int = 3
+type Conf struct {
+  OutPeers int // maximum number of outbound peers
+  InPeers  int // maximum number of inbound peers
 
-const MinNodes int = 10
-const Seeds    int = 1
+  MinNodes int // minimum number of nodes in a Torrent
+  Seeds    int // number of seed nodes
 
-const PieceSize int = 10
-const Pieces    int = 1
+  PieceSize int // the piece size
+  Pieces    int // number of pieces in a Torrent
 
-const Uploads     int = 0
-const Optimistics int = 1
-const Interval    int = 10000 // milliseconds
+  Uploads     int // number of Uploads (without Optimistics) chosen by a Choker
+  Optimistics int // number of Optimistics chosen by a Choker
+  Interval    int // milliseconds
 
-const Backlog     int = 10 // number of pieces requested at a time
+  Backlog     int // number of pieces requested at a time
+}
+
+func NewConf() *Conf {
+  return &Conf{
+    OutPeers : 3,
+    InPeers  : 3,
+
+    MinNodes : 10,
+    Seeds    : 1,
+
+    PieceSize : 10,
+    Pieces    : 1,
+
+    Uploads     : 0,
+    Optimistics : 1,
+    Interval    : 10000,
+
+    Backlog     : 10,
+  }
+}
+
+var Config *Conf = NewConf()

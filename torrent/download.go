@@ -13,7 +13,7 @@ import (
   "strconv"
 )
 
-const backlog int = config.Backlog
+var backlog int = config.Config.Backlog
 
 type Download interface {
   Runner

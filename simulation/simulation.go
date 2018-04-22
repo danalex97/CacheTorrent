@@ -17,11 +17,11 @@ func SmallTorrentSimulation() Simulation {
     // WithInternetworkUnderlay(10, 50, 20, 50).
     WithInternetworkUnderlay(10, 50, 2, 50).
     WithDefaultQueryGenerator().
-    WithLimitedNodes(config.MinNodes + 1).
+    WithLimitedNodes(config.Config.MinNodes + 1).
     // WithMetrics().
     //====================================
     WithCapacities().
     WithTransferInterval(10).
-    WithCapacityNodes(config.MinNodes + 1, 10, 20).
+    WithCapacityNodes(config.Config.MinNodes + 1, 10, 20).
     Build()
 }
