@@ -91,7 +91,10 @@ func TestGotUnchokeRequestsMore(t *testing.T) {
 func TestGotPieceSendsHaves(t *testing.T) {
   d, _, t1, c := makeDownload()
 
-  c.Manager.(*mockManager).downloads = []Download{d}
+  c.Manager.(*mockManager).uploads = []Upload{&mockUpload{
+    me : "0",
+    to : "1",
+  }}
   d.Recv(Piece{"1", 0, 0, Data{"0", 10}})
 
   assertEqual(t, <-t1.ControlRecv(), Have{"0", 0})

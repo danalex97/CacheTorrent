@@ -13,6 +13,17 @@ type mockUpload struct {
   isInterested bool
   choke        bool
   rate         float64
+
+  me string
+  to string
+}
+
+func (m *mockUpload) Me() string {
+  return m.me
+}
+
+func (m *mockUpload) To() string {
+  return m.to
 }
 
 func (m *mockUpload) Choke() {
