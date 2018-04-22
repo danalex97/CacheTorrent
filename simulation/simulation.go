@@ -9,7 +9,29 @@ import (
 
 type Simulation interfaces.ISimulation
 
-func SmallTorrentSimulation(template interface {}, newConfig *config.Conf) Simulation {
+func SmallTorrentConfig() *config.Conf {
+  return &config.Conf{
+    OutPeers : 3,
+    InPeers  : 3,
+
+    MinNodes : 10,
+    Seeds    : 1,
+
+    PieceSize : 10,
+    Pieces    : 1,
+
+    Uploads     : 0,
+    Optimistics : 1,
+    Interval    : 10000,
+
+    Backlog : 10,
+
+    SharedInit     : func() {},
+    SharedCallback : func() {},
+  }
+}
+
+func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
   if newConfig != nil {
     config.Config = newConfig
   }

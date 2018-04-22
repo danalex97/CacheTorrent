@@ -20,6 +20,9 @@ type Conf struct {
   SharedInit     func()
 }
 
+/**
+ * The default simulation configuration.
+ */
 func NewConf() *Conf {
   return &Conf{
     OutPeers : 3,

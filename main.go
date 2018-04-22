@@ -16,11 +16,11 @@ func main() {
 
   var wg sync.WaitGroup
 
-  s := simulation.SmallTorrentSimulation(
+  s := simulation.NewSimulation(
     // new(simulation.SimulatedNode),
     new(simulation.SimulatedCachedNode),
-    config.
-      NewConf().
+    simulation.
+      SmallTorrentConfig().
       WithParams(func(c *config.Conf) {
         c.SharedInit = func() {
           wg.Add(1)
