@@ -16,11 +16,26 @@ func main() {
 
   var wg sync.WaitGroup
 
-  s := simulation.NewSimulation(
+  // s := simulation.NewSimulation(
+  //   // new(simulation.SimulatedNode),
+  //   new(simulation.SimulatedCachedNode),
+  //   simulation.
+  //     SmallTorrentConfig().
+  //     WithParams(func(c *config.Conf) {
+  //       c.SharedInit = func() {
+  //         wg.Add(1)
+  //       }
+  //       c.SharedCallback = func() {
+  //         wg.Done()
+  //       }
+  //     }),
+  // )
+
+  s := simulation.NewITLSimulation(
     // new(simulation.SimulatedNode),
     new(simulation.SimulatedCachedNode),
     simulation.
-      SmallTorrentConfig().
+      ITLConfig().
       WithParams(func(c *config.Conf) {
         c.SharedInit = func() {
           wg.Add(1)
@@ -30,6 +45,7 @@ func main() {
         }
       }),
   )
+
   s.Run()
 
   // Initial time required to run SharedInits

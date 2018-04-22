@@ -50,7 +50,6 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
     Build()
 }
 
-
 /**
  * We want to do a similar simulation to the ones done in:
  * [R. Bindal et al., "Improving Traffic Locality in BitTorrent via
@@ -94,4 +93,24 @@ func ITLConfig() *config.Conf {
    SharedInit     : func() {},
    SharedCallback : func() {},
  }
+}
+
+func NewITLSimulation(template interface {}, newConfig *config.Conf) Simulation {
+  if newConfig != nil {
+    config.Config = newConfig
+  }
+
+  return sdk.NewDHTSimulationBuilder(template).
+    WithPoissonProcessModel(2, 2).
+    // transitDomains, transitDomainSize, stubDomains, stubDomainSize
+    WithInternetworkUnderlay(10, 50, 14, 100).
+    WithDefaultQueryGenerator().
+    WithLimitedNodes(config.Config.MinNodes + 1).
+    //====================================
+    WithCapacities().
+    // unit: ms
+    WithTransferInterval(100).
+    // number, up, down; unit: b/ms
+    WithCapacityNodes(config.Config.MinNodes + 1, 400, 1500).
+    Build()
 }
