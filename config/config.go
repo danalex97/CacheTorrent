@@ -16,8 +16,8 @@ type Conf struct {
 
   Backlog        int // number of pieces requested at a time
 
-  Shared         interface {}
-  SharedCallback func(interface {})
+  SharedCallback func()
+  SharedInit     func()
 }
 
 func NewConf() *Conf {
@@ -37,8 +37,8 @@ func NewConf() *Conf {
 
     Backlog : 10,
 
-    Shared         : nil,
-    SharedCallback : func(interface {}) {},
+    SharedInit     : func() {},
+    SharedCallback : func() {},
   }
 }
 

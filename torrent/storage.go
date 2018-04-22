@@ -8,9 +8,6 @@ import (
 
 var pieceNumber int = config.Config.Pieces
 
-var shared         interface {}       = config.Config.Shared
-var sharedCallback func(interface {}) = config.Config.SharedCallback
-
 type Storage interface {
   Have(index int) (PieceMeta, bool)
   Store(Piece)
@@ -87,7 +84,7 @@ func (s *storage) Pieces() []int {
 func (s *storage) checkCompleted() {
   if len(s.pieces) == pieceNumber && !s.completed {
     // Callback used to interact with the simulation
-    sharedCallback(shared)
+    config.Config.SharedCallback()
 
     // Notify completed
     fmt.Println(s.id, "Completed")
