@@ -75,3 +75,14 @@ func (p *Peer) Bind(m interface {}) (state int) {
   }
   return
 }
+
+func (p *Peer) GetId(m interface {}) string {
+  switch msg := m.(type) {
+  case LeaderStart:
+    return msg.Id
+  case Miss:
+    return msg.Id
+  default:
+    return p.Peer.GetId(m)
+  }
+}

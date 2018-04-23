@@ -28,7 +28,7 @@ func (f *Follower) Run() {
 }
 
 func (f *Follower) Recv(m interface {}) {
-  f.Peer.RunRecv(m, f.incomingConnection)
+  f.Peer.RunRecv(f.GetId(m), m, f.incomingConnection)
 }
 
 func (f *Follower) outgoingConnection(id string) {

@@ -9,14 +9,8 @@ type LeaderStart struct {
   Dest string // the ID of the destination
 }
 
-type RemoteStart struct {
-  Id string // the ID of the leader
-}
-
-type IndirectReq struct {
-  From string
-  Dest string
-
+type Miss struct {
+  Id    string
   Index int
 }
 

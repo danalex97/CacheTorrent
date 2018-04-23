@@ -23,9 +23,12 @@ func (u *CacheUpload) Recv(m interface {}) {
       return
     }
 
-    // If we don't have the respective message, we should choke the sender
-    // so that the sender has to re-request the pieces.
-    u.TorrentUpload.Choke()
+    // If we don't have the respective message, we should inform the sender
+    // by saying a miss occured.
+    u.Transport.ControlSend(msg.Id, Miss{
+      Id    : u.Me(),
+      Index : msg.Index,
+    })
   default:
     u.TorrentUpload.Recv(m)
   }

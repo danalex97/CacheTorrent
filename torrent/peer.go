@@ -130,7 +130,7 @@ func (p *Peer) Process(m interface {}, state int) {
   case BindRun:
     p.Run(p.AddConnector)
   case BindRecv:
-    p.RunRecv(m, p.AddConnector)
+    p.RunRecv(p.GetId(m), m, p.AddConnector)
   }
 }
 
@@ -210,9 +210,7 @@ func (p *Peer) GetId(m interface {}) (id string){
   return
 }
 
-func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
-  id := p.GetId(m)
-
+func (p *Peer) RunRecv(id string, m interface {}, connAdd ConnAdder) {
   if id == "" {
     return
   }

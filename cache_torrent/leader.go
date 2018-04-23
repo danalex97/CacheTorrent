@@ -34,15 +34,6 @@ func (l *Leader) Run() {
   l.Peer.Run(l.outgoingConnection)
 }
 
-func (l *Leader) GetId(m interface {}) string {
-  switch msg := m.(type) {
-  case LeaderStart:
-    return msg.Id
-  default:
-    return l.Peer.GetId(m)
-  }
-}
-
 func (l *Leader) Recv(m interface {}) {
   switch msg := m.(type) {
   case LeaderStart:
@@ -77,7 +68,7 @@ func (l *Leader) Recv(m interface {}) {
   // Add upload component if necessary
   // l.addUploader(m)
 
-  l.Peer.RunRecv(m, l.incomingConnection)
+  l.Peer.RunRecv(l.GetId(m), m, l.incomingConnection)
 }
 
 // func (l *Leader) addUploader(m interface {}) {

@@ -2,6 +2,7 @@ package cache_torrent
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
+  "fmt"
 )
 
 type CacheDownload struct {
@@ -16,6 +17,8 @@ func NewDownload(connector *torrent.Connector) torrent.Download {
 
 func (u *CacheDownload) Recv(m interface {}) {
   switch m.(type) {
+  case Miss:
+    fmt.Println("Miss")
   default:
     u.TorrentDownload.Recv(m)
   }
