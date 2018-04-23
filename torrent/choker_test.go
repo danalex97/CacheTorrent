@@ -5,6 +5,12 @@ import (
 )
 
 /* Mocks. */
+type mockConst struct {
+  value int
+}
+
+func (c *mockConst) Value() int { return c.value }
+
 type mockChoker struct {
   interestedCalled    bool
   notInterestedCalled bool
@@ -22,8 +28,8 @@ func makeChoker(uploads []Upload) ([]Upload, *choker) {
 }
 
 func TestRechokingDecreasingByRate(t *testing.T) {
-  uploads     = 3
-  optimistics = 0
+  uploads     = &mockConst{3}
+  optimistics = &mockConst{0}
 
   ups, c := makeChoker([]Upload{
     &mockUpload{isInterested:true, choke: true, rate:10},
@@ -43,8 +49,8 @@ func TestRechokingDecreasingByRate(t *testing.T) {
 }
 
 func TestRechokingOptimisticChosenOutOfRemaining(t *testing.T) {
-  uploads     = 3
-  optimistics = 1
+  uploads     = &mockConst{3}
+  optimistics = &mockConst{1}
 
   ups, c := makeChoker([]Upload{
     &mockUpload{isInterested:true, choke: true, rate:10},
@@ -64,8 +70,8 @@ func TestRechokingOptimisticChosenOutOfRemaining(t *testing.T) {
 }
 
 func TestRechokingDiffrentOptimistics(t *testing.T) {
-  uploads     = 0
-  optimistics = 1
+  uploads     = &mockConst{0}
+  optimistics = &mockConst{1}
 
   idxs := []int{}
 
@@ -99,8 +105,8 @@ func TestRechokingDiffrentOptimistics(t *testing.T) {
 }
 
 func TestRechokingIgnoresNotIterestedConnections(t *testing.T) {
-  uploads     = 3
-  optimistics = 1
+  uploads     = &mockConst{3}
+  optimistics = &mockConst{1}
 
   ups, c := makeChoker([]Upload{
     &mockUpload{isInterested:true,  choke: true, rate:10},
@@ -120,8 +126,8 @@ func TestRechokingIgnoresNotIterestedConnections(t *testing.T) {
 }
 
 func TestRechokeCalled(t *testing.T) {
-  uploads = 0
-  optimistics = 0
+  uploads = &mockConst{0}
+  optimistics = &mockConst{0}
 
   ups, c := makeChoker([]Upload{
     &mockUpload{isInterested:true, choke: false, rate:10},

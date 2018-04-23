@@ -8,6 +8,8 @@ import (
 
 /* Tests. */
 func TestStorage(t *testing.T) {
+  pieceNumber = &mockConst{10}
+
   s := NewStorage("", []PieceMeta{})
 
   s.Store(Piece{"", 0, 0, Data{"0", 10}})
@@ -33,6 +35,8 @@ func TestStorage(t *testing.T) {
 }
 
 func TestStorageConcurrent(t *testing.T) {
+  pieceNumber = &mockConst{30}
+
   for i := 0; i < 10; i++ {
     s := NewStorage("", []PieceMeta{})
 

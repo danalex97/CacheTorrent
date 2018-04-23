@@ -9,6 +9,9 @@ import (
 /* Tests. */
 
 func makeDownload() (Download, Transport, Transport, *Components) {
+  backlog     = &mockConst{10}
+  pieceNumber = &mockConst{10}
+
   t0 := NewTransferEngine(10, 10, "0")
   t1 := NewTransferEngine(10, 10, "1")
 
