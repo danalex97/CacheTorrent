@@ -169,7 +169,7 @@ func (p *Peer) Bind(m interface {}) (state int) {
 func (p *Peer) Run(connAdd ConnAdder) {
   // We want to bind all these variables here, so
   // we don't need any synchroization.
-  fmt.Println(p.Id, p.Ids)
+  // fmt.Println(p.Id, p.Ids)
 
   // make per peer variables
   p.Storage   = NewStorage(p.Id, p.Pieces)

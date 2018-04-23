@@ -21,6 +21,10 @@ type storage struct {
   id        string
   pieces    map[int]PieceMeta // the pieces that I have
   completed bool
+
+  // Used only for monitoring
+  percents    []int
+  percentDone []bool
 }
 
 func NewStorage(id string, pieces []PieceMeta) Storage {
@@ -33,6 +37,9 @@ func NewStorage(id string, pieces []PieceMeta) Storage {
   for _, p := range pieces {
     storage.pieces[p.Index] = p
   }
+
+  storage.percents = []int{20, 50, 70}
+  storage.percentDone = []bool{false, false, false}
 
   storage.checkCompleted()
 
@@ -82,6 +89,15 @@ func (s *storage) Pieces() []int {
 }
 
 func (s *storage) checkCompleted() {
+  for i := range s.percents {
+    if s.percentDone[i] == false {
+      if len(s.pieces) > pieceNumber.Value() * s.percents[i] / 100 {
+        s.percentDone[i] = true
+        fmt.Println(s.id, "Downloaded", s.percents[i], "%")
+      }
+    }
+  }
+
   if len(s.pieces) == pieceNumber.Value() && !s.completed {
     // Callback used to interact with the simulation
     config.Config.SharedCallback()
