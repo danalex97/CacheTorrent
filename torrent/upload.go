@@ -5,7 +5,6 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "strconv"
-  // "fmt"
 )
 
 type Upload interface {
@@ -61,7 +60,6 @@ func (u *upload) Recv(m interface {}) {
     meta, ok := u.Storage.Have(msg.Index)
 
     if !ok {
-      // fmt.Println("Broke")
       return
     }
 

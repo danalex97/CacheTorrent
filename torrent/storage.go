@@ -38,8 +38,8 @@ func NewStorage(id string, pieces []PieceMeta) Storage {
     storage.pieces[p.Index] = p
   }
 
-  storage.percents = []int{20, 50, 70}
-  storage.percentDone = []bool{false, false, false}
+  storage.percents = []int{2, 20, 50, 70}
+  storage.percentDone = []bool{false, false, false, false}
 
   storage.checkCompleted()
 
