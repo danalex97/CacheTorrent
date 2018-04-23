@@ -21,31 +21,6 @@ type Conf struct {
 }
 
 /**
- * The default simulation configuration.
- */
-func NewConf() *Conf {
-  return &Conf{
-    OutPeers : 3,
-    InPeers  : 3,
-
-    MinNodes : 10,
-    Seeds    : 1,
-
-    PieceSize : 10,
-    Pieces    : 1,
-
-    Uploads     : 0,
-    Optimistics : 1,
-    Interval    : 10000,
-
-    Backlog : 10,
-
-    SharedInit     : func() {},
-    SharedCallback : func() {},
-  }
-}
-
-/**
  * Usage:
  *  c := NewConf().
  *    WithParams(func(c *Conf) {
@@ -58,4 +33,4 @@ func (c *Conf) WithParams(f func (c *Conf)) *Conf {
   return c
 }
 
-var Config *Conf = NewConf()
+var Config *Conf

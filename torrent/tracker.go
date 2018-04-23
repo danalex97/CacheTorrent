@@ -7,11 +7,11 @@ import (
   "math/rand"
 )
 
-var MinNodes       int = config.Config.MinNodes
-var PeerNeighbours int = config.Config.OutPeers
-var Seeds          int = config.Config.Seeds
-var Pieces         int = config.Config.Pieces
-var PieceSize      int = config.Config.PieceSize
+var MinNodes       config.Const = config.NewConst(config.MinNodes)
+var PeerNeighbours config.Const = config.NewConst(config.OutPeers)
+var Seeds          config.Const = config.NewConst(config.Seeds)
+var Pieces         config.Const = config.NewConst(config.Pieces)
+var PieceSize      config.Const = config.NewConst(config.PieceSize)
 
 type Tracker struct {
   Ids       []string
@@ -28,8 +28,8 @@ func (t *Tracker) New(util TorrentNodeUtil) TorrentNode {
 
   tracker.Ids   = []string{}
 
-  tracker.Limit = MinNodes
-  tracker.Neigh = PeerNeighbours
+  tracker.Limit = MinNodes.Value()
+  tracker.Neigh = PeerNeighbours.Value()
   tracker.Id    = util.Id()
 
   tracker.Transport = util.Transport()
@@ -114,13 +114,13 @@ func (t *Tracker) Neighbours(id string) interface {} {
 func (t *Tracker) seedRequest(req SeedReq) SeedRes {
   for i, id := range t.Ids {
     if id == req.From {
-      if i < Seeds {
+      if i < Seeds.Value() {
         // It's a seed
         ps     := []PieceMeta{}
         begin  := 0
-        length := PieceSize
+        length := PieceSize.Value()
 
-        for j := 0; j < Pieces; j++ {
+        for j := 0; j < Pieces.Value(); j++ {
           ps    = append(ps, PieceMeta{j, begin, length})
           begin = begin + length
         }

@@ -28,9 +28,9 @@ import (
 )
 
 // We use variables instead of constants to allow testing.
-var uploads     int = config.Config.Uploads
-var optimistics int = config.Config.Optimistics
-var interval    int = config.Config.Interval
+var uploads     config.Const = config.NewConst(config.Uploads)
+var optimistics config.Const = config.NewConst(config.Optimistics)
+var interval    config.Const = config.NewConst(config.Interval)
 
 type Choker interface {
   Interested(conn Upload)
@@ -81,7 +81,7 @@ func (c *choker) rechoke() {
   // If we want to consider the seeds, we should use 2 separate lists.
 
   // Unchoke the pereferred connections
-  unchoked := uploads
+  unchoked := uploads.Value()
   if unchoked > len(interested) {
     unchoked = len(interested)
   }
@@ -91,7 +91,7 @@ func (c *choker) rechoke() {
 
   // Chocke the rest and handle optimistics
   rest := interested[unchoked:]
-  unchoked = optimistics
+  unchoked = optimistics.Value()
   if unchoked > len(rest) {
     unchoked = len(rest)
   }
@@ -125,7 +125,7 @@ func (c *choker) Run() {
     t = c.time()
 
     // This seems to work fine for up to 1000 nodes.
-    if t - l > interval {
+    if t - l > interval.Value() {
       c.rechoke()
       l = t
     }

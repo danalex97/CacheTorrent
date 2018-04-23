@@ -8,7 +8,8 @@ import (
   "fmt"
 )
 
-var MaxPeers int = config.Config.InPeers + config.Config.OutPeers
+var inPeers  config.Const = config.NewConst(config.InPeers)
+var outPeers config.Const = config.NewConst(config.OutPeers)
 
 type Peer struct {
   *Components
@@ -229,7 +230,7 @@ func (p *Peer) RunRecv(m interface {}, connAdd ConnAdder) {
    * is not needed and we can set OutPeers = 0.
    */
 
-  // if _, ok := p.Connectors[id]; !ok && len(p.Connectors) < maxPeers {
+  // if _, ok := p.Connectors[id]; !ok && len(p.Connectors) < inPeers + outPeers {
   if _, ok := p.Connectors[id]; !ok {
     /*
      * This should not be reached when we having a perfect tracker.

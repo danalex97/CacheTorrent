@@ -16,26 +16,11 @@ func main() {
 
   var wg sync.WaitGroup
 
-  // s := simulation.NewSimulation(
-  //   // new(simulation.SimulatedNode),
-  //   new(simulation.SimulatedCachedNode),
-  //   simulation.
-  //     SmallTorrentConfig().
-  //     WithParams(func(c *config.Conf) {
-  //       c.SharedInit = func() {
-  //         wg.Add(1)
-  //       }
-  //       c.SharedCallback = func() {
-  //         wg.Done()
-  //       }
-  //     }),
-  // )
-
-  s := simulation.NewITLSimulation(
+  s := simulation.NewSimulation(
     // new(simulation.SimulatedNode),
     new(simulation.SimulatedCachedNode),
     simulation.
-      ITLConfig().
+      SmallTorrentConfig().
       WithParams(func(c *config.Conf) {
         c.SharedInit = func() {
           wg.Add(1)
@@ -46,10 +31,25 @@ func main() {
       }),
   )
 
+  // s := simulation.NewITLSimulation(
+  //   // new(simulation.SimulatedNode),
+  //   new(simulation.SimulatedCachedNode),
+  //   simulation.
+  //     ITLConfig().
+  //     WithParams(func(c *config.Conf) {
+  //       c.SharedInit = func() {
+  //         wg.Add(1)
+  //       }
+  //       c.SharedCallback = func() {
+  //         wg.Done()
+  //       }
+  //     }),
+  // )
+
   s.Run()
 
   // Initial time required to run SharedInits
-  time.Sleep(time.Duration(float64(time.Second) * 0.1))
+  time.Sleep(time.Duration(float64(time.Second) * 1))
   fmt.Println("Init period done.")
 
   // Wait for all nodes to finish.

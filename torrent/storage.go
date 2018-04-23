@@ -6,7 +6,7 @@ import (
   "fmt"
 )
 
-var pieceNumber int = config.Config.Pieces
+var pieceNumber config.Const = config.NewConst(config.Pieces)
 
 type Storage interface {
   Have(index int) (PieceMeta, bool)
@@ -82,7 +82,7 @@ func (s *storage) Pieces() []int {
 }
 
 func (s *storage) checkCompleted() {
-  if len(s.pieces) == pieceNumber && !s.completed {
+  if len(s.pieces) == pieceNumber.Value() && !s.completed {
     // Callback used to interact with the simulation
     config.Config.SharedCallback()
 

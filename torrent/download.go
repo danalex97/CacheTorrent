@@ -13,7 +13,7 @@ import (
   "strconv"
 )
 
-var backlog int = config.Config.Backlog
+var backlog config.Const = config.NewConst(config.Backlog)
 
 type Download interface {
   Runner
@@ -208,7 +208,7 @@ func (d *download) gotHave(msg Have) {
  * The pieces are chosen using the Picker.
  */
 func (d *download) RequestMore() {
-  size := backlog
+  size := backlog.Value()
   if len(d.activeRequests) >= size {
     return
   }
