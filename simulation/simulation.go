@@ -11,22 +11,22 @@ type Simulation interfaces.ISimulation
 
 func SmallTorrentConfig() *config.Conf {
   return &config.Conf{
-    OutPeers : 3,
-    InPeers  : 3,
+    OutPeers : 10,
+    InPeers  : 10,
 
-    MinNodes : 10,
+    MinNodes : 20,
     Seeds    : 1,
 
-    PieceSize : 10,
-    Pieces    : 1,
+    PieceSize : 196,
+    Pieces    : 1000,
 
-    Uploads     : 0,
+    Uploads     : 4,
     Optimistics : 1,
     Interval    : 10000,
 
     Backlog : 10,
 
-    LeaderPercent : 0,
+    LeaderPercent : 50,
 
     SharedInit     : func() {},
     SharedCallback : func() {},

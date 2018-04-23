@@ -27,7 +27,7 @@ type Download interface {
   RequestMore() // Request more pieces from a the peer.
 }
 
-type download struct {
+type TorrentDownload struct {
   *Components
 
   me   string // the node that downloads
@@ -36,7 +36,7 @@ type download struct {
   interested bool // if I am interested in uploader's pieces
   choked     bool // if the peer that uploads to me chokes me
 
-  activeRequests map[int]bool
+  ActiveRequests map[int]bool
   /*
    * Requests that were made, but we still did not received a piece
    * back as a response.
@@ -46,7 +46,7 @@ type download struct {
 }
 
 func NewDownload(connector *Connector) Download {
-  return &download{
+  return &TorrentDownload{
     Components: connector.Components,
 
     me:   connector.From,
@@ -55,7 +55,7 @@ func NewDownload(connector *Connector) Download {
     interested: false, // I am not interested in anything
     choked:     true,  // everybody The ID of the peer that I download from.chokes us
 
-    activeRequests: make(map[int]bool),
+    ActiveRequests: make(map[int]bool),
     handshake: connector.Handshake,
   }
 }
@@ -63,32 +63,32 @@ func NewDownload(connector *Connector) Download {
 /*
  * Returns if the peer that uploads to me chokes me.
  */
-func (d *download) Choked() bool {
+func (d *TorrentDownload) Choked() bool {
   return d.choked
 }
 
 /*
  *  Returns if I'm interested in the uploader's piece.
  */
-func (d *download) Interested() bool {
+func (d *TorrentDownload) Interested() bool {
   return d.interested
 }
 
 /*
  * The ID of the peer that downloads.
  */
-func (d *download) Me() string {
+func (d *TorrentDownload) Me() string {
   return d.me
 }
 
 /*
  * The ID of the peer that I download from.
  */
-func (d *download) From() string {
+func (d *TorrentDownload) From() string {
   return d.from
 }
 
-func (d *download) Run() {
+func (d *TorrentDownload) Run() {
   // Watch the link to deliver the piece messages
   for {
     data := <-d.handshake.Downlink().Download()
@@ -99,7 +99,7 @@ func (d *download) Run() {
   }
 }
 
-func (d *download) handlePending() {
+func (d *TorrentDownload) handlePending() {
   if !d.handshake.Done() {
     return
   }
@@ -117,7 +117,7 @@ func (d *download) handlePending() {
   }
 }
 
-func (d *download) Recv(m interface {}) {
+func (d *TorrentDownload) Recv(m interface {}) {
   switch msg := m.(type) {
   case Choke:
     d.gotChoke(msg)
@@ -130,7 +130,7 @@ func (d *download) Recv(m interface {}) {
   }
 }
 
-func (d *download) gotChoke(msg Choke) {
+func (d *TorrentDownload) gotChoke(msg Choke) {
   // Handle all pending downloads
   d.handlePending()
 
@@ -138,7 +138,7 @@ func (d *download) gotChoke(msg Choke) {
   d.choked = true
 
   // Request queued pieces that were lost from the peer that choked us
-  for p, _ := range d.activeRequests {
+  for p, _ := range d.ActiveRequests {
     // let picker know
     d.Picker.Inactive(p)
   }
@@ -146,7 +146,7 @@ func (d *download) gotChoke(msg Choke) {
   d.lost()
 
   // Handle control messages
-  if len(d.activeRequests) > 0 {
+  if len(d.ActiveRequests) > 0 {
     // Send interested message to node, since I am choked
     d.changeInterest(true)
   } else {
@@ -156,21 +156,21 @@ func (d *download) gotChoke(msg Choke) {
     d.changeInterest(ok)
   }
 
-  // Since I am choked, I remove all activeRequests
-  d.activeRequests = make(map[int]bool)
+  // Since I am choked, I remove all ActiveRequests
+  d.ActiveRequests = make(map[int]bool)
 }
 
-func (d *download) gotUnchoke(msg Unchoke) {
+func (d *TorrentDownload) gotUnchoke(msg Unchoke) {
   // Request pieces from peer
   d.choked = false
 
   d.RequestMore()
 }
 
-func (d *download) gotPiece(msg Piece) {
-  // Remove the request from activeRequests
+func (d *TorrentDownload) gotPiece(msg Piece) {
+  // Remove the request from ActiveRequests
   index := msg.Index
-  delete(d.activeRequests, index)
+  delete(d.ActiveRequests, index)
 
   // Let Picker know active requests changed
   d.Picker.Inactive(index)
@@ -186,7 +186,7 @@ func (d *download) gotPiece(msg Piece) {
   d.RequestMore()
 }
 
-func (d *download) gotHave(msg Have) {
+func (d *TorrentDownload) gotHave(msg Have) {
   index := msg.Index
 
   // send interested if I'm not interested and chocked
@@ -207,18 +207,18 @@ func (d *download) gotHave(msg Have) {
  *
  * The pieces are chosen using the Picker.
  */
-func (d *download) RequestMore() {
+func (d *TorrentDownload) RequestMore() {
   size := backlog.Value()
-  if len(d.activeRequests) >= size {
+  if len(d.ActiveRequests) >= size {
     return
   }
 
   // Request more pieces
-  for len(d.activeRequests) < size {
+  for len(d.ActiveRequests) < size {
     interest, ok := d.Picker.Next(d.from)
     if !ok {
       // We can't find any useful piece to request
-      if len(d.activeRequests) == 0 {
+      if len(d.ActiveRequests) == 0 {
         // If we can't find any useful piece and the length of active requests
         // is 0, then we are no longer interested.
         d.changeInterest(false)
@@ -233,14 +233,14 @@ func (d *download) RequestMore() {
     // Update active requests: since our network model is assumed
     // to be perfect, we assume the requests that we make to be active.
     // [see new_request @ RequestManager.py]
-    d.activeRequests[interest] = true
+    d.ActiveRequests[interest] = true
 
     // Let Picker know active requests changed
     d.Picker.Active(interest)
   }
 }
 
-func (d *download) changeInterest(now bool) {
+func (d *TorrentDownload) changeInterest(now bool) {
   before := d.interested
   d.interested = now
 
@@ -272,7 +272,7 @@ func pieceFromDownload(from string, data Data) Piece {
  * 'download.py' and 'RequestManager.py' in the downloader as we only
  * need a struct which references the list of connections.
  */
-func (d *download) lost() {
+func (d *TorrentDownload) lost() {
   for _, conn := range d.Manager.Downloads() {
     // We try to request more pieces only if the connection is not choked
     if !conn.Choked() {
@@ -281,7 +281,7 @@ func (d *download) lost() {
   }
 }
 
-func (d *download) have(index int) {
+func (d *TorrentDownload) have(index int) {
   for _, conn := range d.Manager.Uploads() {
     d.Transport.ControlSend(conn.To(), Have{conn.Me(), index})
   }
