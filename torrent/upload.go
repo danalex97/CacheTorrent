@@ -21,7 +21,7 @@ type Upload interface {
   Rate()         float64  //
 }
 
-type upload struct {
+type TorrentUpload struct {
   *Components
 
   me string
@@ -34,7 +34,7 @@ type upload struct {
 }
 
 func NewUpload(connector *Connector) Upload {
-  return &upload{
+  return &TorrentUpload{
     Components: connector.Components,
 
     me:        connector.From,
@@ -47,21 +47,17 @@ func NewUpload(connector *Connector) Upload {
   }
 }
 
-func (u *upload) Run() {
+func (u *TorrentUpload) Run() {
 }
 
-func (u *upload) Recv(m interface {}) {
+func (u *TorrentUpload) Recv(m interface {}) {
   switch msg := m.(type) {
   case NotInterested:
     u.interested(false)
   case Interested:
     u.interested(true)
   case Request:
-    meta, ok := u.Storage.Have(msg.Index)
-
-    if !ok {
-      return
-    }
+    meta, _ := u.Storage.Have(msg.Index)
 
     toUpload := Data{
       strconv.Itoa(meta.Index),
@@ -76,7 +72,7 @@ func (u *upload) Recv(m interface {}) {
 /*
  * Function called when we want to choke the upload connection.
  */
-func (u *upload) Choke() {
+func (u *TorrentUpload) Choke() {
   u.choke = true
   // Let the other node know
   u.Transport.ControlSend(u.to, Choke{u.me})
@@ -88,14 +84,14 @@ func (u *upload) Choke() {
 /*
  * Function called when we want to unchoke an upload.
  */
-func (u *upload) Unchoke() {
+func (u *TorrentUpload) Unchoke() {
   u.choke = false
 
   // Let the other node know
   u.Transport.ControlSend(u.to, Unchoke{u.me})
 }
 
-func (u *upload) interested(interested bool) {
+func (u *TorrentUpload) interested(interested bool) {
   u.isInterested = interested
 
   if interested {
@@ -108,35 +104,35 @@ func (u *upload) interested(interested bool) {
 /*
  * The ID of the peer that uploads.
  */
-func (u *upload) Me() string {
+func (u *TorrentUpload) Me() string {
   return u.me
 }
 
 /*
  * The ID of the peer that I upload to.
  */
-func (u *upload) To() string {
+func (u *TorrentUpload) To() string {
   return u.to
 }
 
 /*
  * Return if I am choking the connection.
  */
-func (u *upload) Choking() bool {
+func (u *TorrentUpload) Choking() bool {
   return u.choke
 }
 
 /*
  * Return if the other peer is interested in my pieces.
  */
-func (u *upload) IsInterested() bool {
+func (u *TorrentUpload) IsInterested() bool {
   return u.isInterested
 }
 
 /*
  * Returns the downoad rate of the connection.
  */
-func (u *upload) Rate() float64 {
+func (u *TorrentUpload) Rate() float64 {
   // [TODO]
   return 0
 }

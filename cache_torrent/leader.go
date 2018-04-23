@@ -88,7 +88,7 @@ func (l *Leader) addUploader(m interface {}) {
     c := conn.(*torrent.Connector)
 
     // This is ugly...
-    c.Upload = torrent.NewUpload(c)
+    c.Upload = NewUpload(c)
     go c.Upload.Run()
     go c.Handshake.Run()
   }
@@ -130,7 +130,7 @@ func (l *Leader) outgoingConnection(id string) {
   // it's able to upload to anybody for outgoing connections.
   torrent.
     NewConnector(l.Id, id, l.Components).
-    WithUpload(torrent.NewUpload).
+    WithUpload(NewUpload).
     WithDownload(torrent.NewDownload).
     Register(l.Peer.Peer)
 }
