@@ -20,7 +20,12 @@ func (u *CacheUpload) Recv(m interface {}) {
     _, ok := u.Storage.Have(msg.Index)
     if ok {
       u.TorrentUpload.Recv(m)
+      return
     }
+
+    // If we don't have the respective message, we should choke the sender
+    // so that the sender has to re-request the pieces.
+    u.TorrentUpload.Choke()
   default:
     u.TorrentUpload.Recv(m)
   }
