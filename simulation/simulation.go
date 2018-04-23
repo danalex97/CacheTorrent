@@ -26,6 +26,8 @@ func SmallTorrentConfig() *config.Conf {
 
     Backlog : 10,
 
+    LeaderPercent : 0,
+
     SharedInit     : func() {},
     SharedCallback : func() {},
   }
@@ -81,7 +83,7 @@ func ITLConfig() *config.Conf {
    MinNodes : 700,
    Seeds    : 1,
 
-   PieceSize : 1960000,
+   PieceSize : 196,
    Pieces    : 1000,
 
    Uploads     : 4,
@@ -89,6 +91,8 @@ func ITLConfig() *config.Conf {
    Interval    : 10000,
 
    Backlog : 10,
+
+   LeaderPercent : 50,
 
    SharedInit     : func() {},
    SharedCallback : func() {},

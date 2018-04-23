@@ -9,7 +9,7 @@ package cache_torrent
 import (
   "github.com/danalex97/nfsTorrent/torrent"
   "math/rand"
-  "fmt"
+  // "fmt"
 )
 
 type Follower struct {
@@ -23,7 +23,7 @@ func NewFollower(p *Peer) *Follower {
 }
 
 func (f *Follower) Run() {
-  fmt.Println("Follower running.")
+  // fmt.Println("Follower running.")
   f.Peer.Run(f.outgoingConnection)
 }
 

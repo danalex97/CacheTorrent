@@ -14,6 +14,10 @@ type constant struct {
   init  bool
 }
 
+/**
+ * Usage:
+ *  var c config.Const = config.NewConst(config.OutPeers)
+ */
 func NewConst(field string) Const {
   return &constant{
     field : field,
@@ -31,6 +35,9 @@ func (c *constant) Value() int {
   return c.value
 }
 
+/**
+ * Constant values to pass to "config.NewConst".
+ */
 const OutPeers string = "OutPeers"
 const InPeers  string = "InPeers"
 
@@ -45,3 +52,5 @@ const Optimistics string = "Optimistics"
 const Interval    string = "Interval"
 
 const Backlog string = "Backlog"
+
+const LeaderPercent string = "LeaderPercent"

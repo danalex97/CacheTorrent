@@ -2,11 +2,12 @@ package cache_torrent
 
 import (
   . "github.com/danalex97/Speer/interfaces"
+  "github.com/danalex97/nfsTorrent/config"
   "sync"
   "sort"
 )
 
-const MaxLeaders int = 1
+var LeaderPercent config.Const = config.NewConst(config.LeaderPercent)
 
 type Election struct {
   sync.Mutex
@@ -128,7 +129,10 @@ func (e *Election) Elect(as string) []string {
   sort.Sort(byId(candidates))
 
   leaders    := []string{}
-  maxLeaders := MaxLeaders
+  maxLeaders := len(candidates) * LeaderPercent.Value() / 100
+  if maxLeaders == 0 {
+    maxLeaders = 1
+  }
   if len(candidates) < maxLeaders {
     maxLeaders = len(candidates)
   }

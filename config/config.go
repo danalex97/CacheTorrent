@@ -1,6 +1,7 @@
 package config
 
 type Conf struct {
+  // BitTorrent
   OutPeers int // maximum number of outbound peers
   InPeers  int // maximum number of inbound peers
 
@@ -16,6 +17,10 @@ type Conf struct {
 
   Backlog        int // number of pieces requested at a time
 
+  // Extension
+  LeaderPercent int // the percent of leaders in an AS
+
+  // Misc
   SharedCallback func()
   SharedInit     func()
 }

@@ -10,7 +10,7 @@ package cache_torrent
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
-  "fmt"
+  // "fmt"
 )
 
 type Leader struct {
@@ -30,7 +30,7 @@ func NewLeader(p *Peer) *Leader {
 }
 
 func (l *Leader) Run() {
-  fmt.Println("Leader running.")
+  // fmt.Println("Leader running.")
   l.Peer.Run(l.outgoingConnection)
 }
 
@@ -59,7 +59,7 @@ func (l *Leader) Recv(m interface {}) {
       // only connection. That is, we do no handshake and send a message
       // to the peer.
 
-      fmt.Println(l.Id, "<-", peer)
+      // fmt.Println(l.Id, "<-", peer)
 
       // We can add the upload component since the other peer does
       // upload only if it's a follower, so our Upload will do nothing
@@ -111,7 +111,8 @@ func (l *Leader) registerForwarder(follower, peer string) {
 }
 
 func (l *Leader) outgoingConnection(id string) {
-  fmt.Println(l.Id, "<->", id)
+  // fmt.Println(l.Id, "<->", id)
+
   // A leader has the initial protocol capabilities, that is
   // it's able to upload to anybody for outgoing connections.
   torrent.
