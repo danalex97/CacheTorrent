@@ -63,7 +63,7 @@ func (l *Leader) Recv(m interface {}) {
       torrent.
         NewConnector(l.Id, peer, l.Components).
         WithUpload(NewUpload). // [?]
-        WithDownload(torrent.NewDownload).
+        WithDownload(NewDownload).
         Register(l.Peer.Peer)
     }
 
@@ -132,7 +132,7 @@ func (l *Leader) outgoingConnection(id string) {
   torrent.
     NewConnector(l.Id, id, l.Components).
     WithUpload(NewUpload).
-    WithDownload(torrent.NewDownload).
+    WithDownload(NewDownload).
     Register(l.Peer.Peer)
 }
 

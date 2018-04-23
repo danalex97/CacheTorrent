@@ -43,7 +43,7 @@ func (f *Follower) incomingConnection(id string) {
     torrent.
       NewConnector(f.Id, id, f.Components).
       WithUpload(NewUpload).
-      WithDownload(torrent.NewDownload).
+      WithDownload(NewDownload).
       Register(f.Peer.Peer)
   } else {
     // We receive an incoming connection from a diffrent AS
@@ -66,7 +66,7 @@ func (f *Follower) openIndirect(leader, target string) {
     torrent.
       NewConnector(f.Id, leader, f.Components).
       WithUpload(NewUpload).
-      WithDownload(torrent.NewDownload).
+      WithDownload(NewDownload).
       Register(f.Peer.Peer)
   }
 
