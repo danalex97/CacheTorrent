@@ -28,11 +28,11 @@ func TestManagerConcurrent(t *testing.T) {
       NewConnector("0", "1", &Components{
         Storage   : s,
         Transport : NewTransferEngine(10, 10, "0"),
-      }).WithUpload().WithDownload(),
+      }).WithUpload(NewUpload).WithDownload(NewDownload),
       NewConnector("1", "0", &Components{
         Storage   : s,
         Transport : NewTransferEngine(10, 10, "1"),
-      }).WithUpload().WithDownload(),
+      }).WithUpload(NewUpload).WithDownload(NewDownload),
     }
 
     done := make(chan bool)

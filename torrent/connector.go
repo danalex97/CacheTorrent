@@ -31,13 +31,13 @@ func NewConnector(from, to string, components *Components) *Connector {
   return connector
 }
 
-func (c *Connector) WithUpload() *Connector {
-  c.Upload = NewUpload(c)
+func (c *Connector) WithUpload(newUpload func(*Connector) Upload) *Connector {
+  c.Upload = newUpload(c)
   return c
 }
 
-func (c *Connector) WithDownload() *Connector {
-  c.Download = NewDownload(c)
+func (c *Connector) WithDownload(newDownload func(*Connector) Download) *Connector {
+  c.Download = newDownload(c)
   return c
 }
 
