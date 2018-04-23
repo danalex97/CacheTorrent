@@ -178,11 +178,14 @@ func (p *Peer) Run(connAdd ConnAdder) {
   p.Manager   = NewConnectionManager()
   p.Choker    = NewChoker(p.Manager, p.Time)
 
-  // make connectors
+  // Make connectors
   for _, id := range p.Ids {
-    connAdd(id)
+    // Defensive programming
+    if _, ok := p.Connectors[id]; !ok {
+      connAdd(id)
+    }
   }
-
+  
   go p.Choker.Run()
 }
 

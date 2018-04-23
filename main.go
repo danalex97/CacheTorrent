@@ -42,6 +42,7 @@ func main() {
         }
         c.SharedCallback = func() {
           wg.Done()
+          fmt.Println(wg)
         }
       }),
   )
