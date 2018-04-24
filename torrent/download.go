@@ -10,6 +10,7 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
+  "github.com/danalex97/nfsTorrent/log"
   "strconv"
 )
 
@@ -168,6 +169,13 @@ func (d *TorrentDownload) gotUnchoke(msg Unchoke) {
 }
 
 func (d *TorrentDownload) gotPiece(msg Piece) {
+  // Log the piece
+  log.Log.LogTransfer(log.Transfer{
+    From  : d.From(),
+    To    : d.Me(),
+    Index : msg.Index,
+  })
+
   // Remove the request from ActiveRequests
   index := msg.Index
   delete(d.ActiveRequests, index)

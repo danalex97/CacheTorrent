@@ -2,6 +2,7 @@ package log
 
 import (
   "runtime"
+  "fmt"
 )
 
 var Log *Logger = NewLogger()
@@ -65,7 +66,14 @@ func (l *Logger) handleTransfer(t Transfer) {
 }
 
 func (l *Logger) getRedundancy() {
-
+  pieces := 0
+  times  := 0
+  for _, ctr := range l.redundancy {
+    pieces += 1
+    times  += ctr
+  }
+  redundancy := float64(times) / float64(pieces)
+  fmt.Println(redundancy)
 }
 
 func (l *Logger) run() {
