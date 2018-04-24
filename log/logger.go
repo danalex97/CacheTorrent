@@ -64,24 +64,35 @@ func (l *Logger) handleTransfer(t Transfer) {
   }
 }
 
+func (l *Logger) getRedundancy() {
+
+}
+
 func (l *Logger) run() {
   for {
     select {
     case t := <-l.transfers:
       l.handleTransfer(t)
+    default:
+      continue
+    }
 
+    select {
     case q := <-l.queries:
       switch q {
       case GetRedundancy:
+        l.getRedundancy()
       case Stop:
         l.stopped = true
       }
-
     default:
-      if l.stopped {
-        break
-      }
-      runtime.Gosched()
+      continue
     }
+
+    // All channels are drained
+    if l.stopped {
+      break
+    }
+    runtime.Gosched()
   }
 }
