@@ -40,7 +40,8 @@ func (f *Forwarder) Recv(m interface {}) {
       }
     }
   } else {
-    leader <- peer
+    // leader <- peer
+
     switch msg := m.(type) {
     case torrent.Have:
       f.Transport.ControlSend(f.from, torrent.Have{

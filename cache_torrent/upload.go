@@ -19,16 +19,9 @@ func (u *CacheUpload) Recv(m interface {}) {
   case torrent.Request:
     _, ok := u.Storage.Have(msg.Index)
     if ok {
+      // We only transfer the piece if we have it.
       u.TorrentUpload.Recv(m)
-      return
     }
-
-    // If we don't have the respective message, we should inform the sender
-    // by saying a miss occured.
-    u.Transport.ControlSend(msg.Id, Miss{
-      Id    : u.Me(),
-      Index : msg.Index,
-    })
   default:
     u.TorrentUpload.Recv(m)
   }

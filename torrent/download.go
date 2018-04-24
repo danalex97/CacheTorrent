@@ -183,7 +183,12 @@ func (d *TorrentDownload) gotPiece(msg Piece) {
 
   // We need to request more only after we stored the piece, so we don't
   // request the same thing twice.
-  d.RequestMore()
+  if !d.Choked() {
+    // Since the Piece control message is delivered asynchronously with the
+    // Download, it may be that we are already Choked and, thus, we don't
+    // need to request more pieces.
+    d.RequestMore()
+  }
 }
 
 func (d *TorrentDownload) gotHave(msg Have) {

@@ -103,8 +103,10 @@ func TestGotPieceSendsHaves(t *testing.T) {
   assertEqual(t, <-t1.ControlRecv(), Have{"0", 0})
 }
 
-func TestGotPieceRequestsMore(t *testing.T) {
+func TestGotPieceRequestsMoreIfNotChoked(t *testing.T) {
   d, _, t1, c := makeDownload()
+
+  d.(*TorrentDownload).choked = false
 
   c.Picker.GotHave("1", 1)
   d.Recv(Piece{"1", 0, 0, Data{"0", 10}})
