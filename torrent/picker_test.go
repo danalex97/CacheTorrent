@@ -6,7 +6,7 @@ import (
 
 /* Tests. */
 func TestPickerChoosesRarestPiece(t *testing.T) {
-  p := NewPicker(NewStorage("", []PieceMeta{}))
+  p := NewPicker(NewStorage("", []PieceMeta{}, func() int{return 0}))
 
   have := p.GotHave
 
@@ -32,7 +32,7 @@ func TestPickerChoosesRarestPiece(t *testing.T) {
 
 func TestPickerChoosesRarestPieceConcurrently(t *testing.T) {
   for i := 0; i < 10; i++ {
-    p := NewPicker(NewStorage("", []PieceMeta{}))
+    p := NewPicker(NewStorage("", []PieceMeta{}, func() int{return 0}))
 
     done := make(chan bool)
     have := func(peer string, idx int) {
@@ -75,7 +75,7 @@ func TestPickerDoesntChoosePendingRequest(t *testing.T) {
   /*
    * Note: see Next specification to understand this test.
    */
-  p := NewPicker(NewStorage("", []PieceMeta{}))
+  p := NewPicker(NewStorage("", []PieceMeta{}, func() int{return 0}))
 
   have := p.GotHave
 

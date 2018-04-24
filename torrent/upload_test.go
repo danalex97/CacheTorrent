@@ -59,7 +59,7 @@ func makeUpload() (Upload, Transport, Transport, *Components) {
   c := &Components{
     Storage   : NewStorage("", []PieceMeta{
       PieceMeta{Index : 0, Length : 10},
-    }),
+    }, func() int {return 0}),
     Transport : t0,
     Choker    : &mockChoker{},
   }

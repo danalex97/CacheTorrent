@@ -10,7 +10,7 @@ import (
 func TestStorage(t *testing.T) {
   pieceNumber = &mockConst{10}
 
-  s := NewStorage("", []PieceMeta{})
+  s := NewStorage("", []PieceMeta{}, func() int{return 0})
 
   s.Store(Piece{"", 0, 0, Data{"0", 10}})
   val, _ := s.Have(0)
@@ -38,7 +38,7 @@ func TestStorageConcurrent(t *testing.T) {
   pieceNumber = &mockConst{30}
 
   for i := 0; i < 10; i++ {
-    s := NewStorage("", []PieceMeta{})
+    s := NewStorage("", []PieceMeta{}, func() int{return 0})
 
     done := make(chan bool)
     store := func (idx int) {

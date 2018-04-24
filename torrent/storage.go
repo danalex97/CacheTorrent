@@ -23,16 +23,20 @@ type storage struct {
   pieces    map[int]PieceMeta // the pieces that I have
   completed bool
 
+  // Used for logging
+  time  func() int
+
   // Used only for monitoring
   percents    []int
   percentDone []bool
 }
 
-func NewStorage(id string, pieces []PieceMeta) Storage {
+func NewStorage(id string, pieces []PieceMeta, time func() int) Storage {
   storage := new(storage)
 
   storage.id = id
   storage.completed = false
+  storage.time = time
 
   storage.pieces = make(map[int]PieceMeta)
   for _, p := range pieces {
@@ -103,15 +107,16 @@ func (s *storage) checkCompleted() {
 
   if len(s.pieces) == pieceNumber.Value() && !s.completed {
     // Notify logger
+    time := s.time()
     log.Log.LogCompleted(log.Completed{
-      Time : 0,
+      Time : time,
     })
 
     // Callback used to interact with the simulation
     config.Config.SharedCallback()
 
     // Notify completed
-    fmt.Println(s.id, "Completed")
+    fmt.Println(s.id, "Completed at", time, "ms")
     s.completed = true
   }
 }

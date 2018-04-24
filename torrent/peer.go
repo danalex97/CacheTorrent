@@ -172,7 +172,7 @@ func (p *Peer) Run(connAdd ConnAdder) {
   // fmt.Println(p.Id, p.Ids)
 
   // make per peer variables
-  p.Storage   = NewStorage(p.Id, p.Pieces)
+  p.Storage   = NewStorage(p.Id, p.Pieces, p.Time)
   p.Picker    = NewPicker(p.Storage)
   p.Transport = p.Transport
   p.Manager   = NewConnectionManager()
@@ -185,7 +185,7 @@ func (p *Peer) Run(connAdd ConnAdder) {
       connAdd(id)
     }
   }
-  
+
   go p.Choker.Run()
 }
 
