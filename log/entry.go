@@ -6,3 +6,7 @@ type Transfer struct {
 
   Index  int
 }
+
+type Completed struct {
+  Time int
+}

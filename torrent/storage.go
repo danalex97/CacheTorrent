@@ -2,6 +2,7 @@ package torrent
 
 import (
   "github.com/danalex97/nfsTorrent/config"
+  "github.com/danalex97/nfsTorrent/log"
   "sync"
   "fmt"
 )
@@ -38,6 +39,7 @@ func NewStorage(id string, pieces []PieceMeta) Storage {
     storage.pieces[p.Index] = p
   }
 
+  // Used only informatively.
   storage.percents = []int{2, 20, 50, 70}
   storage.percentDone = []bool{false, false, false, false}
 
@@ -89,6 +91,7 @@ func (s *storage) Pieces() []int {
 }
 
 func (s *storage) checkCompleted() {
+  // Only informative.
   for i := range s.percents {
     if s.percentDone[i] == false {
       if len(s.pieces) > pieceNumber.Value() * s.percents[i] / 100 {
@@ -99,6 +102,11 @@ func (s *storage) checkCompleted() {
   }
 
   if len(s.pieces) == pieceNumber.Value() && !s.completed {
+    // Notify logger
+    log.Log.LogCompleted(log.Completed{
+      Time : 0,
+    })
+
     // Callback used to interact with the simulation
     config.Config.SharedCallback()
 
