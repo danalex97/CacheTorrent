@@ -33,7 +33,7 @@ func NewLogger() *Logger {
     redundancy : make(map[piece]int),
 
     transfers  : make(chan Transfer, maxTransfers),
-    queries    : make(chan int),
+    queries    : make(chan int, 1),
 
     stopped    : false,
   }
@@ -73,7 +73,7 @@ func (l *Logger) getRedundancy() {
     times  += ctr
   }
   redundancy := float64(times) / float64(pieces)
-  fmt.Println(redundancy)
+  fmt.Println("Redundancy:", redundancy)
 }
 
 func (l *Logger) run() {
@@ -81,8 +81,8 @@ func (l *Logger) run() {
     select {
     case t := <-l.transfers:
       l.handleTransfer(t)
-    default:
       continue
+    default:
     }
 
     select {
@@ -93,8 +93,8 @@ func (l *Logger) run() {
       case Stop:
         l.stopped = true
       }
-    default:
       continue
+    default:
     }
 
     // All channels are drained
