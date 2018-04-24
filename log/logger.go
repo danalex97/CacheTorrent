@@ -96,7 +96,7 @@ func (l *Logger) getRedundancy() {
 func (l *Logger) getTime() {
   fmt.Println("Average time:", getAverage(l.times))
   fmt.Println("50th percentile:", getPercentile(50.0, l.times))
-  fmt.Println("90th percentile:", getPercentile(50.0, l.times))
+  fmt.Println("90th percentile:", getPercentile(90.0, l.times))
 }
 
 /* Runner. */
