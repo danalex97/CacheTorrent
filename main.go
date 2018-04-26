@@ -17,8 +17,6 @@ func main() {
 
   var wg sync.WaitGroup
 
-  fmt.Println(config.JSONConfig("./config/confs/small.json"))
-
   s := simulation.NewSimulation(
     // new(simulation.SimulatedNode),
     new(simulation.SimulatedCachedNode),

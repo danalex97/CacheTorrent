@@ -1,3 +1,5 @@
+// Simple configuration used only for testing purposes.
+
 {
   "outPeers" : 10,
   "inPeers"  : 10,
