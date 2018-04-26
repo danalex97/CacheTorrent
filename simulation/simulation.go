@@ -118,25 +118,18 @@ func ITLConfig() *config.Conf {
 
    SharedInit     : func() {},
    SharedCallback : func() {},
+
+   TransitDomains    : 10,
+   TransitDomainSize : 50,
+   StubDomains       : 14,
+   StubDomainSize    : 100,
+
+   TransferInterval  : 100,
+
+   CapacityNodes : []config.NodeConf{config.NodeConf{
+     Number   : 700 + 1,
+     Upload   : 400,
+     Download : 1500,
+   }},
  }
-}
-
-func NewITLSimulation(template interface {}, newConfig *config.Conf) Simulation {
-  if newConfig != nil {
-    config.Config = newConfig
-  }
-
-  return sdk.NewDHTSimulationBuilder(template).
-    WithPoissonProcessModel(2, 2).
-    // transitDomains, transitDomainSize, stubDomains, stubDomainSize
-    WithInternetworkUnderlay(10, 50, 14, 100).
-    WithDefaultQueryGenerator().
-    WithLimitedNodes(config.Config.MinNodes + 1).
-    //====================================
-    WithCapacities().
-    // unit: ms
-    WithTransferInterval(100).
-    // number, up, down; unit: b/ms
-    WithCapacityNodes(config.Config.MinNodes + 1, 400, 1500).
-    Build()
 }

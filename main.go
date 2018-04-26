@@ -21,6 +21,7 @@ func main() {
     // new(simulation.SimulatedNode),
     new(simulation.SimulatedCachedNode),
     simulation.
+      // ITLConfig().
       SmallTorrentConfig().
       WithParams(func(c *config.Conf) {
         c.SharedInit = func() {
@@ -31,22 +32,6 @@ func main() {
         }
       }),
   )
-
-  // s := simulation.NewITLSimulation(
-  //   // new(simulation.SimulatedNode),
-  //   new(simulation.SimulatedCachedNode),
-  //   simulation.
-  //     ITLConfig().
-  //     WithParams(func(c *config.Conf) {
-  //       c.SharedInit = func() {
-  //         wg.Add(1)
-  //       }
-  //       c.SharedCallback = func() {
-  //         wg.Done()
-  //         fmt.Println(wg)
-  //       }
-  //     }),
-  // )
 
   s.Run()
 
