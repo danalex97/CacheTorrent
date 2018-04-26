@@ -1,5 +1,11 @@
 package config
 
+type NodeConf struct {
+  Number    int
+  Upload    int
+  Download  int
+}
+
 type Conf struct {
   // BitTorrent
   OutPeers int // maximum number of outbound peers
@@ -23,6 +29,15 @@ type Conf struct {
   // Misc
   SharedCallback func()
   SharedInit     func()
+
+  // Simulation parameters
+  TransitDomains     int
+  TransitDomainSize  int
+  StubDomains        int
+  StubDomainSize     int
+
+  TransferInterval   int
+  CapacityNodes      []NodeConf
 }
 
 /**

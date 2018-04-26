@@ -9,6 +9,34 @@ import (
 
 type Simulation interfaces.ISimulation
 
+func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
+  config.Config = newConfig
+
+  builder := sdk.NewDHTSimulationBuilder(template).
+    WithPoissonProcessModel(2, 2).
+    WithInternetworkUnderlay(
+      config.Config.TransitDomains,
+      config.Config.TransitDomainSize,
+      config.Config.StubDomains,
+      config.Config.StubDomainSize).
+    WithDefaultQueryGenerator().
+    WithLimitedNodes(config.Config.MinNodes + 1).
+    // WithMetrics().
+    //====================================
+    WithCapacities().
+    WithTransferInterval(
+      config.Config.TransferInterval)
+
+  for _, tuple := range config.Config.CapacityNodes {
+    builder = builder.WithCapacityNodes(
+      tuple.Number,
+      tuple.Upload,
+      tuple.Download)
+  }
+
+  return builder.Build()
+}
+
 func SmallTorrentConfig() *config.Conf {
   return &config.Conf{
     OutPeers : 10,
@@ -30,26 +58,20 @@ func SmallTorrentConfig() *config.Conf {
 
     SharedInit     : func() {},
     SharedCallback : func() {},
-  }
-}
 
-func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
-  if newConfig != nil {
-    config.Config = newConfig
-  }
+    TransitDomains    : 10,
+    TransitDomainSize : 50,
+    StubDomains       : 2,
+    StubDomainSize    : 50,
 
-  return sdk.NewDHTSimulationBuilder(template).
-    WithPoissonProcessModel(2, 2).
-    // WithInternetworkUnderlay(10, 50, 20, 50).
-    WithInternetworkUnderlay(10, 50, 2, 50).
-    WithDefaultQueryGenerator().
-    WithLimitedNodes(config.Config.MinNodes + 1).
-    // WithMetrics().
-    //====================================
-    WithCapacities().
-    WithTransferInterval(10).
-    WithCapacityNodes(config.Config.MinNodes + 1, 10, 20).
-    Build()
+    TransferInterval  : 10,
+
+    CapacityNodes : []config.NodeConf{config.NodeConf{
+      Number   : 20 + 1,
+      Upload   : 10,
+      Download : 20,
+    }},
+  }
 }
 
 /**
