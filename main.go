@@ -16,7 +16,7 @@ import (
 // Flags
 var confPath = flag.String(
   "conf",
-  "./config/confs/small.json",
+  "./confs/small.json",
   "The path to configuration .json file.",
 )
 
