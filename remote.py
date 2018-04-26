@@ -2,9 +2,17 @@ import os
 import random
 import threading
 import subprocess
+import time
 
 ID  = "ad5915"
 EXT = "doc.ic.ac.uk"
+
+keys = {
+  "red"  : "Redundancy",
+  "time" : "Average time",
+  "50p"  : "50th percentile",
+  "90p"  : "90th percentile",
+}
 
 class Pool:
     def __init__(self):
@@ -14,8 +22,8 @@ class Pool:
             return id + str(idx)
         POOL = \
             [app("point", i) for i in range(1, 41)] + \
-            [app("matrix", i) for i in range(1, 21)] + \
-            [app("graphic", i) for i in range(1, 21)]
+            [app("matrix", i) for i in range(1, 41)] + \
+            [app("graphic", i) for i in range(1, 41)]
         self.pool = POOL[:]
         random.shuffle(self.pool)
 
@@ -33,6 +41,9 @@ class Job:
     def __init__(self, pool, command, times):
         self.pool = pool
 
+        self.lock = threading.Lock()
+        self.results = []
+
         self.command = command
         self.times   = times
 
@@ -43,11 +54,24 @@ class Job:
 
             run_remote(ID, host, self.command, file)
 
-            print(process_output(file))
+            res = process_output(file)
 
-        for _ in range(self.times):
+            self.lock.acquire()
+            self.results.append(res)
+            self.lock.release()
+
+        for _ in range(int(self.times * 1.5)):
             host = self.pool.next()
             threading.Thread(target=run, args=[host]).start()
+
+    def wait(self):
+        def get_len():
+            self.lock.acquire()
+            ln = len(self.results)
+            self.lock.release()
+            return ln
+        while get_len() < self.times:
+            time.sleep(1)
 
 def test_remote(id, host):
     SSH_RUN = """
@@ -85,12 +109,6 @@ def process_output(file):
 
     lines = content.split("\n")
 
-    keys = {
-      "red"  : "Redundancy",
-      "time" : "Average time",
-      "50p"  : "50th percentile",
-      "90p"  : "90th percentile",
-    }
     ans = {}
     for line in lines:
         for k, v in keys.items():
@@ -104,8 +122,27 @@ def process_output(file):
 if __name__ == "__main__":
     pool = Pool()
     jobs = [
-        Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
         Job(pool, "go run main.go -conf=confs/small.json", 10),
+        Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
     ]
     for job in jobs:
         job.run()
+    for job in jobs:
+        job.wait()
+    for job in jobs:
+        print("===========================")
+        print("Job: {}".format(job.command))
+        print("===========================")
+
+        rs = [r for r in job.results if r != None][:job.times]
+
+        if len(rs) < job.times:
+            print("Failed!")
+            continue
+
+        ans = rs[0]
+        for r in rs[1:]:
+            for k, v in r.items():
+                ans[k] += v
+        for k, v in r.items():
+            print("{} : {}".format(keys[k], v / len(rs)))
