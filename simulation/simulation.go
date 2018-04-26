@@ -37,43 +37,6 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
   return builder.Build()
 }
 
-func SmallTorrentConfig() *config.Conf {
-  return &config.Conf{
-    OutPeers : 10,
-    InPeers  : 10,
-
-    MinNodes : 20,
-    Seeds    : 1,
-
-    PieceSize : 196,
-    Pieces    : 1000,
-
-    Uploads     : 4,
-    Optimistics : 1,
-    Interval    : 10000,
-
-    Backlog : 10,
-
-    LeaderPercent : 50,
-
-    SharedInit     : func() {},
-    SharedCallback : func() {},
-
-    TransitDomains    : 10,
-    TransitDomainSize : 50,
-    StubDomains       : 2,
-    StubDomainSize    : 50,
-
-    TransferInterval  : 10,
-
-    CapacityNodes : []config.NodeConf{config.NodeConf{
-      Number   : 20 + 1,
-      Upload   : 10,
-      Download : 20,
-    }},
-  }
-}
-
 /**
  * We want to do a similar simulation to the ones done in:
  * [R. Bindal et al., "Improving Traffic Locality in BitTorrent via
@@ -97,39 +60,3 @@ func SmallTorrentConfig() *config.Conf {
  *   - pieces: 1000 (default)
  *   - backlog: 10 (default)
  */
-func ITLConfig() *config.Conf {
- return &config.Conf{
-   OutPeers : 35,
-   InPeers  : 35,
-
-   MinNodes : 700,
-   Seeds    : 1,
-
-   PieceSize : 196,
-   Pieces    : 1000,
-
-   Uploads     : 4,
-   Optimistics : 1,
-   Interval    : 10000,
-
-   Backlog : 10,
-
-   LeaderPercent : 50,
-
-   SharedInit     : func() {},
-   SharedCallback : func() {},
-
-   TransitDomains    : 10,
-   TransitDomainSize : 50,
-   StubDomains       : 14,
-   StubDomainSize    : 100,
-
-   TransferInterval  : 100,
-
-   CapacityNodes : []config.NodeConf{config.NodeConf{
-     Number   : 700 + 1,
-     Upload   : 400,
-     Download : 1500,
-   }},
- }
-}

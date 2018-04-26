@@ -24,6 +24,7 @@ func main() {
     new(simulation.SimulatedCachedNode),
     config.
       JSONConfig("./config/confs/small.json").
+      // JSONConfig("./config/confs/itl.json").
       WithParams(func(c *config.Conf) {
         c.SharedInit = func() {
           wg.Add(1)
