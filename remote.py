@@ -23,7 +23,9 @@ class Pool:
         POOL = \
             [app("point", i) for i in range(1, 41)] + \
             [app("matrix", i) for i in range(1, 41)] + \
-            [app("graphic", i) for i in range(1, 41)]
+            [app("graphic", i) for i in range(1, 41)] + \
+            [app("voxel", i) for i in range(1, 41)] + \
+            [app("edge", i) for i in range(1, 41)]
         self.pool = POOL[:]
         random.shuffle(self.pool)
 
@@ -129,20 +131,36 @@ if __name__ == "__main__":
         job.run()
     for job in jobs:
         job.wait()
+    time.sleep(5)
+    print("\n\n\n\n\n")
     for job in jobs:
+        print("\n")
         print("===========================")
         print("Job: {}".format(job.command))
-        print("===========================")
 
-        rs = [r for r in job.results if r != None][:job.times]
+        rs = list([r for r in job.results if r != None][:job.times])
 
         if len(rs) < job.times:
             print("Failed!")
             continue
 
+        # print("===========================")
+        # print("Runs:")
+        # print("===========================")
+        # idx = 0
+        # for r in rs:
+        #     print("Run {}".format(idx))
+        #     idx += 1
+        #
+        #     for k, v in r.items():
+        #         print("{} : {}".format(keys[k], v))
+
+        print("===========================")
+        print("Summary:")
+        print("===========================")
         ans = rs[0]
         for r in rs[1:]:
             for k, v in r.items():
                 ans[k] += v
-        for k, v in r.items():
-            print("{} : {}".format(keys[k], v / len(rs)))
+        for k, v in ans.items():
+            print("{} : {}".format(keys[k], v / job.times))
