@@ -36,7 +36,8 @@ func (f *Forwarder) Recv(m interface {}) {
         // but we don't have the piece. We will try to favor the transfer of
         // the piece by letting the picker know.
 
-        //[TODO] let picker know
+        picker := f.Picker.(*CachePicker)
+        picker.GotRequest(msg.Index)
       }
     }
   } else {

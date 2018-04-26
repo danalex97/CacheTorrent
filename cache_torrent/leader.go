@@ -32,6 +32,8 @@ func NewLeader(p *Peer) *Leader {
 func (l *Leader) Run() {
   // log.Println("Leader running.")
   l.Peer.Run(l.outgoingConnection)
+
+  l.Picker = NewPicker(l.Storage)
 }
 
 func (l *Leader) Recv(m interface {}) {

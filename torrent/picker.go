@@ -31,7 +31,7 @@ type Picker interface {
 type TorrentPicker struct {
   *sync.Mutex
 
-  storage Storage
+  Storage Storage
 
   freq    map[int]int // map from index to frequency
   buckets map[int]map[int]bool // map from frequency to bucket
@@ -40,13 +40,13 @@ type TorrentPicker struct {
   have   map[string]map[int]bool // the pieces that the remote peers have
   active map[int]int             // number of active requests for a piece
 
-  bans   map[int]bool            // the pieces that I already have stored
+  Bans   map[int]bool            // the pieces that I already have stored
 }
 
-func NewPicker(storage Storage) Picker {
+func NewPicker(Storage Storage) Picker {
   return &TorrentPicker{
     new(sync.Mutex),
-    storage,
+    Storage,
     make(map[int]int),
     make(map[int]map[int]bool),
     make(map[string]map[int]bool),
@@ -194,7 +194,7 @@ func (p *TorrentPicker) SelectBucket(bucket map[int]bool,
       // and I did not requested the piece already
       if nbr, ok := tiebreaks[index]; !ok || nbr == 0 {
         // and the piece is not already stored
-        if !p.isBanned(index) {
+        if !p.IsBanned(index) {
           return index, true
         }
       }
@@ -203,15 +203,15 @@ func (p *TorrentPicker) SelectBucket(bucket map[int]bool,
   return 0, false
 }
 
-func (p *TorrentPicker) isBanned(index int) bool {
-  if _, ok := p.bans[index]; ok {
+func (p *TorrentPicker) IsBanned(index int) bool {
+  if _, ok := p.Bans[index]; ok {
     return ok
   }
 
-  _, ok := p.storage.Have(index)
+  _, ok := p.Storage.Have(index)
   if ok {
     // we cache only positives
-    p.bans[index] = true
+    p.Bans[index] = true
   }
 
   return ok
