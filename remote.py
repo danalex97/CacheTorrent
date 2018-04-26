@@ -1,5 +1,6 @@
 import os
 import random
+import threading
 
 ID  = "ad5915"
 EXT = "doc.ic.ac.uk"
@@ -11,9 +12,9 @@ class Pool:
                 id = id + "0"
             return id + str(idx)
         POOL = \
-            [app("point", i) for i in range(0,20)] + \
-            [app("matrix", i) for i in range(0,20)] + \
-            [app("ray", i) for i in range(0,20)]
+            [app("point", i) for i in range(1, 41)] + \
+            [app("matrix", i) for i in range(1, 21)] + \
+            [app("graphic", i) for i in range(1, 21)]
         self.pool = POOL[:]
         random.shuffle(self.pool)
 
@@ -25,8 +26,27 @@ class Pool:
 
         return out
 
+class Job:
+    def __init__(self, pool, command, times):
+        self.pool = pool
 
-def run_remote(id, host, file):
+        self.command = command
+        self.times   = times
+
+    def run(self):
+        def run(host):
+            os.system("mkdir remote_run")
+            file = "remote_run/{}.txt".format(host)
+
+            run_remote(ID, host, self.command, file)
+
+            print(process_output(file))
+
+        for _ in range(self.times):
+            host = self.pool.next()
+            threading.Thread(target=run, args=[host]).start()
+
+def run_remote(id, host, command, file):
     SSH_RUN = """
     where={}@{}
     ssh -tt -o "StrictHostKeyChecking no" $where <<-'ENDSSH'
@@ -35,12 +55,12 @@ def run_remote(id, host, file):
       export GOPATH=~/golang
       cd ~/golang/src/github.com/danalex97/nfsTorrent
 
-      go run main.go > {}
+      {} > {}
       exit
-    ENDSSH
+    ENDSSH > /dev/null
     """
 
-    to_run = SSH_RUN.format(id, host, file)
+    to_run = SSH_RUN.format(id, host, command, file)
     os.system(to_run)
 
 def process_output(file):
@@ -61,11 +81,15 @@ def process_output(file):
             if v in line:
                 ans[k] = float(line.split(":")[1])
 
-    print(ans)
     if not ans["red"]:
         return None
     return ans
 
-# for host in HOSTS:
-#     file = "hmm.txt"
-#     run_remote(ID, host + EXT, file)
+if __name__ == "__main__":
+    pool = Pool()
+    jobs = [
+        Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
+        Job(pool, "go run main.go -conf=confs/small.json", 10),
+    ]
+    for job in jobs:
+        job.run()
