@@ -111,7 +111,15 @@ type byId []Candidate
 
 func (a byId) Len() int           { return len(a) }
 func (a byId) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a byId) Less(i, j int) bool { return a[i].Id < a[j].Id }
+func (a byId) Less(i, j int) bool {
+  if a[i].Up != a[j].Up {
+    return a[i].Up > a[j].Up
+  }
+  if a[i].Down != a[j].Down {
+    return a[i].Down > a[j].Down
+  }
+  return a[i].Id < a[j].Id
+}
 
 /* Run leader election in a specific as. */
 func (e *Election) Elect(as string) []string {
