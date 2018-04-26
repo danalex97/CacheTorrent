@@ -12,7 +12,7 @@ func trimComments(arr []byte) []byte {
 
   out := ""
   for _, v := range strings.Split(str, "\n") {
-    if len(strings.TrimSpace(v)) > 3 {
+    if len(strings.TrimSpace(v)) >= 2 {
         if strings.TrimSpace(v)[:2] != "//" {
             out = out + v
         }
