@@ -11,10 +11,13 @@ import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
   "github.com/danalex97/nfsTorrent/log"
+
+  "container/list"
   "strconv"
 )
 
-var backlog config.Const = config.NewConst(config.Backlog)
+var backlog  config.Const = config.NewConst(config.Backlog)
+var removeInterval int    = 20000
 
 type Download interface {
   Runner
@@ -26,6 +29,8 @@ type Download interface {
   From() string // The ID of the peer that I download from.
 
   RequestMore() // Request more pieces from a the peer.
+
+  Rate() float64 //
 }
 
 type TorrentDownload struct {
@@ -44,6 +49,8 @@ type TorrentDownload struct {
    */
 
   handshake Handshake
+
+  times *list.List
 }
 
 func NewDownload(connector *Connector) Download {
@@ -58,6 +65,8 @@ func NewDownload(connector *Connector) Download {
 
     ActiveRequests: make(map[int]bool),
     handshake: connector.Handshake,
+
+    times: list.New(),
   }
 }
 
@@ -169,6 +178,9 @@ func (d *TorrentDownload) gotUnchoke(msg Unchoke) {
 }
 
 func (d *TorrentDownload) gotPiece(msg Piece) {
+  // Update rate.
+  d.updateRate()
+
   // Log the piece
   log.LogTransfer(log.Transfer{
     From  : d.From(),
@@ -277,6 +289,22 @@ func pieceFromDownload(from string, data Data) Piece {
     index,
     begin,
     data,
+  }
+}
+
+/*
+ * Calculate the download rate as a moving average.
+ */
+func (d *TorrentDownload) Rate() float64 {
+  return float64(d.times.Len())
+}
+
+func (d *TorrentDownload) updateRate() {
+  t := d.Time()
+
+  d.times.PushBack(t)
+  for d.times.Front().Value.(int) <= t - removeInterval {
+    d.times.Remove(d.times.Front())
   }
 }
 

@@ -19,8 +19,6 @@ type Peer struct {
   Tracker string
   Ids     []string
 
-  Time      func() int
-
   // BitTorrent protocol
   Pieces []PieceMeta
 

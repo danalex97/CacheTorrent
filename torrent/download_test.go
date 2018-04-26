@@ -22,6 +22,7 @@ func makeDownload() (Download, Transport, Transport, *Components) {
     Manager   : &mockManager{},
     Transport : t0,
     Choker    : &mockChoker{},
+    Time      : func() int {return 0},
   }
   d := NewDownload(NewConnector("0", "1", c))
   return d, t0, t1, c

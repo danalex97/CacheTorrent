@@ -16,4 +16,5 @@ type Components struct {
   Transport     interfaces.Transport
   Choker        Choker
   Manager       Manager
+  Time          func() int
 }

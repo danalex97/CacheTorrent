@@ -5,6 +5,7 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "strconv"
+  "fmt"
 )
 
 type Upload interface {
@@ -31,6 +32,9 @@ type TorrentUpload struct {
   choke        bool // If I choke to connection to that peer
 
   handshake Handshake
+
+  // Connector -- used only to reference download
+  connector *Connector
 }
 
 func NewUpload(connector *Connector) Upload {
@@ -44,6 +48,7 @@ func NewUpload(connector *Connector) Upload {
     choke:        true,  // initially, I choke all peers
 
     handshake: connector.Handshake,
+    connector: connector,
   }
 }
 
@@ -133,6 +138,9 @@ func (u *TorrentUpload) IsInterested() bool {
  * Returns the downoad rate of the connection.
  */
 func (u *TorrentUpload) Rate() float64 {
-  // [TODO]
-  return 0
+  fmt.Println(u.connector.Download)
+  if u.connector.Download == nil {
+    return 0
+  }
+  return u.connector.Download.Rate()
 }
