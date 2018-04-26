@@ -3,6 +3,26 @@
 
 Network-friendly speedy torrents.
 
+To run use `go run main.go`. It supports the following arguments:
+```
+-conf string
+    The path to configuration .json file. (default "./confs/small.json")
+-ext
+    Whether we use the extension
+-v
+    Verbose output
+```
+
+To run multiple simulations in parallel, use `python3 remote.py`. The jobs can
+be configured by hand as follows:
+```python
+jobs = [
+    Job(pool, "go run main.go -conf=confs/small.json", times=10),
+    Job(pool, "go run main.go -ext -conf=confs/small.json", times=10),
+]
+```
+
+
 ### Simulation [![GoDoc](https://godoc.org/github.com/danalex97/Speer/interfaces?status.png)](https://godoc.org/github.com/danalex97/Speer/interfaces)
 
 The simulation package uses [Speer](https://github.com/danalex97/Speer) simulator.

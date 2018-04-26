@@ -5,7 +5,6 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "strconv"
-  "fmt"
 )
 
 type Upload interface {
@@ -138,7 +137,6 @@ func (u *TorrentUpload) IsInterested() bool {
  * Returns the downoad rate of the connection.
  */
 func (u *TorrentUpload) Rate() float64 {
-  fmt.Println(u.connector.Download)
   if u.connector.Download == nil {
     return 0
   }
