@@ -3,7 +3,7 @@ package cache_torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/torrent"
-  "fmt"
+  "github.com/danalex97/nfsTorrent/log"
 )
 
 type Peer struct {
@@ -62,7 +62,7 @@ func (p *Peer) Bind(m interface {}) (state int) {
   case Leaders:
     state = torrent.BindDone
     p.Leaders = msg.Ids
-    fmt.Println(p.Id, "has Leaders", p.Leaders)
+    log.Println(p.Id, "has Leaders", p.Leaders)
 
     if isLeader(p) {
       p.amLeader = true

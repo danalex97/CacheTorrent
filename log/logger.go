@@ -22,6 +22,8 @@ type piece struct {
 }
 
 type Logger struct {
+  verbose    bool
+
   redundancy map[piece]int
   times     []int
 
@@ -34,6 +36,8 @@ type Logger struct {
 
 func NewLogger() *Logger {
   logger := &Logger{
+    verbose : false,
+
     redundancy : make(map[piece]int),
     times      : []int{},
 
@@ -49,7 +53,24 @@ func NewLogger() *Logger {
   return logger
 }
 
+/* Defaults*/
+func SetVerbose(verbose bool)  { Log.SetVerbose(verbose) }
+func Println(v ...interface{}) { Log.Println(v...) }
+func LogCompleted(t Completed) { Log.LogCompleted(t) }
+func LogTransfer(t Transfer)   { Log.LogTransfer(t) }
+func Query(q int)              { Log.Query(q) }
+
 /* Interface. */
+func (l *Logger) SetVerbose(verbose bool) {
+  l.verbose = verbose
+}
+
+func (l *Logger) Println(v ...interface{}) {
+  if l.verbose {
+    fmt.Println(v...)
+  }
+}
+
 func (l *Logger) LogCompleted(t Completed) {
   l.completes <- t
 }

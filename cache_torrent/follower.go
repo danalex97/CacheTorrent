@@ -23,7 +23,7 @@ func NewFollower(p *Peer) *Follower {
 }
 
 func (f *Follower) Run() {
-  // fmt.Println("Follower running.")
+  // log.Println("Follower running.")
   f.Peer.Run(f.outgoingConnection)
 }
 

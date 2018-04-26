@@ -30,7 +30,7 @@ func NewLeader(p *Peer) *Leader {
 }
 
 func (l *Leader) Run() {
-  // fmt.Println("Leader running.")
+  // log.Println("Leader running.")
   l.Peer.Run(l.outgoingConnection)
 }
 
@@ -50,7 +50,7 @@ func (l *Leader) Recv(m interface {}) {
       // only connection. That is, we do no handshake and send a message
       // to the peer.
 
-      // fmt.Println(l.Id, "<-", peer)
+      // log.Println(l.Id, "<-", peer)
       torrent.
         NewConnector(l.Id, peer, l.Components).
         WithUpload(NewUpload). // [?]
@@ -116,7 +116,7 @@ func (l *Leader) registerForwarder(follower, peer string) {
 }
 
 func (l *Leader) outgoingConnection(id string) {
-  // fmt.Println(l.Id, "<->", id)
+  // log.Println(l.Id, "<->", id)
 
   // A leader has the initial protocol capabilities, that is
   // it's able to upload to anybody for outgoing connections.

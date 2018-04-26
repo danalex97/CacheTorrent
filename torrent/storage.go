@@ -4,7 +4,6 @@ import (
   "github.com/danalex97/nfsTorrent/config"
   "github.com/danalex97/nfsTorrent/log"
   "sync"
-  "fmt"
 )
 
 var pieceNumber config.Const = config.NewConst(config.Pieces)
@@ -100,7 +99,7 @@ func (s *storage) checkCompleted() {
     if s.percentDone[i] == false {
       if len(s.pieces) > pieceNumber.Value() * s.percents[i] / 100 {
         s.percentDone[i] = true
-        fmt.Println(s.id, "Downloaded", s.percents[i], "%")
+        log.Println(s.id, "Downloaded", s.percents[i], "%")
       }
     }
   }
@@ -108,7 +107,7 @@ func (s *storage) checkCompleted() {
   if len(s.pieces) == pieceNumber.Value() && !s.completed {
     // Notify logger
     time := s.time()
-    log.Log.LogCompleted(log.Completed{
+    log.LogCompleted(log.Completed{
       Time : time,
     })
 
@@ -116,7 +115,7 @@ func (s *storage) checkCompleted() {
     config.Config.SharedCallback()
 
     // Notify completed
-    fmt.Println(s.id, "Completed at", time, "ms")
+    log.Println(s.id, "Completed at", time, "ms")
     s.completed = true
   }
 }

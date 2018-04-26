@@ -170,7 +170,7 @@ func (d *TorrentDownload) gotUnchoke(msg Unchoke) {
 
 func (d *TorrentDownload) gotPiece(msg Piece) {
   // Log the piece
-  log.Log.LogTransfer(log.Transfer{
+  log.LogTransfer(log.Transfer{
     From  : d.From(),
     To    : d.Me(),
     Index : msg.Index,

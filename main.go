@@ -26,6 +26,12 @@ var extension = flag.Bool(
   "Whether we use the extension",
 )
 
+var verbose = flag.Bool(
+  "v",
+  false,
+  "Verbose output",
+)
+
 func main() {
   // Parsing the flags
   flag.Parse()
@@ -33,8 +39,12 @@ func main() {
   // Random seed
   rand.Seed(time.Now().UTC().UnixNano())
 
+  // Set verbosity
+  log.SetVerbose(*verbose)
+
   var wg sync.WaitGroup
 
+  // Set extension
   var template interface {}
   if !*extension {
     template = new(simulation.SimulatedNode)
@@ -43,6 +53,7 @@ func main() {
     fmt.Println("Running with extension.")
   }
 
+  // Run with configuration
   s := simulation.NewSimulation(
     template,
     config.
@@ -71,9 +82,9 @@ func main() {
   t := s.Time()
   fmt.Println("Downloads finished in", t, "milliseconds.")
 
-  log.Log.Query(log.GetRedundancy)
-  log.Log.Query(log.GetTime)
-  log.Log.Query(log.Stop)
+  log.Query(log.GetRedundancy)
+  log.Query(log.GetTime)
+  log.Query(log.Stop)
 
   os.Exit(0)
 }

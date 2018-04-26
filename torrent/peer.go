@@ -3,9 +3,10 @@ package torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
+  "github.com/danalex97/nfsTorrent/log"
+
   "runtime"
   // "reflect"
-  "fmt"
 )
 
 var inPeers  config.Const = config.NewConst(config.InPeers)
@@ -81,7 +82,7 @@ func (p *Peer) Init() {
   p.Tracker = msg.(TrackerRes).Id
 
   // The peer should be initialized
-  fmt.Printf("Node %s started with tracker %s\n", p.Id, p.Tracker)
+  log.Println("Node", p.Id, "started with tracker", p.Tracker)
 
   // Send join message to the tracker
   p.Transport.ControlSend(p.Tracker, Join{p.Id})
@@ -169,7 +170,7 @@ func (p *Peer) Bind(m interface {}) (state int) {
 func (p *Peer) Run(connAdd ConnAdder) {
   // We want to bind all these variables here, so
   // we don't need any synchroization.
-  // fmt.Println(p.Id, p.Ids)
+  // log.Println(p.Id, p.Ids)
 
   // make per peer variables
   p.Storage   = NewStorage(p.Id, p.Pieces, p.Time)
@@ -190,7 +191,7 @@ func (p *Peer) Run(connAdd ConnAdder) {
 }
 
 func (p *Peer) GetId(m interface {}) (id string){
-  // fmt.Println("Msg:", p.Id, reflect.TypeOf(m), m)
+  // log.Println("Msg:", p.Id, reflect.TypeOf(m), m)
 
   switch msg := m.(type) {
   case Choke:
