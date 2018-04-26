@@ -28,7 +28,7 @@ type Picker interface {
   Next(peer string) (int, bool)
 }
 
-type picker struct {
+type TorrentPicker struct {
   *sync.Mutex
 
   storage Storage
@@ -44,7 +44,7 @@ type picker struct {
 }
 
 func NewPicker(storage Storage) Picker {
-  return &picker{
+  return &TorrentPicker{
     new(sync.Mutex),
     storage,
     make(map[int]int),
@@ -58,7 +58,7 @@ func NewPicker(storage Storage) Picker {
 /*
  * Handler for receiving a `have` message.
  */
-func (p *picker) GotHave(peer string, index int) {
+func (p *TorrentPicker) GotHave(peer string, index int) {
   p.Lock()
   defer p.Unlock()
 
@@ -93,7 +93,7 @@ func (p *picker) GotHave(peer string, index int) {
  * Mark a certain pice as being in an active request -- that is the transfer
  * has been scheduled, but it is not yet finished.
  */
-func (p *picker) Active(index int) {
+func (p *TorrentPicker) Active(index int) {
   p.Lock()
   defer p.Unlock()
 
@@ -107,7 +107,7 @@ func (p *picker) Active(index int) {
  * Mark a piece as inactive -- that is the request has been eliminated or
  * the piece transfer has finished. (see `download.go`)
  */
-func (p *picker) Inactive(index int) {
+func (p *TorrentPicker) Inactive(index int) {
   p.Lock()
   defer p.Unlock()
 
@@ -117,7 +117,13 @@ func (p *picker) Inactive(index int) {
 /*
  * Return the next piece for a certain peer.
  */
-func (p *picker) Next(peer string) (int, bool) {
+func (p *TorrentPicker) Next(peer string) (int, bool) {
+  return p.ItrateBuckets(peer, p.SelectBucket)
+}
+
+type Selector func (b, h map[int]bool, t map[int]int) (int, bool)
+
+func (p *TorrentPicker) ItrateBuckets(peer string, selector Selector) (int, bool) {
   p.Lock()
   defer p.Unlock()
 
@@ -156,17 +162,9 @@ func (p *picker) Next(peer string) (int, bool) {
       continue
     }
 
-    for index, _ := range bucket {
-      // if the remote peer has the piece
-      if _, ok := haves[index]; ok {
-        // and I did not requested the piece already
-        if nbr, ok := tiebreaks[index]; !ok || nbr == 0 {
-          // and the piece is not already stored
-          if !p.isBanned(index) {
-            return index, true
-          }
-        }
-      }
+    index, ok := selector(bucket, haves, tiebreaks)
+    if ok {
+      return index, ok
     }
   }
 
@@ -181,7 +179,31 @@ func (p *picker) Next(peer string) (int, bool) {
   return 0, false
 }
 
-func (p *picker) isBanned(index int) bool {
+func (p *TorrentPicker) SelectBucket(bucket map[int]bool,
+                              haves map[int]bool,
+                              tiebreaks map[int]int) (int, bool) {
+
+  /*
+   * @haves: set of pieces remote peer has
+   * @tiebreaks: set of pieces with active started requests
+   */
+
+  for index, _ := range bucket {
+    // if the remote peer has the piece
+    if _, ok := haves[index]; ok {
+      // and I did not requested the piece already
+      if nbr, ok := tiebreaks[index]; !ok || nbr == 0 {
+        // and the piece is not already stored
+        if !p.isBanned(index) {
+          return index, true
+        }
+      }
+    }
+  }
+  return 0, false
+}
+
+func (p *TorrentPicker) isBanned(index int) bool {
   if _, ok := p.bans[index]; ok {
     return ok
   }
