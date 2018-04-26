@@ -17,12 +17,13 @@ func main() {
 
   var wg sync.WaitGroup
 
+  fmt.Println(config.JSONConfig("./config/confs/small.json"))
+
   s := simulation.NewSimulation(
     // new(simulation.SimulatedNode),
     new(simulation.SimulatedCachedNode),
-    simulation.
-      // ITLConfig().
-      SmallTorrentConfig().
+    config.
+      JSONConfig("./config/confs/small.json").
       WithParams(func(c *config.Conf) {
         c.SharedInit = func() {
           wg.Add(1)

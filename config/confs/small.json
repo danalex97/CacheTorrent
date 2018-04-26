@@ -1,0 +1,31 @@
+{
+  "outPeers" : 10,
+  "inPeers"  : 10,
+
+  "minNodes" : 20,
+  "seeds"    : 1,
+
+  "pieceSize" : 196,
+  "pieces"   : 1000,
+
+  "uploads"     : 4,
+  "optimistics" : 1,
+  "interval"    : 10000,
+
+  "backlog" : 10,
+
+  "leaderPercent" : 50,
+
+  "transitDomains"    : 10,
+  "transitDomainSize" : 50,
+  "stubDomains"       : 2,
+  "stubDomainSize"    : 50,
+
+  "transferInterval"  : 10,
+
+  "capacityNodes" : [{
+      "number"   : 21,
+      "upload"   : 10,
+      "download" : 20
+  }]
+}

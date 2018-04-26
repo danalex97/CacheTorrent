@@ -1,43 +1,46 @@
 package config
 
 type NodeConf struct {
-  Number    int
-  Upload    int
-  Download  int
+  Number    int `json:"number"`
+  Upload    int `json:"upload"`
+  Download  int `json:"download"`
 }
 
 type Conf struct {
   // BitTorrent
-  OutPeers int // maximum number of outbound peers
-  InPeers  int // maximum number of inbound peers
+  OutPeers int `json:"outPeers"` // maximum number of outbound peers
+  InPeers  int `json:"inPeers"`  // maximum number of inbound peers
 
-  MinNodes int // minimum number of nodes in a Torrent
-  Seeds    int // number of seed nodes
+  MinNodes int `json:"minNodes"` // minimum number of nodes in a Torrent
+  Seeds    int `json:"seeds"`    // number of seed nodes
 
-  PieceSize int // the piece size
-  Pieces    int // number of pieces in a Torrent
+  PieceSize int `json:"pieceSize"` // the piece size
+  Pieces    int `json:"pieces"`    // number of pieces in a Torrent
 
-  Uploads     int // number of Uploads (without Optimistics) chosen by a Choker
-  Optimistics int // number of Optimistics chosen by a Choker
-  Interval    int // milliseconds
+  Uploads     int `json:"uploads"`    // number of Uploads (without Optimistics)
+                                      //   chosen by a Choker
+  Optimistics int `json:"optimistics"`// number of Optimistics
+                                      //   chosen by a Choker
+  Interval    int `json:"interval"`   // milliseconds
 
-  Backlog        int // number of pieces requested at a time
+  Backlog int `json:"backlog"`// number of pieces requested at a time
 
   // Extension
-  LeaderPercent int // the percent of leaders in an AS
+  LeaderPercent int `json:"leaderPercent"`// the percent of leaders in an AS
 
   // Misc
   SharedCallback func()
   SharedInit     func()
 
   // Simulation parameters
-  TransitDomains     int
-  TransitDomainSize  int
-  StubDomains        int
-  StubDomainSize     int
+  TransitDomains     int `json:"transitDomains"`
+  TransitDomainSize  int `json:"transitDomainSize"`
+  StubDomains        int `json:"stubDomains"`
+  StubDomainSize     int `json:"stubDomainSize"`
 
-  TransferInterval   int
-  CapacityNodes      []NodeConf
+  TransferInterval   int `json:"transferInterval"`
+
+  CapacityNodes      []NodeConf `json:"capacityNodes"`
 }
 
 /**
