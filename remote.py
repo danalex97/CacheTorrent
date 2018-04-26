@@ -1,6 +1,7 @@
 import os
 import random
 import threading
+import subprocess
 
 ID  = "ad5915"
 EXT = "doc.ic.ac.uk"
@@ -46,6 +47,19 @@ class Job:
             host = self.pool.next()
             threading.Thread(target=run, args=[host]).start()
 
+def test_remote(id, host):
+    SSH_RUN = """
+    ssh -t -o "StrictHostKeyChecking no" {}@{} 'who | cut -d " " -f 1 | sort -u | wc -l'
+    """
+
+    to_run = SSH_RUN.format(id, host)
+    try:
+        out = subprocess.check_output(to_run, shell=True)
+        val = int(out)
+        return val == 1
+    except:
+        return False
+
 def run_remote(id, host, command, file):
     SSH_RUN = """
     where={}@{}
@@ -86,10 +100,11 @@ def process_output(file):
     return ans
 
 if __name__ == "__main__":
-    pool = Pool()
-    jobs = [
-        Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
-        Job(pool, "go run main.go -conf=confs/small.json", 10),
-    ]
-    for job in jobs:
-        job.run()
+    print(test_remote(ID, "point28.doc.ic.ac.uk"))
+    # pool = Pool()
+    # jobs = [
+    #     Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
+    #     Job(pool, "go run main.go -conf=confs/small.json", 10),
+    # ]
+    # for job in jobs:
+    #     job.run()
