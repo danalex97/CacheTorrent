@@ -5,6 +5,7 @@ import (
   "github.com/danalex97/nfsTorrent/config"
   "github.com/danalex97/nfsTorrent/log"
 
+  "flag"
   "math/rand"
   "time"
   "sync"
@@ -12,17 +13,40 @@ import (
   "os"
 )
 
+// Flags
+var confPath = flag.String(
+  "conf",
+  "./config/confs/small.json",
+  "The path to configuration .json file.",
+)
+
+var extension = flag.Bool(
+  "ext",
+  false,
+  "Whether we use the extension",
+)
+
 func main() {
+  // Parsing the flags
+  flag.Parse()
+
+  // Random seed
   rand.Seed(time.Now().UTC().UnixNano())
 
   var wg sync.WaitGroup
 
+  var template interface {}
+  if !*extension {
+    template = new(simulation.SimulatedNode)
+  } else {
+    template = new(simulation.SimulatedCachedNode)
+    fmt.Println("Running with extension.")
+  }
+
   s := simulation.NewSimulation(
-    // new(simulation.SimulatedNode),
-    new(simulation.SimulatedCachedNode),
+    template,
     config.
-      JSONConfig("./config/confs/small.json").
-      // JSONConfig("./config/confs/itl.json").
+      JSONConfig(*confPath).
       WithParams(func(c *config.Conf) {
         c.SharedInit = func() {
           wg.Add(1)

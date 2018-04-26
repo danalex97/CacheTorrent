@@ -5,7 +5,6 @@ import (
   "io/ioutil"
   "strings"
   "bytes"
-  "fmt"
 )
 
 func trimComments(arr []byte) []byte {
@@ -22,7 +21,6 @@ func trimComments(arr []byte) []byte {
     }
     out += "\n"
   }
-  fmt.Println(out)
 
   return []byte(out)
 }
