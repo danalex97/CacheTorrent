@@ -25,7 +25,9 @@ class Pool:
         out = self.pool[-1]
         del self.pool[-1]
 
-        return out
+        if test_remote(ID, out):
+            return out
+        return self.next()
 
 class Job:
     def __init__(self, pool, command, times):
@@ -49,7 +51,7 @@ class Job:
 
 def test_remote(id, host):
     SSH_RUN = """
-    ssh -t -o "StrictHostKeyChecking no" {}@{} 'who | cut -d " " -f 1 | sort -u | wc -l'
+    ssh -t -o StrictHostKeyChecking=no -o ConnectTimeout=1 {}@{} 'who | cut -d " " -f 1 | sort -u | wc -l'
     """
 
     to_run = SSH_RUN.format(id, host)
@@ -100,11 +102,10 @@ def process_output(file):
     return ans
 
 if __name__ == "__main__":
-    print(test_remote(ID, "point28.doc.ic.ac.uk"))
-    # pool = Pool()
-    # jobs = [
-    #     Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
-    #     Job(pool, "go run main.go -conf=confs/small.json", 10),
-    # ]
-    # for job in jobs:
-    #     job.run()
+    pool = Pool()
+    jobs = [
+        Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
+        Job(pool, "go run main.go -conf=confs/small.json", 10),
+    ]
+    for job in jobs:
+        job.run()
