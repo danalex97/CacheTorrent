@@ -6,10 +6,11 @@ import (
 
 /* Mocks. */
 type mockConst struct {
-  value int
+  value interface {}
 }
 
-func (c *mockConst) Value() int { return c.value }
+func (c *mockConst) Ref() interface {} { return c.value }
+func (c *mockConst) Int() int          { return c.value.(int) }
 
 type mockChoker struct {
   interestedCalled    bool
