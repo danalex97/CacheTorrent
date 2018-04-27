@@ -49,5 +49,7 @@
       "number"   : 701,
       "upload"   : 400,
       "download" : 1500
-  }]
+  }],
+
+  "allNodesRunInterval" : 10
 }

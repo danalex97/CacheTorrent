@@ -233,7 +233,7 @@ func (d *TorrentDownload) gotHave(msg Have) {
  * The pieces are chosen using the Picker.
  */
 func (d *TorrentDownload) RequestMore() {
-  size := backlog.Value()
+  size := backlog.Int()
   if len(d.ActiveRequests) >= size {
     return
   }

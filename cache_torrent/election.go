@@ -137,7 +137,7 @@ func (e *Election) Elect(as string) []string {
   sort.Sort(byId(candidates))
 
   leaders    := []string{}
-  maxLeaders := len(candidates) * LeaderPercent.Value() / 100
+  maxLeaders := len(candidates) * LeaderPercent.Int() / 100
   if maxLeaders == 0 {
     maxLeaders = 1
   }

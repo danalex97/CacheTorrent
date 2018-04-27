@@ -81,7 +81,7 @@ func (c *choker) rechoke() {
   // If we want to consider the seeds, we should use 2 separate lists.
 
   // Unchoke the pereferred connections
-  unchoked := uploads.Value()
+  unchoked := uploads.Int()
   if unchoked > len(interested) {
     unchoked = len(interested)
   }
@@ -91,7 +91,7 @@ func (c *choker) rechoke() {
 
   // Chocke the rest and handle optimistics
   rest := interested[unchoked:]
-  unchoked = optimistics.Value()
+  unchoked = optimistics.Int()
   if unchoked > len(rest) {
     unchoked = len(rest)
   }
@@ -125,7 +125,7 @@ func (c *choker) Run() {
     t = c.time()
 
     // This seems to work fine for up to 1000 nodes.
-    if t - l > interval.Value() {
+    if t - l > interval.Int() {
       c.rechoke()
       l = t
     }

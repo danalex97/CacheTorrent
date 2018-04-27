@@ -5,12 +5,13 @@ import (
 )
 
 type Const interface {
-  Value() int
+  Ref() interface {}
+  Int() int
 }
 
 type constant struct {
   field string
-  value int
+  value interface {}
   init  bool
 }
 
@@ -25,14 +26,18 @@ func NewConst(field string) Const {
   }
 }
 
-func (c *constant) Value() int {
+func (c *constant) Ref() interface {} {
   if !c.init {
     r := reflect.ValueOf(Config)
     f := reflect.Indirect(r).FieldByName(c.field)
-    c.value = int(f.Int())
+    c.value = f.Interface()
     c.init  = true
   }
   return c.value
+}
+
+func (c *constant) Int() int {
+  return c.Ref().(int)
 }
 
 /**

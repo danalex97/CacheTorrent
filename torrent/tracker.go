@@ -28,8 +28,8 @@ func (t *Tracker) New(util TorrentNodeUtil) TorrentNode {
 
   tracker.Ids   = []string{}
 
-  tracker.Limit = MinNodes.Value()
-  tracker.Neigh = PeerNeighbours.Value()
+  tracker.Limit = MinNodes.Int()
+  tracker.Neigh = PeerNeighbours.Int()
   tracker.Id    = util.Id()
 
   tracker.Transport = util.Transport()
@@ -114,13 +114,13 @@ func (t *Tracker) Neighbours(id string) interface {} {
 func (t *Tracker) seedRequest(req SeedReq) SeedRes {
   for i, id := range t.Ids {
     if id == req.From {
-      if i < Seeds.Value() {
+      if i < Seeds.Int() {
         // It's a seed
         ps     := []PieceMeta{}
         begin  := 0
-        length := PieceSize.Value()
+        length := PieceSize.Int()
 
-        for j := 0; j < Pieces.Value(); j++ {
+        for j := 0; j < Pieces.Int(); j++ {
           ps    = append(ps, PieceMeta{j, begin, length})
           begin = begin + length
         }

@@ -97,14 +97,14 @@ func (s *storage) checkCompleted() {
   // Only informative.
   for i := range s.percents {
     if s.percentDone[i] == false {
-      if len(s.pieces) > pieceNumber.Value() * s.percents[i] / 100 {
+      if len(s.pieces) > pieceNumber.Int() * s.percents[i] / 100 {
         s.percentDone[i] = true
         log.Println(s.id, "Downloaded", s.percents[i], "%")
       }
     }
   }
 
-  if len(s.pieces) == pieceNumber.Value() && !s.completed {
+  if len(s.pieces) == pieceNumber.Int() && !s.completed {
     // Notify logger
     time := s.time()
     log.LogCompleted(log.Completed{

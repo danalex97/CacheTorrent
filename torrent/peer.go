@@ -48,6 +48,8 @@ func (p *Peer) OnJoin() {
     return
   }
 
+  //
+
   p.Init()
   go p.CheckMessages(p.Bind, p.Process)
 }
