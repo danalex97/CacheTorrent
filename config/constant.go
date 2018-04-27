@@ -6,7 +6,7 @@ import (
 
 type Const interface {
   Ref() interface {}
-  Int() int
+  Int()  int
 }
 
 type constant struct {
@@ -59,3 +59,5 @@ const Interval    string = "Interval"
 const Backlog string = "Backlog"
 
 const LeaderPercent string = "LeaderPercent"
+
+const AllNodesRun string = "AllNodesRun"

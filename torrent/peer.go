@@ -6,11 +6,11 @@ import (
   "github.com/danalex97/nfsTorrent/log"
 
   "runtime"
-  // "reflect"
 )
 
 var inPeers  config.Const = config.NewConst(config.InPeers)
 var outPeers config.Const = config.NewConst(config.OutPeers)
+var progress config.Const = config.NewConst(config.AllNodesRun)
 
 type Peer struct {
   *Components
@@ -47,8 +47,6 @@ func (p *Peer) OnJoin() {
   if p.Transport == nil {
     return
   }
-
-  //
 
   p.Init()
   go p.CheckMessages(p.Bind, p.Process)
@@ -105,6 +103,9 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
 
     // No new messages, so we can let somebody else run
     if len(messages) == 0 {
+      // Notify progress properties.
+      progress.Ref().(*config.WGProgress).Progress(p.Id)
+
       runtime.Gosched()
       continue
     }
@@ -116,8 +117,17 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
       if state != BindNone {
         any = true
       }
+
+      if state == BindRun {
+        // Notify the progress properties.
+        progress.Ref().(*config.WGProgress).Add()
+      }
+
       process(m, state)
     }
+
+    // Notify progress properties.
+    progress.Ref().(*config.WGProgress).Progress(p.Id)
 
     // No useful work done
     if !any {
