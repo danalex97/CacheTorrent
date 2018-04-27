@@ -31,5 +31,7 @@
     "number"   : 350,
     "upload"   : 800,
     "download" : 3000
-  }]
+  }],
+
+  "allNodesRunInterval" : 10
 }

@@ -41,6 +41,10 @@ type Conf struct {
   TransferInterval   int `json:"transferInterval"`
 
   CapacityNodes      []NodeConf `json:"capacityNodes"`
+
+  // Progress properties
+  AllNodesRun         *WGProgress
+  AllNodesRunInterval int `json:allNodesRunInterval`
 }
 
 /**

@@ -21,7 +21,9 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
       config.Config.StubDomainSize).
     WithDefaultQueryGenerator().
     WithLimitedNodes(config.Config.MinNodes + 1).
-    // WithMetrics().
+    WithProgress(
+      config.Config.AllNodesRun,
+      config.Config.AllNodesRunInterval).
     //====================================
     WithCapacities().
     WithTransferInterval(

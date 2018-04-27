@@ -36,6 +36,7 @@ func JSONConfig(path string) *Conf {
   var conf Conf
   json.Unmarshal(raw, &conf)
 
+  conf.AllNodesRun    = NewWGProgress()
   conf.SharedCallback = func () {}
   conf.SharedInit     = func () {}
 

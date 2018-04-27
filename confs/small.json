@@ -29,5 +29,7 @@
       "number"   : 21,
       "upload"   : 10,
       "download" : 20
-  }]
+  }],
+
+  "allNodesRunInterval" : 10
 }
