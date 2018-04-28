@@ -23,6 +23,7 @@ class Pool:
         POOL = \
             [app("point", i) for i in range(1, 41)] + \
             [app("matrix", i) for i in range(1, 41)] + \
+            [app("sprite", i) for i in range(1, 41)] + \
             [app("graphic", i) for i in range(1, 41)] + \
             [app("voxel", i) for i in range(1, 41)] + \
             [app("edge", i) for i in range(1, 41)]
@@ -48,6 +49,7 @@ class Job:
 
         self.command = command
         self.times   = times
+        self.runs    = 0
 
     def run(self):
         def run(host):
@@ -61,11 +63,27 @@ class Job:
             except:
                 pass
 
+            if res != None:
+                self.lock.acquire()
+                self.runs += 1
+                runs = self.runs
+                self.lock.release()
+
+                print("===========================")
+                if runs <= self.times:
+                    print("Job: {} -- single run".format(self.command))
+                else:
+                    print("Job: {} -- additional run".format(self.command))
+                print("===========================")
+                for k, v in res.items():""
+                    print("{} : {}".format(keys[k], v))
+
             self.lock.acquire()
             self.results.append(res)
             self.lock.release()
 
-        for _ in range(int(self.times * 1.5)):
+        print("Running job: {}".format(self.command))
+        for _ in range(int(self.times * 2.5)):
             host = self.pool.next()
             threading.Thread(target=run, args=[host]).start()
 
@@ -125,6 +143,7 @@ def process_output(file):
     return ans
 
 if __name__ == "__main__":
+    print("Remote run started...")
     pool = Pool()
     jobs = [
         Job(pool, "go run main.go -conf=confs/small.json", 10),
@@ -146,17 +165,6 @@ if __name__ == "__main__":
         if len(rs) < job.times:
             print("Failed!")
             continue
-
-        print("===========================")
-        print("Runs:")
-        print("===========================")
-        idx = 0
-        for r in rs:
-            print("Run {}".format(idx))
-            idx += 1
-
-            for k, v in r.items():
-                print("{} : {}".format(keys[k], v))
 
         print("===========================")
         print("Summary:")
