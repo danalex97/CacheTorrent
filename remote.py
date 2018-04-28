@@ -54,9 +54,12 @@ class Job:
             os.system("mkdir remote_run")
             file = "remote_run/{}.txt".format(host)
 
-            run_remote(ID, host, self.command, file)
-
-            res = process_output(file)
+            res = None
+            try:
+                run_remote(ID, host, self.command, file)
+                res = process_output(file)
+            except:
+                pass
 
             self.lock.acquire()
             self.results.append(res)
@@ -117,7 +120,7 @@ def process_output(file):
             if v in line:
                 ans[k] = float(line.split(":")[1])
 
-    if not ans["red"]:
+    if "red" not in ans:
         return None
     return ans
 
@@ -144,16 +147,16 @@ if __name__ == "__main__":
             print("Failed!")
             continue
 
-        # print("===========================")
-        # print("Runs:")
-        # print("===========================")
-        # idx = 0
-        # for r in rs:
-        #     print("Run {}".format(idx))
-        #     idx += 1
-        #
-        #     for k, v in r.items():
-        #         print("{} : {}".format(keys[k], v))
+        print("===========================")
+        print("Runs:")
+        print("===========================")
+        idx = 0
+        for r in rs:
+            print("Run {}".format(idx))
+            idx += 1
+
+            for k, v in r.items():
+                print("{} : {}".format(keys[k], v))
 
         print("===========================")
         print("Summary:")
