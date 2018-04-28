@@ -2,6 +2,7 @@ import os
 import random
 import threading
 import subprocess
+import string
 import time
 
 ID  = "ad5915"
@@ -13,6 +14,10 @@ keys = {
   "50p"  : "50th percentile",
   "90p"  : "90th percentile",
 }
+
+random_id = lambda : ''.join(
+    random.choice(string.ascii_lowercase + string.digits)
+    for _ in range(20))
 
 class Pool:
     def __init__(self):
@@ -41,6 +46,9 @@ class Pool:
         return self.next()
 
 class Job:
+    os.system("mkdir remote_run")
+    os.system("mkdir results")
+
     def __init__(self, pool, command, times):
         self.pool = pool
 
@@ -51,9 +59,14 @@ class Job:
         self.times   = times
         self.runs    = 0
 
+        self.id = random_id()
+
+        os.system("mkdir results/{}".format(self.id))
+        os.system("mkdir results/{}/single".format(self.id))
+        os.system("mkdir results/{}/additional".format(self.id))
+
     def run(self):
         def run(host):
-            os.system("mkdir remote_run")
             file = "remote_run/{}.txt".format(host)
 
             res = None
@@ -64,19 +77,25 @@ class Job:
                 pass
 
             if res != None:
+                out = None
+
                 self.lock.acquire()
                 self.runs += 1
                 runs = self.runs
                 self.lock.release()
 
-                print("===========================")
                 if runs <= self.times:
-                    print("Job: {} -- single run".format(self.command))
+                    out = open("results/{}/single/{}.txt".format(self.id, runs), 'w')
                 else:
-                    print("Job: {} -- additional run".format(self.command))
-                print("===========================")
-                for k, v in res.items():""
-                    print("{} : {}".format(keys[k], v))
+                    out = open("results/{}/additional/{}.txt".format(self.id, runs), 'w')
+
+                print("===========================", file=out)
+                print("Job: {} -- run".format(self.command), file=out)
+                print("===========================", file=out)
+                for k, v in res.items():
+                    print("{} : {}".format(keys[k], v), file=out)
+
+                out.close()
 
             self.lock.acquire()
             self.results.append(res)
@@ -154,24 +173,25 @@ if __name__ == "__main__":
     for job in jobs:
         job.wait()
     time.sleep(5)
-    print("\n\n\n\n\n")
     for job in jobs:
-        print("\n")
-        print("===========================")
-        print("Job: {}".format(job.command))
+        out = open("results/{}/summary.txt".format(job.id), 'w')
 
-        rs = list([r for r in job.results if r != None][:job.times])
+        print("===========================", file=out)
+        print("Job: {}".format(job.command), file=out)
+
+        rs = list([r for r in job.results if r != None][:job.runs])
 
         if len(rs) < job.times:
-            print("Failed!")
+            print("Failed!", file=out)
             continue
 
-        print("===========================")
-        print("Summary:")
-        print("===========================")
+        print("===========================", file=out)
+        print("Summary:", file=out)
+        print("===========================", file=out)
+        print("Runs: {}".format(job.runs), file=out)
         ans = rs[0]
         for r in rs[1:]:
             for k, v in r.items():
                 ans[k] += v
         for k, v in ans.items():
-            print("{} : {}".format(keys[k], v / job.times))
+            print("{} : {}".format(keys[k], v / job.times), file=out)
