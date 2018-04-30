@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
         rs = list([r for r in job.results if r != None][:job.runs])
 
-        if len(rs) < job.times:
+        if len(rs) == 0:
             print("Failed!", file=out)
             continue
 
@@ -194,4 +194,4 @@ if __name__ == "__main__":
             for k, v in r.items():
                 ans[k] += v
         for k, v in ans.items():
-            print("{} : {}".format(keys[k], v / job.times), file=out)
+            print("{} : {}".format(keys[k], v / job.runs), file=out)
