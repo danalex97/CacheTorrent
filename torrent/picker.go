@@ -118,12 +118,12 @@ func (p *TorrentPicker) Inactive(index int) {
  * Return the next piece for a certain peer.
  */
 func (p *TorrentPicker) Next(peer string) (int, bool) {
-  return p.ItrateBuckets(peer, p.SelectBucket)
+  return p.IterateBuckers(peer, p.SelectBucket)
 }
 
 type Selector func (b, h map[int]bool, t map[int]int) (int, bool)
 
-func (p *TorrentPicker) ItrateBuckets(peer string, selector Selector) (int, bool) {
+func (p *TorrentPicker) IterateBuckers(peer string, selector Selector) (int, bool) {
   p.Lock()
   defer p.Unlock()
 

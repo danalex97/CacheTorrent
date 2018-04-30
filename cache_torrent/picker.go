@@ -27,7 +27,7 @@ func (p *CachePicker) GotRequest(index int) {
 }
 
 func (p *CachePicker) Next(peer string) (int, bool) {
-  return p.ItrateBuckets(peer, p.SelectBucket)
+  return p.IterateBuckers(peer, p.SelectBucket)
 }
 
 /* We use a different bucket selection which takes into account
