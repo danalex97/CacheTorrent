@@ -52,10 +52,14 @@ func (l *Leader) Recv(m interface {}) {
       // only connection. That is, we do no handshake and send a message
       // to the peer.
 
+      // We add the upload capability even though it will not be used.
+      // This is necessary in case we will contacted for a bidirectional
+      // leader-leader connection.
+
       // log.Println(l.Id, "<-", peer)
       torrent.
         NewConnector(l.Id, peer, l.Components).
-        WithUpload(NewUpload). // [?]
+        WithUpload(NewUpload).
         WithDownload(NewDownload).
         Register(l.Peer.Peer)
     }
@@ -67,26 +71,8 @@ func (l *Leader) Recv(m interface {}) {
   // Send the messages to corresponding forwarders
   l.forward(m)
 
-  // Add upload component if necessary
-  // l.addUploader(m)
-
   l.Peer.RunRecv(l.GetId(m), m, l.incomingConnection)
 }
-
-// func (l *Leader) addUploader(m interface {}) {
-//   // If we have an incoming connection, we may need to upgrade the current
-//   // connection by adding a upload component.
-//   id := l.GetId(m)
-//   if conn, ok := l.Connectors[id]; ok && conn.(*torrent.Connector).Upload == nil {
-//     // If there is a connection with the id
-//     c := conn.(*torrent.Connector)
-//
-//     // This is ugly...
-//     c.Upload = NewUpload(c)
-//     go c.Upload.Run()
-//     go c.Handshake.Run()
-//   }
-// }
 
 func (l *Leader) forward(m interface {}) {
   id := l.GetId(m)
