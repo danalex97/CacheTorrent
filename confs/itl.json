@@ -9,15 +9,15 @@
 //   - around 50 peers/ISP
 // - links:
 //   - unit of measure: b/ms
-//   - uplink:   400Kb/s = 0.4Kb/ms = 400 b/ms
-//   - downlink: 1.5Mb/s = 1,500Kb/s = 1.5Kb/ms = 1,500 b/ms
+//   - uplink:   100Kb/s = 0.1Kb/ms = 100 b/ms
+//   - downlink: 1Mb/s = 1000Kb/s = 1Kb/ms = 1500 b/ms
 // - BitTorrent configuration:
 //   - out peers: 35
 //   - rechoking interval: 10s = 10,000ms
 //   - 5 unchoked connections with 1 optimistic
 //   - piece size: 245KB = 245,000B = 1,960,000b
 //
-//   - pieces: 1000 (default)
+//   - pieces: 400 (total of ~100MB - see Figure 3)
 //   - backlog: 10 (default)
 
 {
@@ -27,8 +27,8 @@
   "minNodes" : 700,
   "seeds"    : 1,
 
-  "pieceSize" : 196,
-  "pieces"   : 1000,
+  "pieceSize" : 1960000,
+  "pieces"   : 400,
 
   "uploads"     : 4,
   "optimistics" : 1,
@@ -43,13 +43,13 @@
   "stubDomains"       : 14,
   "stubDomainSize"    : 100,
 
-  "transferInterval"  : 100,
+  "transferInterval"  : 1500,
 
   "capacityNodes" : [{
       "number"   : 701,
-      "upload"   : 400,
-      "download" : 1500
+      "upload"   : 100,
+      "download" : 1000
   }],
 
-  "allNodesRunInterval" : 10
+  "allNodesRunInterval" : 500
 }
