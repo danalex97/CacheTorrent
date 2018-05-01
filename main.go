@@ -83,6 +83,7 @@ func main() {
   fmt.Println("Downloads finished in", t, "milliseconds.")
 
   log.Query(log.GetRedundancy)
+  log.Query(log.GetTraffic)
   log.Query(log.GetTime)
   log.Query(log.Stop)
 

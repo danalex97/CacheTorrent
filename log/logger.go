@@ -10,6 +10,7 @@ var Log *Logger = NewLogger()
 const (
   GetRedundancy = iota
   GetTime       = iota
+  GetTraffic    = iota
   Stop          = iota
 )
 
@@ -25,6 +26,7 @@ type Logger struct {
   verbose    bool
 
   redundancy map[piece]int
+  traffic    map[int]int
   times     []int
 
   transfers chan Transfer
@@ -39,6 +41,7 @@ func NewLogger() *Logger {
     verbose : false,
 
     redundancy : make(map[piece]int),
+    traffic    : make(map[int]int),
     times      : []int{},
 
     transfers  : make(chan Transfer, maxTransfers),
@@ -96,6 +99,12 @@ func (l *Logger) handleTransfer(t Transfer) {
     }
     l.redundancy[p] += 1
   }
+
+  idx := t.Index
+  if _, ok := l.traffic[idx]; !ok {
+    l.traffic[idx] = 0
+  }
+  l.traffic[idx] += 1
 }
 
 func (l *Logger) handleComplete(c Completed) {
@@ -112,6 +121,17 @@ func (l *Logger) getRedundancy() {
   }
   redundancy := float64(times) / float64(pieces)
   fmt.Println("Redundancy:", redundancy)
+}
+
+func (l *Logger) getTraffic() {
+  total := 0
+  peers := 0
+  for _, ctr := range l.traffic {
+    total += ctr
+    peers += 1
+  }
+  traffic := float64(total) / float64(peers)
+  fmt.Println("Traffic:", traffic)
 }
 
 func (l *Logger) getTime() {
@@ -144,6 +164,8 @@ func (l *Logger) run() {
         l.getRedundancy()
       case GetTime:
         l.getTime()
+      case GetTraffic:
+        l.getTraffic()
       case Stop:
         l.stopped = true
       }
