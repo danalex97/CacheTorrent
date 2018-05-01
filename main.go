@@ -5,6 +5,10 @@ import (
   "github.com/danalex97/nfsTorrent/config"
   "github.com/danalex97/nfsTorrent/log"
 
+  errLog "log"
+  "runtime/pprof"
+  "runtime"
+
   "flag"
   "math/rand"
   "time"
@@ -38,6 +42,36 @@ var verbose = flag.Bool(
   "Verbose output",
 )
 
+var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
+var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+
+func cpuprofileRun() {
+  if *cpuprofile != "" {
+    f, err := os.Create(*cpuprofile)
+    if err != nil {
+        errLog.Fatal("could not create CPU profile: ", err)
+    }
+    if err := pprof.StartCPUProfile(f); err != nil {
+        errLog.Fatal("could not start CPU profile: ", err)
+    }
+    defer pprof.StopCPUProfile()
+  }
+}
+
+func memprofileRun() {
+  if *memprofile != "" {
+    f, err := os.Create(*memprofile)
+    if err != nil {
+        errLog.Fatal("could not create memory profile: ", err)
+    }
+    runtime.GC() // get up-to-date statistics
+    if err := pprof.WriteHeapProfile(f); err != nil {
+        errLog.Fatal("could not write memory profile: ", err)
+    }
+    f.Close()
+  }
+}
+
 func main() {
   // Parsing the flags
   flag.Parse()
@@ -47,6 +81,9 @@ func main() {
 
   // Set verbosity
   log.SetVerbose(*verbose)
+
+  // Profiling
+  cpuprofileRun()
 
   var wg sync.WaitGroup
 
@@ -96,6 +133,9 @@ func main() {
   log.Query(log.GetTraffic)
   log.Query(log.GetTime)
   log.Query(log.Stop)
+
+  // Profiling
+  memprofileRun()
 
   os.Exit(0)
 }
