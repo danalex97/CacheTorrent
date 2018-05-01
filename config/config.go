@@ -28,6 +28,9 @@ type Conf struct {
   // Extension
   LeaderPercent int `json:"leaderPercent"`// the percent of leaders in an AS
 
+  // Biased Tracker extension
+  Bias int `json:"bias"` // the number of connections to peers in different AS
+
   // Misc
   SharedCallback func()
   SharedInit     func()

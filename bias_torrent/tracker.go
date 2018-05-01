@@ -1,14 +1,15 @@
 package bias_torrent
 
 import (
-  "strings"
-  "math/rand"
-
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/torrent"
+  "github.com/danalex97/nfsTorrent/config"
+
+  "strings"
+  "math/rand"
 )
 
-const K int = 1
+var K config.Const = config.NewConst(config.Bias)
 
 type Tracker struct {
   asId map[string][]string
@@ -63,7 +64,7 @@ func newNeigh(allIds, ids []string) string {
 func (t *Tracker) Neighbours(id string) interface {} {
   neighbours := torrent.Neighbours{[]string{}}
   as := getAS(id)
-  B  := t.Neigh - K
+  B  := t.Neigh - K.Int()
 
   if nbr, _ :=t.asId[as]; B > len(nbr) {
     B = len(nbr) - 1

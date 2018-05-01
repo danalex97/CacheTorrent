@@ -59,5 +59,6 @@ const Interval    string = "Interval"
 const Backlog string = "Backlog"
 
 const LeaderPercent string = "LeaderPercent"
+const Bias string = "Bias"
 
 const AllNodesRun string = "AllNodesRun"
