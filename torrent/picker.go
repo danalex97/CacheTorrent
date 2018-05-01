@@ -212,6 +212,12 @@ func (p *TorrentPicker) IsBanned(index int) bool {
   if ok {
     // we cache only positives
     p.Bans[index] = true
+
+    // once we have a piece we can save some memory by deleting the haves of
+    // those pieces
+    for _, have := range p.have {
+      delete(have, index)
+    }
   }
 
   return ok
