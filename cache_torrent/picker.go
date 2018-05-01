@@ -2,6 +2,7 @@ package cache_torrent
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
+  // "fmt"
 )
 
 type CachePicker struct {
@@ -27,6 +28,9 @@ func (p *CachePicker) GotRequest(index int) {
 }
 
 func (p *CachePicker) Next(peer string) (int, bool) {
+  p.RLock()
+  defer p.RUnlock()
+
   return p.IterateBuckers(peer, p.SelectBucket)
 }
 
@@ -41,37 +45,53 @@ func (p *CachePicker) SelectBucket(bucket map[int]bool,
    * @tiebreaks: set of pieces with active started requested
    */
 
-  look := func (check func (index int) bool) (int, bool) {
-    for index, _ := range bucket {
-     if !check(index) {
-       continue
-     }
+  // fmt.Println(len(p.requested), len(haves), len(bucket))
 
-     // if the remote peer has the piece
-     if _, ok := haves[index]; ok {
-       // and I did not requested the piece already
-       if nbr, ok := tiebreaks[index]; !ok || nbr == 0 {
-         // and the piece is not already stored
-         if !p.IsBanned(index) {
+  iterate := bucket
+  check1  := haves
+  check2  := p.requested
+  if len(check1) < len(iterate) {
+    check1, iterate = iterate, check1
+  }
+  if len(check2) < len(iterate) {
+    check2, iterate = iterate, check2
+  }
+  if len(check2) < len(check1) {
+    check2, check1 = check1, check2
+  }
+
+  for index, _ := range iterate {
+    if _, ok := check1[index]; ok {
+      if _, ok := check2[index]; ok {
+        if nbr, ok := tiebreaks[index]; !ok || nbr == 0 {
+          // and the piece is not already stored
+          if !p.IsBanned(index) {
            return index, true
-         }
-       }
-     }
+          }
+        }
+      }
     }
-    return 0, false
   }
 
-  checkReqs := func (index int) bool {
-    return p.requested[index]
+  iterate  = bucket
+  check   := haves
+  if len(bucket) < len(haves) {
+    check, iterate = iterate, check
   }
-  checkTrue := func (index int) bool {
-    return true
+  for index, _ := range iterate {
+    // if the remote peer has the piece
+    if _, ok := check[index]; ok {
+      // and I did not requested the piece already
+      if nbr, ok := tiebreaks[index]; !ok || nbr == 0 {
+        // and the piece is not already stored
+        if !p.IsBanned(index) {
+          return index, true
+        }
+      }
+    }
   }
 
-  if ans, ok := look(checkReqs); ok {
-    return ans, ok
-  }
-  return look(checkTrue)
+  return 0, false
 }
 
 func (p *CachePicker) IsBanned(index int) bool {
@@ -81,6 +101,13 @@ func (p *CachePicker) IsBanned(index int) bool {
 
   _, ok := p.Storage.Have(index)
   if ok {
+    p.RUnlock()
+    p.Lock()
+    defer func() {
+      p.Unlock()
+      p.RLock()
+    }()
+
     // We also want to delete the fact that we have a request for that node
     // since is already banned.
     delete(p.requested, index)
