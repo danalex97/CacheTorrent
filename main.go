@@ -26,6 +26,12 @@ var extension = flag.Bool(
   "Whether we use the extension",
 )
 
+var biased = flag.Bool(
+  "bias",
+  false,
+  "Whether we use the biased tracker",
+)
+
 var verbose = flag.Bool(
   "v",
   false,
@@ -47,7 +53,11 @@ func main() {
   // Set extension
   var template interface {}
   if !*extension {
-    template = new(simulation.SimulatedNode)
+    if !*biased {
+      template = new(simulation.SimulatedNode)
+    } else {
+      template = new(simulation.SimulatedBiasedNode)
+    }
   } else {
     template = new(simulation.SimulatedCachedNode)
     fmt.Println("Running with extension.")
