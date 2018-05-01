@@ -90,7 +90,7 @@ func (p *CachePicker) IsBanned(index int) bool {
 
     // once we have a piece we can save some memory by deleting the haves of
     // those pieces
-    for _, have := range p.have {
+    for _, have := range p.Have {
       delete(have, index)
     }
   }

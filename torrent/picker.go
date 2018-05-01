@@ -37,7 +37,7 @@ type TorrentPicker struct {
   buckets map[int]map[int]bool // map from frequency to bucket
   // a bucket is a set of indexes having a specific frequency
 
-  have   map[string]map[int]bool // the pieces that the remote peers have
+  Have   map[string]map[int]bool // the pieces that the remote peers have
   active map[int]int             // number of active requests for a piece
 
   Bans   map[int]bool            // the pieces that I already have stored
@@ -63,10 +63,10 @@ func (p *TorrentPicker) GotHave(peer string, index int) {
   defer p.Unlock()
 
   // update have
-  if _, ok := p.have[peer]; !ok {
-    p.have[peer] = make(map[int]bool)
+  if _, ok := p.Have[peer]; !ok {
+    p.Have[peer] = make(map[int]bool)
   }
-  p.have[peer][index] = true
+  p.Have[peer][index] = true
 
   // update freq
   if _, ok := p.freq[index]; !ok {
@@ -132,10 +132,10 @@ func (p *TorrentPicker) IterateBuckers(peer string, selector Selector) (int, boo
    * @tiebreaks: set of pieces with active started requests
    */
 
-  haves := p.have[peer]
+  haves := p.Have[peer]
   if haves == nil {
     haves = make(map[int]bool)
-    p.have[peer] = haves
+    p.Have[peer] = haves
   }
   tiebreaks := p.active
 
@@ -215,7 +215,7 @@ func (p *TorrentPicker) IsBanned(index int) bool {
 
     // once we have a piece we can save some memory by deleting the haves of
     // those pieces
-    for _, have := range p.have {
+    for _, have := range p.Have {
       delete(have, index)
     }
   }
