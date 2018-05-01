@@ -61,6 +61,13 @@ func makeMemprofile() {
   }
 }
 
+func getStats() {
+  log.Query(log.GetRedundancy)
+  log.Query(log.GetTraffic)
+  log.Query(log.GetTime)
+  log.Query(log.Stop)
+}
+
 func main() {
   // Parsing the flags
   flag.Parse()
@@ -87,6 +94,9 @@ func main() {
         pprof.StopCPUProfile()
       }
       makeMemprofile()
+
+      fmt.Println("Partial stats:")
+      getStats()
       os.Exit(0)
     }
   }()
@@ -141,8 +151,5 @@ func main() {
   t := s.Time()
   fmt.Println("Downloads finished in", t, "milliseconds.")
 
-  log.Query(log.GetRedundancy)
-  log.Query(log.GetTraffic)
-  log.Query(log.GetTime)
-  log.Query(log.Stop)
+  getStats()
 }
