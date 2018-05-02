@@ -63,9 +63,8 @@ class Job:
 
         self.id = random_id()
 
-        os.system("mkdir results/{}".format(self.id))
-        os.system("mkdir results/{}/single".format(self.id))
-        os.system("mkdir results/{}/additional".format(self.id))
+        os.system("mkdir -p results/{}".format(self.id))
+        os.system("mkdir -p results/{}/runs".format(self.id))
 
     def run(self):
         def run(host):
@@ -79,17 +78,12 @@ class Job:
                 pass
 
             if res != None:
-                out = None
-
                 self.lock.acquire()
                 self.runs += 1
                 runs = self.runs
                 self.lock.release()
 
-                if runs <= self.times:
-                    out = open("results/{}/single/{}.txt".format(self.id, runs), 'w')
-                else:
-                    out = open("results/{}/additional/{}.txt".format(self.id, runs), 'w')
+                out = open("results/{}/runs/{}.txt".format(self.id, runs), 'w')
 
                 print("===========================", file=out)
                 print("Job: {} -- run".format(self.command), file=out)
@@ -104,7 +98,7 @@ class Job:
             self.lock.release()
 
         print("Running job: {}".format(self.command))
-        for _ in range(int(self.times * 2.5)):
+        for _ in range(int(self.times)):
             host = self.pool.next()
             threading.Thread(target=run, args=[host]).start()
         return self
