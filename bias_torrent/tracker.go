@@ -7,9 +7,10 @@ import (
 
   "strings"
   "math/rand"
+  "math"
 )
 
-var K config.Const = config.NewConst(config.Bias)
+var KPercent config.Const = config.NewConst(config.Bias)
 
 type Tracker struct {
   asId map[string][]string
@@ -64,7 +65,7 @@ func newNeigh(allIds, ids []string) string {
 func (t *Tracker) Neighbours(id string) interface {} {
   neighbours := torrent.Neighbours{[]string{}}
   as := getAS(id)
-  B  := t.Neigh - K.Int()
+  B  := t.Neigh - int(math.Floor(float64(KPercent.Int()) * float64(t.Neigh) / 100))
 
   if nbr, _ :=t.asId[as]; B > len(nbr) {
     B = len(nbr) - 1

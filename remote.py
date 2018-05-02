@@ -30,12 +30,14 @@ class Pool:
                 id = id + "0"
             return id + str(idx)
         POOL = \
-            [app("point", i) for i in range(1, 41)] + \
-            [app("matrix", i) for i in range(1, 41)] + \
-            [app("sprite", i) for i in range(1, 41)] + \
-            [app("graphic", i) for i in range(1, 41)] + \
-            [app("voxel", i) for i in range(1, 41)] + \
-            [app("edge", i) for i in range(1, 41)]
+            [app("matrix", i) for i in range(1, 45)] + \
+            [app("sprite", i) for i in range(1, 39)] + \
+            [app("arc", i) for i in range(1, 15)] + \
+            [app("line", i) for i in range(1, 28)] + \
+            [app("edge", i) for i in range(1, 41)] + \
+            [app("point", i) for i in range(1, 61)] + \
+            [app("voxel", i) for i in range(1, 27)] + \
+            [app("graphic", i) for i in range(1, 13)]
         self.pool = POOL[:]
         random.shuffle(self.pool)
 
