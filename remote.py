@@ -4,6 +4,8 @@ import threading
 import subprocess
 import string
 import time
+import sys
+import argparse
 
 ID  = "ad5915"
 EXT = "doc.ic.ac.uk"
@@ -46,8 +48,8 @@ class Pool:
         return self.next()
 
 class Job:
-    os.system("mkdir remote_run")
-    os.system("mkdir results")
+    os.system("mkdir -p remote_run")
+    os.system("mkdir -p results")
 
     def __init__(self, pool, command, times):
         self.pool = pool
@@ -164,36 +166,42 @@ def process_output(file):
     return ans
 
 if __name__ == "__main__":
-     print("Remote run started...")
-     pool = Pool()
-     jobs = [
-         Job(pool, "go run main.go -conf=confs/small.json", 10),
-         Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
-     ]
-     for job in jobs:
-         job.run()
-     for job in jobs:
-         job.wait()
-     time.sleep(5)
-     for job in jobs:
-         out = open("results/{}/summary.txt".format(job.id), 'w')
- 
-         print("===========================", file=out)
-         print("Job: {}".format(job.command), file=out)
- 
-         rs = list([r for r in job.results if r != None][:job.runs])
- 
-         if len(rs) == 0:
-             print("Failed!", file=out)
-             continue
- 
-         print("===========================", file=out)
-         print("Summary:", file=out)
-         print("===========================", file=out)
-         print("Runs: {}".format(job.runs), file=out)
-         ans = rs[0]
-         for r in rs[1:]:
-             for k, v in r.items():
-                 ans[k] += v
-         for k, v in ans.items():
-             print("{} : {}".format(keys[k], v / job.runs), file=out)
+    parser = argparse.ArgumentParser(description='Run multiple simulations \
+        remotely')
+
+    parser.add_argument("-r", "--runs", type=int, default=1,
+        help="Number of times that the job run.")
+    parser.add_argument('command', nargs='*')
+
+    args, command_flags = parser.parse_known_args()
+
+    runs    = args.runs
+    command = " ".join(args.command + command_flags)
+
+    print("Running remote command: {}".format(command))
+
+    # Run the job remotely
+    job = Job(Pool(), command, runs).run().wait()
+
+    # Output the results
+    out = open("results/{}/summary.txt".format(job.id), 'w')
+
+    print("===========================", file=out)
+    print("Job: {}".format(job.command), file=out)
+
+    rs = list([r for r in job.results if r != None][:job.runs])
+
+    if len(rs) == 0:
+        print("Failed!", file=out)
+        continue
+
+    print("===========================", file=out)
+    print("Summary:", file=out)
+    print("===========================", file=out)
+    print("Runs: {}".format(job.runs), file=out)
+    ans = rs[0]
+    for r in rs[1:]:
+        for k, v in r.items():
+            ans[k] += v
+    for k, v in ans.items():
+        print("{} : {}".format(keys[k], v / job.runs), file=out)
