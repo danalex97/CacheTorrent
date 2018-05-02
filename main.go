@@ -18,6 +18,9 @@ import (
   "fmt"
 )
 
+const MaxUint = ^uint(0)
+const MaxInt  = int(MaxUint >> 1)
+
 // Flags
 var confPath = flag.String(
   "conf",
@@ -25,16 +28,22 @@ var confPath = flag.String(
   "The path to configuration .json file.",
 )
 
-var extension = flag.Bool(
+var extension = flag.Int(
   "ext",
-  false,
-  "Whether we use the extension",
+  MaxInt,
+  "Use the textesion with ext percent number of leaders.",
 )
 
-var biased = flag.Bool(
-  "bias",
+var timeCDF = flag.Bool(
+  "cdf",
   false,
-  "Whether we use the biased tracker",
+  "Enable printing time cumulative distribution function.",
+)
+
+var biased = flag.Int(
+  "bias",
+  MaxInt,
+  "Number of outgoing connections for a biased Tracker.",
 )
 
 var verbose = flag.Bool(
@@ -65,6 +74,11 @@ func getStats() {
   log.Query(log.GetRedundancy)
   log.Query(log.GetTraffic)
   log.Query(log.GetTime)
+
+  if *timeCDF {
+    log.Query(log.GetTimeCDF)
+  }
+
   log.Query(log.Stop)
 }
 
@@ -111,8 +125,8 @@ func main() {
 
   // Set extension
   var template interface {}
-  if !*extension {
-    if !*biased {
+  if *extension == MaxInt {
+    if *biased == MaxInt {
       template = new(simulation.SimulatedNode)
     } else {
       template = new(simulation.SimulatedBiasedNode)
@@ -128,6 +142,9 @@ func main() {
     config.
       JSONConfig(*confPath).
       WithParams(func(c *config.Conf) {
+        c.Bias          = *biased
+        c.LeaderPercent = *extension
+
         c.SharedInit = func() {
           wg.Add(1)
         }

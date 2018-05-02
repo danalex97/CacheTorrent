@@ -11,6 +11,7 @@ const (
   GetRedundancy = iota
   GetTime       = iota
   GetTraffic    = iota
+  GetTimeCDF    = iota
   Stop          = iota
 )
 
@@ -140,6 +141,14 @@ func (l *Logger) getTime() {
   fmt.Println("90th percentile:", getPercentile(90.0, l.times))
 }
 
+func (l *Logger) getTimeCDF() {
+  fmt.Print("Time CDF: [")
+  for _, t := range normalize(l.times) {
+    fmt.Print(t, ",")
+  }
+  fmt.Println("]")
+}
+
 /* Runner. */
 func (l *Logger) run() {
   for {
@@ -166,6 +175,8 @@ func (l *Logger) run() {
         l.getTime()
       case GetTraffic:
         l.getTraffic()
+      case GetTimeCDF:
+        l.getTimeCDF()
       case Stop:
         l.stopped = true
       }
