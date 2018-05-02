@@ -51,7 +51,7 @@ class Job:
     os.system("mkdir -p remote_run")
     os.system("mkdir -p results")
 
-    def __init__(self, pool, command, times):
+    def __init__(self, pool, command, times, name):
         self.pool = pool
 
         self.lock = threading.Lock()
@@ -61,7 +61,7 @@ class Job:
         self.times   = times
         self.runs    = 0
 
-        self.id = random_id()
+        self.id = name
 
         os.system("mkdir -p results/{}".format(self.id))
         os.system("mkdir -p results/{}/runs".format(self.id))
@@ -97,6 +97,7 @@ class Job:
             self.results.append(res)
             self.lock.release()
 
+        print("Job id: {}".format(self.id))
         print("Running job: {}".format(self.command))
         for _ in range(int(self.times)):
             host = self.pool.next()
@@ -163,19 +164,22 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run multiple simulations \
         remotely')
 
+    parser.add_argument("-n", "--name", type=str, default=random_id(),
+        help="The name of the folder in which the results will be saved.")
     parser.add_argument("-r", "--runs", type=int, default=1,
-        help="Number of times that the job run.")
+        help="Number of times that the job runs.")
     parser.add_argument('command', nargs='*')
 
     args, command_flags = parser.parse_known_args()
 
     runs    = args.runs
+    name    = args.name
     command = " ".join(args.command + command_flags)
 
     print("Running remote command: {}".format(command))
 
     # Run the job remotely
-    job = Job(Pool(), command, runs).run().wait()
+    job = Job(Pool(), command, runs, name).run().wait()
 
     # Output the results
     out = open("results/{}/summary.txt".format(job.id), 'w')
