@@ -1,12 +1,12 @@
 ARGS=$@
-ssh ad5915@shell1.doc.ic.ac.uk << ENDSSH
-  echo "Connected to shell1."
+ssh ad5915@shell3.doc.ic.ac.uk << ENDSSH
+  echo "Connected to shell."
   echo "Job: $ARGS"
-  ssh -tt -o StrictHostKeyChecking=no ad5915@matrix01.doc.ic.ac.uk "
-    echo 'Remote job dispached: $ARGS'
+  ssh -f -o StrictHostKeyChecking=no ad5915@matrix01.doc.ic.ac.uk "
+    echo 'Dispaching: $ARGS'
     cd ~/golang/src/github.com/danalex97/nfsTorrent
-    python3 remote.py $@
+    nohup python3 remote.py $ARGS > /dev/null 2>&1 &
+    echo 'Job dispached.'
     exit
-  "
-  exit
-ENDSSH
+  " &
+ENDSSH &
