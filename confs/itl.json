@@ -10,7 +10,7 @@
 // - links:
 //   - unit of measure: b/ms
 //   - uplink:   100Kb/s = 0.1Kb/ms = 100 b/ms
-//   - downlink: 1Mb/s = 1000Kb/s = 1Kb/ms = 1500 b/ms
+//   - downlink: 1Mb/s = 1000Kb/s = 1Kb/ms = 1000 b/ms
 // - BitTorrent configuration:
 //   - out peers: 35
 //   - rechoking interval: 10s = 10,000ms
@@ -35,16 +35,13 @@
   "interval"    : 10000,
 
   "backlog" : 10,
-  "bias" : 1,
-
-  "leaderPercent" : 50,
 
   "transitDomains"    : 10,
   "transitDomainSize" : 50,
   "stubDomains"       : 14,
   "stubDomainSize"    : 100,
 
-  "transferInterval"  : 1500,
+  "transferInterval"  : 100,
 
   "capacityNodes" : [{
       "number"   : 701,
@@ -52,5 +49,5 @@
       "download" : 1000
   }],
 
-  "allNodesRunInterval" : 500
+  "allNodesRunInterval" : 50
 }

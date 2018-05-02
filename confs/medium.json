@@ -13,9 +13,6 @@
   "interval"    : 10000,
 
   "backlog" : 10,
-  "bias" : 1,
-
-  "leaderPercent" : 50,
 
   "transitDomains"    : 10,
   "transitDomainSize" : 50,

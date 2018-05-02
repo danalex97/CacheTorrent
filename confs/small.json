@@ -16,9 +16,6 @@
 
   "backlog" : 10,
 
-  "leaderPercent" : 50,
-  "bias" : 1,
-
   "transitDomains"    : 10,
   "transitDomainSize" : 50,
   "stubDomains"       : 2,
