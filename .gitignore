@@ -1,3 +1,5 @@
 nfsTorrent
 remote_run
 results
+cpu.prof
+mem.prof

@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
     if len(rs) == 0:
         print("Failed!", file=out)
-        continue
+        sys.exit(0)
 
     print("===========================", file=out)
     print("Summary:", file=out)
