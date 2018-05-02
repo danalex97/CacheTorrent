@@ -105,6 +105,7 @@ class Job:
         for _ in range(int(self.times * 2.5)):
             host = self.pool.next()
             threading.Thread(target=run, args=[host]).start()
+        return self
 
     def wait(self):
         def get_len():
@@ -114,10 +115,11 @@ class Job:
             return ln
         while get_len() < self.times:
             time.sleep(1)
+        return self
 
 def test_remote(id, host):
     SSH_RUN = """
-    ssh -t -o StrictHostKeyChecking=no -o ConnectTimeout=1 {}@{} 'who | cut -d " " -f 1 | sort -u | wc -l'
+    ssh -o StrictHostKeyChecking=no -o ConnectTimeout=1 {}@{} 'who | cut -d " " -f 1 | sort -u | wc -l'
     """
 
     to_run = SSH_RUN.format(id, host)
@@ -131,15 +133,15 @@ def test_remote(id, host):
 def run_remote(id, host, command, file):
     SSH_RUN = """
     where={}@{}
-    ssh -tt -o "StrictHostKeyChecking no" $where <<-'ENDSSH'
-      echo "Running remote at $where"
+    ssh -o "StrictHostKeyChecking no" $where "
+      echo 'Running remote at $where'
 
       export GOPATH=~/golang
       cd ~/golang/src/github.com/danalex97/nfsTorrent
 
       {} > {}
       exit
-    ENDSSH > /dev/null
+    "
     """
 
     to_run = SSH_RUN.format(id, host, command, file)
@@ -162,36 +164,36 @@ def process_output(file):
     return ans
 
 if __name__ == "__main__":
-    print("Remote run started...")
-    pool = Pool()
-    jobs = [
-        Job(pool, "go run main.go -conf=confs/small.json", 10),
-        Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
-    ]
-    for job in jobs:
-        job.run()
-    for job in jobs:
-        job.wait()
-    time.sleep(5)
-    for job in jobs:
-        out = open("results/{}/summary.txt".format(job.id), 'w')
-
-        print("===========================", file=out)
-        print("Job: {}".format(job.command), file=out)
-
-        rs = list([r for r in job.results if r != None][:job.runs])
-
-        if len(rs) == 0:
-            print("Failed!", file=out)
-            continue
-
-        print("===========================", file=out)
-        print("Summary:", file=out)
-        print("===========================", file=out)
-        print("Runs: {}".format(job.runs), file=out)
-        ans = rs[0]
-        for r in rs[1:]:
-            for k, v in r.items():
-                ans[k] += v
-        for k, v in ans.items():
-            print("{} : {}".format(keys[k], v / job.runs), file=out)
+     print("Remote run started...")
+     pool = Pool()
+     jobs = [
+         Job(pool, "go run main.go -conf=confs/small.json", 10),
+         Job(pool, "go run main.go -ext -conf=confs/small.json", 10),
+     ]
+     for job in jobs:
+         job.run()
+     for job in jobs:
+         job.wait()
+     time.sleep(5)
+     for job in jobs:
+         out = open("results/{}/summary.txt".format(job.id), 'w')
+ 
+         print("===========================", file=out)
+         print("Job: {}".format(job.command), file=out)
+ 
+         rs = list([r for r in job.results if r != None][:job.runs])
+ 
+         if len(rs) == 0:
+             print("Failed!", file=out)
+             continue
+ 
+         print("===========================", file=out)
+         print("Summary:", file=out)
+         print("===========================", file=out)
+         print("Runs: {}".format(job.runs), file=out)
+         ans = rs[0]
+         for r in rs[1:]:
+             for k, v in r.items():
+                 ans[k] += v
+         for k, v in ans.items():
+             print("{} : {}".format(keys[k], v / job.runs), file=out)
