@@ -83,6 +83,8 @@ func getStats() {
 }
 
 func main() {
+  fmt.Println("Running:", os.Args[1:])
+
   // Parsing the flags
   flag.Parse()
 

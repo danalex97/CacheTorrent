@@ -122,7 +122,7 @@ def test_remote(id, host):
     # Check if there is only one user and
     # my script is not already running on the host.
     SSH_RUN = """
-    ssh -o StrictHostKeyChecking=no -o ConnectTimeout=1 {}@{} '
+    ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 {}@{} '
         echo $[`who | cut -d " " -f 1 | sort -u | wc -l`
               + `ps -A | grep main | wc -l`]'
     """
