@@ -1,13 +1,16 @@
 #!/usr/bin/python3
 
 import os
-import random
 import threading
-import subprocess
 import string
 import time
 import sys
 import argparse
+
+from util import test_remote
+from util import random_id
+
+from pool import Pool
 
 ID  = "ad5915"
 EXT = "doc.ic.ac.uk"
@@ -18,38 +21,6 @@ keys = {
   "50p"  : "50th percentile",
   "90p"  : "90th percentile",
 }
-
-random_id = lambda : ''.join(
-    random.choice(string.ascii_lowercase + string.digits)
-    for _ in range(20))
-
-class Pool:
-    def __init__(self):
-        def app(id, idx):
-            if idx < 10:
-                id = id + "0"
-            return id + str(idx)
-        POOL = \
-            [app("matrix", i) for i in range(1, 45)] + \
-            [app("sprite", i) for i in range(1, 39)] + \
-            [app("arc", i) for i in range(1, 15)] + \
-            [app("line", i) for i in range(1, 28)] + \
-            [app("edge", i) for i in range(1, 41)] + \
-            [app("point", i) for i in range(1, 61)] + \
-            [app("voxel", i) for i in range(1, 27)] + \
-            [app("graphic", i) for i in range(1, 13)]
-        self.pool = POOL[:]
-        random.shuffle(self.pool)
-
-    def next(self):
-        if len(self.pool) == 0:
-            return None
-        out = self.pool[-1]
-        del self.pool[-1]
-
-        if test_remote(ID, out):
-            return out
-        return self.next()
 
 class Job:
     os.system("mkdir -p remote_run")
@@ -117,40 +88,6 @@ class Job:
         while get_len() < self.times:
             time.sleep(1)
         return self
-
-def test_remote(id, host):
-    # Check if there is only one user and
-    # my script is not already running on the host.
-    SSH_RUN = """
-    ssh -o StrictHostKeyChecking=no -o ConnectTimeout=1 {}@{} '
-        echo $[`who | cut -d " " -f 1 | sort -u | wc -l`
-              + `ps -A | grep main | wc -l`]'
-    """
-
-    to_run = SSH_RUN.format(id, host)
-    try:
-        out = subprocess.check_output(to_run, shell=True)
-        val = int(out)
-        return val == 1
-    except:
-        return False
-
-def run_remote(id, host, command, file):
-    SSH_RUN = """
-    where={}@{}
-    ssh -o "StrictHostKeyChecking no" $where "
-      echo 'Running remote at $where'
-
-      export GOPATH=~/golang
-      cd ~/golang/src/github.com/danalex97/nfsTorrent
-
-      {} > {}
-      exit
-    "
-    """
-
-    to_run = SSH_RUN.format(id, host, command, file)
-    os.system(to_run)
 
 def process_output(file):
     with open(file, 'r') as content_file:
