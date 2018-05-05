@@ -3,3 +3,4 @@ remote_run
 results
 cpu.prof
 mem.prof
+*__pycache__*
