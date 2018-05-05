@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 
+from util import random_id
+
+from server.client import Client
+
 import argparse
 import sys
 import os
-
-from util import random_id
-from client import Client
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run a single simulation.')
@@ -19,8 +20,6 @@ if __name__ == "__main__":
     parser.add_argument('command', nargs='*')
 
     args, command_flags = parser.parse_known_args()
-    print(args)
-    print(command_flags)
 
     if args.name == None:
         print("No name provided.")

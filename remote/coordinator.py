@@ -3,8 +3,8 @@ from util import get_ip
 from util import run_remote
 from util import process_output
 
-from component import Component
-from server    import Server
+from server.component import Component
+from server.server    import Server
 
 import threading
 import os
