@@ -44,10 +44,10 @@ if __name__ == "__main__":
     if exit == 0:
         print("Job done.")
         client.post("/done", {
-            "name" : name
+            "done" : name
         })
     else:
         print("Job failed.")
         client.post("/done", {
-            "fail" : "fail"
+            "fail" : name
         })
