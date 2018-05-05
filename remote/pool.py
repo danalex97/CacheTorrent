@@ -1,3 +1,6 @@
+from util import test_remote
+from util import ID
+
 import random
 
 class Pool:

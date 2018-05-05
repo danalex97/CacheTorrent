@@ -1,5 +1,12 @@
 #!/usr/bin/python3
 
+from util import test_remote
+from util import random_id
+from util import ID
+from util import KEYS as keys
+
+from coordinator import Coordinator
+
 import os
 import threading
 import string
@@ -7,11 +14,30 @@ import time
 import sys
 import argparse
 
-from util import test_remote
-from util import random_id
+def onDone(coordinator):
+    # Output the results
+    out = open("results/{}/summary.txt".format(coordinator.id), 'w')
 
-from util import ID
-from util import KEYS as keys
+    print("===========================", file=out)
+    print("Job: {}".format(coordinator.command), file=out)
+
+    rs   = coordinator.results
+    runs = len(rs)
+
+    if len(rs) == 0:
+        print("Failed!", file=out)
+        sys.exit(0)
+
+    print("===========================", file=out)
+    print("Summary:", file=out)
+    print("===========================", file=out)
+    print("Runs: {}".format(runs), file=out)
+    ans = rs[0]
+    for r in rs[1:]:
+        for k, v in r.items():
+            ans[k] += v
+    for k, v in ans.items():
+        print("{} : {}".format(keys[k], v / runs), file=out)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run multiple simulations \
@@ -31,28 +57,11 @@ if __name__ == "__main__":
 
     print("Running remote command: {}".format(command))
 
-    # Run the job remotely
-    job = Job(Pool(), command, runs, name).run().wait()
+    # Starting the coordinator
+    coordinator = Coordinator(
+        command = command,
+        times   = runs,
+        name    = name) \
+    .run()
 
-    # Output the results
-    out = open("results/{}/summary.txt".format(job.id), 'w')
-
-    print("===========================", file=out)
-    print("Job: {}".format(job.command), file=out)
-
-    rs = list([r for r in job.results if r != None][:job.runs])
-
-    if len(rs) == 0:
-        print("Failed!", file=out)
-        sys.exit(0)
-
-    print("===========================", file=out)
-    print("Summary:", file=out)
-    print("===========================", file=out)
-    print("Runs: {}".format(job.runs), file=out)
-    ans = rs[0]
-    for r in rs[1:]:
-        for k, v in r.items():
-            ans[k] += v
-    for k, v in ans.items():
-        print("{} : {}".format(keys[k], v / job.runs), file=out)
+    coordinator.onDone(lambda: onDone(coordinator))

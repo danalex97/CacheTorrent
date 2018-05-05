@@ -4,6 +4,7 @@ from util import run_remote
 from util import process_output
 
 from component import Component
+from server    import Server
 
 import threading
 import os
@@ -17,8 +18,10 @@ class OnDone(Component):
 
     def process(self, message):
         if "fail" in message:
+            print("Fail: {}".format(message["fail"]))
             self.coordinator.fail(message["fail"])
         elif "done" in message:
+            print("Done: {}".format(message["done"]))
             self.coordinator.done(message["done"])
         else:
             # Unexpected message.
@@ -84,6 +87,8 @@ class Coordinator:
         print("Running job: {}".format(self.command))
         for _ in range(int(self.times)):
             host = self.pool.next()
+            if host == None:
+                continue
             run(host)
             # threading.Thread(target=run, args=[host]).start()
         return self
@@ -94,7 +99,7 @@ class Coordinator:
             self.callback()
 
     def done(self, file):
-        process_output(file)
+        self.results.append(process_output(file))
         self.fail()
 
     def onDone(self, callback):
