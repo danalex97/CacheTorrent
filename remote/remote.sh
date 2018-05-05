@@ -1,8 +1,8 @@
 ARGS=$@
-if [ "$1" -eq '-h' ];
+if [ "$1" = '-h' ]
 then
   python3 remote.py -h
-elif [ "$1" -eq '--help' ];
+elif [ "$1" = '--help' ]
 then
   python3 remote.py -h
 else
