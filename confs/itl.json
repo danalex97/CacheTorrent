@@ -41,7 +41,7 @@
   "stubDomains"       : 14,
   "stubDomainSize"    : 100,
 
-  "transferInterval"  : 100,
+  "transferInterval"  : 1500,
 
   "capacityNodes" : [{
       "number"   : 701,
@@ -49,5 +49,5 @@
       "download" : 1000
   }],
 
-  "allNodesRunInterval" : 50
+  "allNodesRunInterval" : 500
 }
