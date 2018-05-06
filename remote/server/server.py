@@ -1,7 +1,9 @@
 import threading
 import random
 
-from flask import Blueprint, Flask, request
+from flask import Blueprint
+from flask import Flask
+from flask import request
 
 class Server():
     """
@@ -50,3 +52,6 @@ class Server():
 
     def run(self):
         self.app.run(host='0.0.0.0', port=int(self.port))
+
+    def stop(self):
+        request.environ.get('werkzeug.server.shutdown')()

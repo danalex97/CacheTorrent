@@ -1,5 +1,8 @@
 from pool import Pool
+
 from util import ID
+from util import KEYS as keys
+
 from util import get_ip
 from util import run_remote
 from util import process_output
@@ -79,13 +82,13 @@ class Coordinator:
         os.system("rm -f {}".format(self.log))
 
         # Run server
-        self.server = get_ip()
+        self.ip = get_ip()
         self.port   = 8080
 
-        server = Server("coordinator", self.port)
-        server.add_component_post("/done", OnDone(self))
-        server.add_component_post("/start", OnStart(self))
-        threading.Thread(target=server.run).start()
+        self.server = Server("coordinator", self.port)
+        self.server.add_component_post("/done", OnDone(self))
+        self.server.add_component_post("/start", OnStart(self))
+        threading.Thread(target=self.server.run).start()
 
     def run(self):
         def run(host):
@@ -102,7 +105,7 @@ class Coordinator:
                     host    = host,
                     command = self.command,
                     file    = file,
-                    server  = self.server,
+                    server  = self.ip,
                     port    = self.port,
                 )
                 with self.lock:
@@ -131,9 +134,30 @@ class Coordinator:
     def check_finished(self):
         with self.lock:
             if self.completed == self.runs and not self.dispaching:
+                # Run callback.
                 with open(self.log, "a") as f:
                     print("Jobs finished. Starting callback.", file=f)
                 self.callback()
+
+                # Stop server.
+                with open(self.log, "a") as f:
+                    print("Stopping server.", file=f)
+                self.server.stop()
+
+    def job_stats(self, file, res):
+        with self.lock:
+            runs = self.completed
+
+        out = open("results/{}/runs/{}.txt".format(self.id, runs), 'w')
+
+        print("===========================", file=out)
+        print("Job: {} -- run".format(self.command), file=out)
+        print("Machine: {}".format(file), file=out)
+        print("===========================", file=out)
+        for k, v in res.items():
+            print("{} : {}".format(keys[k], v), file=out)
+
+        out.close()
 
     def fail(self, file):
         with self.lock:
@@ -141,7 +165,10 @@ class Coordinator:
         self.check_finished()
 
     def done(self, file):
-        self.results.append(process_output(file))
+        res = process_output(file)
+        self.results.append(res)
+
+        self.job_stats(file, res)
         self.fail(file)
 
     def onDone(self, callback):
