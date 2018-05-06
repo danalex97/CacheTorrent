@@ -35,13 +35,14 @@ if __name__ == "__main__":
     command = args.command
 
     # Client used for server communication
+    print(server, port)
     client = Client(server, port)
     client.post("/start", {
         "done" : name
     })
 
     command_with_flags = " ".join(command + list(command_flags))
-    # command_with_flags = "{} > {}".format(command_with_flags, name)
+    command_with_flags = "{} > {}".format(command_with_flags, name)
     print("Running {}".format(command_with_flags))
 
     # Run the command

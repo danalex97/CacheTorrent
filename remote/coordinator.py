@@ -60,8 +60,12 @@ class Coordinator:
         self.command = command
         self.times   = times
 
-        self.runs      = 0
-        self.completed = 0
+        # Job control
+        self.dispaching = True
+        self.runs       = 0
+        self.completed  = 0
+        self.lock       = threading.Lock()
+
         self.callback  = lambda *args: None
 
         self.id = name
@@ -101,7 +105,8 @@ class Coordinator:
                     server  = self.server,
                     port    = self.port,
                 )
-                self.runs += 1
+                with self.lock:
+                    self.runs += 1
             except Exception as e:
                 with open(self.log, "a") as f:
                     print("Job failed on: {}".format(host), file=f)
@@ -116,14 +121,24 @@ class Coordinator:
                 continue
             run(host)
             # threading.Thread(target=run, args=[host]).start()
+
+        with self.lock:
+            self.dispaching = False
+        self.check_finished()
+
         return self
 
+    def check_finished(self):
+        with self.lock:
+            if self.completed == self.runs and not self.dispaching:
+                with open(self.log, "a") as f:
+                    print("Jobs finished. Starting callback.", file=f)
+                self.callback()
+
     def fail(self, file):
-        self.completed += 1
-        if self.completed == self.runs:
-            with open(self.log, "a") as f:
-                print("Jobs finished. Starting callback.", file=f)
-            self.callback()
+        with self.lock:
+            self.completed += 1
+        self.check_finished()
 
     def done(self, file):
         self.results.append(process_output(file))

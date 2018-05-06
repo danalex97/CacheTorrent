@@ -18,7 +18,8 @@ def onDone(coordinator):
     # Output the results
     out = "results/{}/summary.txt".format(coordinator.id)
 
-    with open(out, "a") as f:
+    # We firstly open the file for writing to overwrite older results
+    with open(out, "w") as f:
         print("===========================", file=f)
         print("Job: {}".format(coordinator.command), file=f)
 
