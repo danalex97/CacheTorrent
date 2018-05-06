@@ -20,13 +20,24 @@ To run use `go run main.go`. It supports the following arguments:
 -v	Verbose output
 ```
 
-To run multiple simulations in parallel, use `python3 remote.py`. The jobs can
-be configured by hand as follows:
-```python
-jobs = [
-    Job(pool, "go run main.go -conf=confs/small.json", times=10),
-    Job(pool, "go run main.go -ext -conf=confs/small.json", times=10),
-]
+To run multiple simulations in parallel, use `./remote.sh`.
+```
+Usage: ./remote.sh [-h] [-n NAME] [-r RUNS] command
+
+Run multiple simulations remotely.
+
+Positional arguments:
+  command
+
+Optional arguments:
+  -h, --help            show this help message and exit
+  -n NAME, --name NAME  The name of the folder in which the results will be
+                        saved.
+  -r RUNS, --runs RUNS  Number of times that the job runs.
+```
+Example usage:
+```
+./remote.sh -n=test -r=5 go run main.go -conf=confs/itl.json -v
 ```
 
 
