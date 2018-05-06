@@ -18,8 +18,14 @@ class Client():
     def port(self):
         return self._port
 
-    def get(self, resource, default=None):
+    def get_full_url(self, resource):
         full_url = "{}:{}{}".format(self.url, str(self.port), resource)
+        if "http://" not in full_url:
+            full_url = "http://{}".format(full_url)
+        return full_url
+
+    def get(self, resource, default=None):
+        full_url = self.get_full_url(resource)
         try:
             r = requests.get(url = full_url)
             data = json_lib.dumps(ast.literal_eval(r.text))
@@ -28,7 +34,7 @@ class Client():
             return default
 
     def post(self, resource, json, default=None):
-        full_url = self.url + ":" + str(self.port) + resource
+        full_url = self.get_full_url(resource)
         try:
             r = requests.post(
                 url = full_url,

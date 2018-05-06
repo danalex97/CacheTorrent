@@ -49,16 +49,17 @@ def test_remote(id, host):
 
 def run_remote(id, host, command, file, server, port):
     print("Run remote.")
-    to_run = """
+    SSH_RUN = """
     where={id}@{host}
     ssh -o "StrictHostKeyChecking no" $where "
-      echo 'Running remote at $where'
+      echo 'Disapching remote at $where'
 
       export GOPATH=~/golang
       cd ~/golang/src/github.com/danalex97/nfsTorrent
 
-      # nohop python3 remote/job.py -s={server} -p={port} -n={file} {command} > /dev/null 2>&1 &
-      python3 remote/job.py -s={server} -p={port} -n={file} {command}
+      nohop python3 remote/job.py -s={server} -p={port} -n={file} {command} > /dev/null 2>&1 &
+      # python3 remote/job.py -s={server} -p={port} -n={file} {command}
+      echo 'Finished dispaching at $where'
       exit
     "
     """
@@ -74,6 +75,7 @@ def run_remote(id, host, command, file, server, port):
     os.system(to_run)
 
 def process_output(file):
+    print(os.path.realpath(file))
     with open(file, 'r') as content_file:
         content = content_file.read()
 
@@ -81,7 +83,7 @@ def process_output(file):
 
     ans = {}
     for line in lines:
-        for k, v in keys.items():
+        for k, v in KEYS.items():
             if v in line:
                 ans[k] = float(line.split(":")[1])
 

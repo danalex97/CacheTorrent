@@ -1,4 +1,5 @@
 from pool import Pool
+from util import ID
 from util import get_ip
 from util import run_remote
 from util import process_output
@@ -18,11 +19,11 @@ class OnDone(Component):
 
     def process(self, message):
         if "fail" in message:
-            with open(coordinator.log, "a") as f:
+            with open(self.coordinator.log, "a") as f:
                 print("Fail: {}".format(message["fail"]), file=f)
             self.coordinator.fail(message["fail"])
         elif "done" in message:
-            with open(coordinator.log, "a") as f:
+            with open(self.coordinator.log, "a") as f:
                 print("Done: {}".format(message["done"]), file=f)
             self.coordinator.done(message["done"])
         else:
@@ -37,8 +38,9 @@ class OnStart(Component):
         self.coordinator = coordinator
 
     def process(self, message):
-        with open(coordinator.log, "a") as f:
-            print("Start: {}".format(message["start"]), file=f)
+        if "start" in message:
+            with open(self.coordinator.log, "a") as f:
+                print("Start: {}".format(message["start"]), file=f)
 
 class Coordinator:
     """
@@ -70,6 +72,7 @@ class Coordinator:
 
         # Logging
         self.log = "results/{}/log.txt".format(self.id)
+        os.system("rm -f {}".format(self.log))
 
         # Run server
         self.server = get_ip()
@@ -99,10 +102,10 @@ class Coordinator:
                     port    = self.port,
                 )
                 self.runs += 1
-            except:
+            except Exception as e:
                 with open(self.log, "a") as f:
                     print("Job failed on: {}".format(host), file=f)
-
+                    print("Exception: {}".format(e), file=f)
 
         with open(self.log, "a") as f:
             print("Job id: {}".format(self.id), file=f)
@@ -118,11 +121,13 @@ class Coordinator:
     def fail(self, file):
         self.completed += 1
         if self.completed == self.runs:
+            with open(self.log, "a") as f:
+                print("Jobs finished. Starting callback.", file=f)
             self.callback()
 
     def done(self, file):
         self.results.append(process_output(file))
-        self.fail()
+        self.fail(file)
 
     def onDone(self, callback):
         self.callback = callback

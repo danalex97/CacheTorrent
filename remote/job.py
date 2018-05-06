@@ -49,12 +49,12 @@ if __name__ == "__main__":
 
     # Send the response back to the main server
     if exit == 0:
-        print("Job done.")
+        print("Job done: {}".format(name))
         client.post("/done", {
             "done" : name
         })
     else:
-        print("Job failed.")
+        print("Job failed: {}".format(name))
         client.post("/done", {
             "fail" : name
         })
