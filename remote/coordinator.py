@@ -11,6 +11,8 @@ from server.component import Component
 from server.server    import Server
 
 import threading
+import random
+import signal
 import os
 
 class OnDone(Component):
@@ -54,7 +56,7 @@ class Coordinator:
     os.system("mkdir -p remote_run")
     os.system("mkdir -p results")
 
-    def __init__(self, command, times, name, pool=Pool()):
+    def __init__(self, command, times, name, notify, pool=Pool()):
         self.pool = pool
 
         self.lock = threading.Lock()
@@ -62,6 +64,9 @@ class Coordinator:
 
         self.command = command
         self.times   = times
+
+        # Notifications
+        self.notify = notify
 
         # Job control
         self.dispaching = True
@@ -82,8 +87,8 @@ class Coordinator:
         os.system("rm -f {}".format(self.log))
 
         # Run server
-        self.ip = get_ip()
-        self.port   = 8080
+        self.ip   = get_ip()
+        self.port = random.uniform(30000, 30100)
 
         self.server = Server("coordinator", self.port)
         self.server.add_component_post("/done", OnDone(self))
@@ -124,6 +129,10 @@ class Coordinator:
                 continue
             run(host)
             # threading.Thread(target=run, args=[host]).start()
+
+        # Notify that everything was dispached
+        if self.notify != 0:
+            os.kill(self.notify, signal.SIGUSR1)
 
         with self.lock:
             self.dispaching = False

@@ -50,12 +50,15 @@ if __name__ == "__main__":
 
     parser.add_argument("-n", "--name", type=str, default=random_id(),
         help="The name of the folder in which the results will be saved.")
-    parser.add_argument("-r", "--runs", type=int, default=1,
+    parser.add_argument("-r", "--runs", type=int, default=0,
         help="Number of times that the job runs.")
+    parser.add_argument("-notify", type=int, default=0,
+        help="The PID of process to be notified when all jobs were dispached.")
     parser.add_argument('command', nargs='*')
 
     args, command_flags = parser.parse_known_args()
 
+    notify  = args.notify
     runs    = args.runs
     name    = args.name
     command = " ".join(args.command + command_flags)
@@ -66,7 +69,8 @@ if __name__ == "__main__":
     coordinator = Coordinator(
         command = command,
         times   = runs,
-        name    = name) \
+        name    = name,
+        notify  = notify) \
 
     coordinator.onDone(lambda: onDone(coordinator))
     coordinator.run()
