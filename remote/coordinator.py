@@ -18,14 +18,27 @@ class OnDone(Component):
 
     def process(self, message):
         if "fail" in message:
-            print("Fail: {}".format(message["fail"]))
+            with open(coordinator.log, "a") as f:
+                print("Fail: {}".format(message["fail"]), file=f)
             self.coordinator.fail(message["fail"])
         elif "done" in message:
-            print("Done: {}".format(message["done"]))
+            with open(coordinator.log, "a") as f:
+                print("Done: {}".format(message["done"]), file=f)
             self.coordinator.done(message["done"])
         else:
             # Unexpected message.
             pass
+
+class OnStart(Component):
+    """
+    A component that reacts to start notifications.
+    """
+    def __init__(self, coordinator):
+        self.coordinator = coordinator
+
+    def process(self, message):
+        with open(coordinator.log, "a") as f:
+            print("Start: {}".format(message["start"]), file=f)
 
 class Coordinator:
     """
@@ -55,12 +68,16 @@ class Coordinator:
         os.system("mkdir -p results/{}".format(self.id))
         os.system("mkdir -p results/{}/runs".format(self.id))
 
+        # Logging
+        self.log = "results/{}/log.txt".format(self.id)
+
         # Run server
         self.server = get_ip()
         self.port   = 8080
 
         server = Server("coordinator", self.port)
         server.add_component_post("/done", OnDone(self))
+        server.add_component_post("/start", OnStart(self))
         threading.Thread(target=server.run).start()
 
     def run(self):
@@ -69,6 +86,8 @@ class Coordinator:
             Runs a Job at a particular host.
             """
             file = "remote_run/{}.txt".format(host)
+            with open(self.log, "a") as f:
+                print("Run remote job on: {}".format(host), file=f)
 
             try:
                 run_remote(
@@ -81,10 +100,13 @@ class Coordinator:
                 )
                 self.runs += 1
             except:
-                pass
+                with open(self.log, "a") as f:
+                    print("Job failed on: {}".format(host), file=f)
 
-        print("Job id: {}".format(self.id))
-        print("Running job: {}".format(self.command))
+
+        with open(self.log, "a") as f:
+            print("Job id: {}".format(self.id), file=f)
+            print("Running job: {}".format(self.command), file=f)
         for _ in range(int(self.times)):
             host = self.pool.next()
             if host == None:

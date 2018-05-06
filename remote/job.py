@@ -19,6 +19,7 @@ if __name__ == "__main__":
         help="The remote port to which the job will send back the results.")
     parser.add_argument('command', nargs='*')
 
+    print("Job started.")
     args, command_flags = parser.parse_known_args()
 
     if args.name == None:
@@ -33,6 +34,12 @@ if __name__ == "__main__":
     port    = args.port
     command = args.command
 
+    # Client used for server communication
+    client = Client(server, port)
+    client.post("/start", {
+        "done" : name
+    })
+
     command_with_flags = " ".join(command + list(command_flags))
     # command_with_flags = "{} > {}".format(command_with_flags, name)
     print("Running {}".format(command_with_flags))
@@ -41,7 +48,6 @@ if __name__ == "__main__":
     exit = os.system(command_with_flags) >> 8
 
     # Send the response back to the main server
-    client = Client(server, port)
     if exit == 0:
         print("Job done.")
         client.post("/done", {

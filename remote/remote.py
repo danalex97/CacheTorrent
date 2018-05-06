@@ -16,28 +16,32 @@ import argparse
 
 def onDone(coordinator):
     # Output the results
-    out = open("results/{}/summary.txt".format(coordinator.id), 'w')
+    out = "results/{}/summary.txt".format(coordinator.id)
 
-    print("===========================", file=out)
-    print("Job: {}".format(coordinator.command), file=out)
+    with open(out, "a") as f:
+        print("===========================", file=f)
+        print("Job: {}".format(coordinator.command), file=f)
 
     rs   = coordinator.results
     runs = len(rs)
 
     if len(rs) == 0:
-        print("Failed!", file=out)
+        with open(out, "a") as f:
+            print("Failed!", file=f)
         sys.exit(0)
 
-    print("===========================", file=out)
-    print("Summary:", file=out)
-    print("===========================", file=out)
-    print("Runs: {}".format(runs), file=out)
+    with open(out, "a") as f:
+        print("===========================", file=f)
+        print("Summary:", file=f)
+        print("===========================", file=f)
+        print("Runs: {}".format(runs), file=f)
     ans = rs[0]
     for r in rs[1:]:
         for k, v in r.items():
             ans[k] += v
-    for k, v in ans.items():
-        print("{} : {}".format(keys[k], v / runs), file=out)
+    with open(out, "a") as f:
+        for k, v in ans.items():
+            print("{} : {}".format(keys[k], v / runs), file=f)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Run multiple simulations \
@@ -62,6 +66,6 @@ if __name__ == "__main__":
         command = command,
         times   = runs,
         name    = name) \
-    .run()
 
     coordinator.onDone(lambda: onDone(coordinator))
+    coordinator.run()

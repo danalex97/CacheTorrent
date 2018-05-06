@@ -31,6 +31,8 @@ random_id = lambda : ''.join(
 def test_remote(id, host):
     # Check if there is only one user and
     # my script is not already running on the host.
+    print("Test remote {}.".format(host))
+
     SSH_RUN = """
     ssh -o StrictHostKeyChecking=no -o ConnectTimeout=1 {}@{} '
         echo $[`who | cut -d " " -f 1 | sort -u | wc -l`
@@ -39,13 +41,14 @@ def test_remote(id, host):
 
     to_run = SSH_RUN.format(id, host)
     try:
-        out = subprocess.check_output(to_run, shell=True)
+        out = subprocess.check_output(to_run, shell=True, timeout=2)
         val = int(out)
         return val == 1
     except:
         return False
 
 def run_remote(id, host, command, file, server, port):
+    print("Run remote.")
     to_run = """
     where={id}@{host}
     ssh -o "StrictHostKeyChecking no" $where "
@@ -54,7 +57,8 @@ def run_remote(id, host, command, file, server, port):
       export GOPATH=~/golang
       cd ~/golang/src/github.com/danalex97/nfsTorrent
 
-      nohop python3 remote/job.py {command} -s={sender} -p={port} -n={file} > /dev/null 2>&1 &
+      # nohop python3 remote/job.py -s={server} -p={port} -n={file} {command} > /dev/null 2>&1 &
+      python3 remote/job.py -s={server} -p={port} -n={file} {command}
       exit
     "
     """
