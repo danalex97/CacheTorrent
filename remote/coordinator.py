@@ -88,7 +88,7 @@ class Coordinator:
 
         # Run server
         self.ip   = get_ip()
-        self.port = random.uniform(30000, 30100)
+        self.port = int(random.uniform(30000, 30100))
 
         self.server = Server("coordinator", self.port)
         self.server.add_component_post("/done", OnDone(self))
@@ -132,7 +132,9 @@ class Coordinator:
 
         # Notify that everything was dispached
         if self.notify != 0:
+            print("Notify.")
             os.kill(self.notify, signal.SIGUSR1)
+            print("Notified.")
 
         with self.lock:
             self.dispaching = False

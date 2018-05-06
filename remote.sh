@@ -15,11 +15,13 @@ else
   pid=$$
   echo "Dispaching job: $ARGS"
   echo "PID: $pid"
-  nohup python3 remote/remote.py -notify=$pid $ARGS > /dev/null 2>&1 &
-  # python3 remote/remote.py -notify=$pid $ARGS &
 
   # Wait for SIGUR1 signal
   trap "on_done" SIGUSR1
+
+  nohup python3 remote/remote.py -notify=$pid $ARGS > /dev/null 2>&1 &
+  # python3 remote/remote.py -notify=$pid $ARGS
+
   while :; do
     sleep 1
   done

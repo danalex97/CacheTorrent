@@ -15,7 +15,7 @@ if __name__ == "__main__":
         help="The name of the folder in which the results will be saved.")
     parser.add_argument("-s", "--server", type=str, default=None,
         help="The remote server to which the job will send back the results.")
-    parser.add_argument("-p", "--port", type=int, default=8080,
+    parser.add_argument("-p", "--port", type=int, default=None,
         help="The remote port to which the job will send back the results.")
     parser.add_argument('command', nargs='*')
 
@@ -28,6 +28,7 @@ if __name__ == "__main__":
     if args.server == None:
         print("No report server provided. Using 10.0.0.1.")
         args.server = "10.0.0.1"
+        args.port   = 8080
 
     name    = args.name
     server  = args.server
