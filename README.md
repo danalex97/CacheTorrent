@@ -5,12 +5,19 @@ Network-friendly speedy torrents.
 
 To run use `go run main.go`. It supports the following arguments:
 ```
+-bias int
+  	Number of outgoing connections for a biased Tracker.
+-cdf
+  	Enable printing time cumulative distribution function.
 -conf string
-    The path to configuration .json file. (default "./confs/small.json")
--ext
-    Whether we use the extension
--v
-    Verbose output
+  	The path to configuration .json file. (default "./confs/small.json")
+-cpuprofile file
+  	Write cpu profile to file.
+-ext int
+  	Use the textesion with ext percent number of leaders.
+-memprofile file
+  	Write memory profile to file.
+-v	Verbose output
 ```
 
 To run multiple simulations in parallel, use `python3 remote.py`. The jobs can
