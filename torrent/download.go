@@ -228,6 +228,13 @@ func (d *TorrentDownload) gotHave(msg Have) {
 
   // let picker know I can get piece index
   d.Picker.GotHave(d.from, index)
+
+  // If I am unchoked, since the Picker's state changed, we
+  // may be able to request more pieces. This may be the case
+  // when we receive a Have after an Unchoke.
+  if !d.choked {
+    d.RequestMore()
+  }
 }
 
 /*
