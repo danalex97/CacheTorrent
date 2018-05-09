@@ -6,6 +6,7 @@ import (
   "github.com/danalex97/nfsTorrent/log"
 
   "runtime"
+  // "reflect"
 )
 
 var inPeers  config.Const = config.NewConst(config.InPeers)
@@ -201,8 +202,6 @@ func (p *Peer) Run(connAdd ConnAdder) {
 }
 
 func (p *Peer) GetId(m interface {}) (id string){
-  // log.Println("Msg:", p.Id, reflect.TypeOf(m), m)
-
   switch msg := m.(type) {
   case Choke:
     id = msg.Id
