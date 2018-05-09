@@ -14,6 +14,7 @@ import (
 
   "container/list"
   "strconv"
+  "sync"
 )
 
 var backlog  config.Const = config.NewConst(config.Backlog)
@@ -50,6 +51,7 @@ type TorrentDownload struct {
 
   handshake Handshake
 
+  rateLock *sync.Mutex
   times *list.List
 }
 
@@ -66,6 +68,7 @@ func NewDownload(connector *Connector) Download {
     ActiveRequests: make(map[int]bool),
     handshake: connector.Handshake,
 
+    rateLock: new(sync.Mutex),
     times: list.New(),
   }
 }
@@ -296,10 +299,16 @@ func pieceFromDownload(from string, data Data) Piece {
  * Calculate the download rate as a moving average.
  */
 func (d *TorrentDownload) Rate() float64 {
+  d.rateLock.Lock()
+  defer d.rateLock.Unlock()
+
   return float64(d.times.Len())
 }
 
 func (d *TorrentDownload) updateRate() {
+  d.rateLock.Lock()
+  defer d.rateLock.Unlock()
+
   t := d.Time()
 
   d.times.PushBack(t)

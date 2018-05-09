@@ -28,8 +28,8 @@ type TorrentUpload struct {
   me string
   to string
 
-  interestedMutex *sync.Mutex
-  chokeMutex *sync.Mutex
+  interestedLock *sync.Mutex
+  chokeLock *sync.Mutex
 
   isInterested bool // If the other peer is interested in my pieces
   choke        bool // If I choke to connection to that peer
@@ -47,8 +47,8 @@ func NewUpload(connector *Connector) Upload {
     me:        connector.From,
     to:        connector.To,
 
-    interestedMutex: new(sync.Mutex),
-    chokeMutex: new(sync.Mutex),
+    interestedLock: new(sync.Mutex),
+    chokeLock: new(sync.Mutex),
 
     isInterested: false, // initially, nobody is interested in my pieces
     choke:        true,  // initially, I choke all peers
@@ -84,8 +84,8 @@ func (u *TorrentUpload) Recv(m interface {}) {
  * Function called when we want to choke the upload connection.
  */
 func (u *TorrentUpload) Choke() {
-  u.chokeMutex.Lock()
-  defer u.chokeMutex.Unlock()
+  u.chokeLock.Lock()
+  defer u.chokeLock.Unlock()
 
   u.choke = true
   // Let the other node know
@@ -99,8 +99,8 @@ func (u *TorrentUpload) Choke() {
  * Function called when we want to unchoke an upload.
  */
 func (u *TorrentUpload) Unchoke() {
-  u.chokeMutex.Lock()
-  defer u.chokeMutex.Unlock()
+  u.chokeLock.Lock()
+  defer u.chokeLock.Unlock()
 
   u.choke = false
 
@@ -109,9 +109,9 @@ func (u *TorrentUpload) Unchoke() {
 }
 
 func (u *TorrentUpload) interested(interested bool) {
-  u.interestedMutex.Lock()
+  u.interestedLock.Lock()
   u.isInterested = interested
-  u.interestedMutex.Unlock()
+  u.interestedLock.Unlock()
 
   if interested {
     u.Choker.Interested(u)
@@ -138,8 +138,8 @@ func (u *TorrentUpload) To() string {
  * Return if I am choking the connection.
  */
 func (u *TorrentUpload) Choking() bool {
-  u.chokeMutex.Lock()
-  defer u.chokeMutex.Unlock()
+  u.chokeLock.Lock()
+  defer u.chokeLock.Unlock()
 
   return u.choke
 }
@@ -148,8 +148,8 @@ func (u *TorrentUpload) Choking() bool {
  * Return if the other peer is interested in my pieces.
  */
 func (u *TorrentUpload) IsInterested() bool {
-  u.interestedMutex.Lock()
-  defer u.interestedMutex.Unlock()
+  u.interestedLock.Lock()
+  defer u.interestedLock.Unlock()
 
   return u.isInterested
 }
