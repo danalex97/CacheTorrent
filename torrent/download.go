@@ -217,8 +217,18 @@ func (d *TorrentDownload) gotPiece(msg Piece) {
 func (d *TorrentDownload) gotHave(msg Have) {
   index := msg.Index
 
-  // send interested if I'm not interested and chocked
-  if d.choked && !d.interested {
+  // Send interested if I'm not interested.
+  // a) If I am choked, then we can do this to force a rechoke.
+  // b) If I am not choked, it must be that:
+  //    1. I was interested
+  //    2. I got unchoked
+  //    3. I became uninterested
+  //    4. I got a have
+  // The uninterested message triggered a rechoke, so we will get choked
+  // at some point afterwards. However if RequestMore will not get called
+  // our interest will remain false even though we may need a piece from
+  // the peer.
+  if !d.interested {
     // I need to be interested in the piece as well
     if _, ok := d.Storage.Have(index); !ok {
       // Send interested message to node
@@ -228,13 +238,6 @@ func (d *TorrentDownload) gotHave(msg Have) {
 
   // let picker know I can get piece index
   d.Picker.GotHave(d.from, index)
-
-  // If I am unchoked, since the Picker's state changed, we
-  // may be able to request more pieces. This may be the case
-  // when we receive a Have after an Unchoke.
-  if !d.choked {
-    d.RequestMore()
-  }
 }
 
 /*
