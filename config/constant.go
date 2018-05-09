@@ -2,6 +2,7 @@ package config
 
 import (
   "reflect"
+  "sync"
 )
 
 type Const interface {
@@ -10,6 +11,8 @@ type Const interface {
 }
 
 type constant struct {
+  sync.RWMutex
+
   field string
   value interface {}
   init  bool
@@ -27,11 +30,20 @@ func NewConst(field string) Const {
 }
 
 func (c *constant) Ref() interface {} {
+  c.RLock()
+  defer c.RUnlock()
+
   if !c.init {
+    c.RUnlock()
+    c.Lock()
+
     r := reflect.ValueOf(Config)
     f := reflect.Indirect(r).FieldByName(c.field)
     c.value = f.Interface()
     c.init  = true
+
+    c.Unlock()
+    c.RLock()
   }
   return c.value
 }
