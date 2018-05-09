@@ -155,8 +155,12 @@ func (d *TorrentDownload) gotChoke(msg Choke) {
     // let picker know
     d.Picker.Inactive(p)
   }
-  // Redistribute the requests for lost pieces
-  d.lost()
+
+  // Redistribute the requests for lost pieces.
+  // We do this only if there are active requests to avoid useless work.
+  if len(d.ActiveRequests) > 0 {
+    d.lost()
+  }
 
   // Handle control messages
   if len(d.ActiveRequests) > 0 {
