@@ -14,8 +14,6 @@ type Conf struct {
   MinNodes int `json:"minNodes"` // minimum number of nodes in a Torrent
   Seeds    int `json:"seeds"`    // number of seed nodes
 
-  SeedUpload   int `json:"seedUpload"`   // the upload capacity for the seed
-
   PieceSize int `json:"pieceSize"` // the piece size
   Pieces    int `json:"pieces"`    // number of pieces in a Torrent
 

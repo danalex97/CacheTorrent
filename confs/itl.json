@@ -27,8 +27,6 @@
   "minNodes" : 700,
   "seeds"    : 1,
 
-  "seedUpload" : 400,
-
   "pieceSize" : 1960000,
   "pieces"   : 400,
 
@@ -46,9 +44,17 @@
   "transferInterval"  : 1500,
 
   "capacityNodes" : [{
-      "number"   : 701,
-      "upload"   : 100,
-      "download" : 1000
+    "number"   : 1,
+    "upload"   : 0,
+    "download" : 0
+  },{
+    "number"   : 1,
+    "upload"   : 400,
+    "download" : 0
+  }, {
+    "number"   : 699,
+    "upload"   : 100,
+    "download" : 1000
   }],
 
   "allNodesRunInterval" : 500
