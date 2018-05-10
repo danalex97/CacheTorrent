@@ -26,9 +26,6 @@ type Peer struct {
   // BitTorrent components
   Connectors  map[string]Runner // the connectors that were chosen by tracker
 
-  // If I am seed
-  Seed bool
-
   // used only to identify tracker
   join    string
 }
@@ -66,7 +63,6 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.join      = util.Join()
   peer.Components = new(Components)
   peer.Transport  = util.Transport()
-  peer.Seed       = false
 
   peer.Pieces     = []PieceMeta{}
   peer.Connectors = make(map[string]Runner)
@@ -170,8 +166,6 @@ func (p *Peer) Bind(m interface {}) (state int) {
     p.Pieces = msg.Pieces
     if len(p.Pieces) > 0 {
       // I am seed
-      p.Seed = true
-
       log.Println("Seed upload:", p.Transport.Up())
     }
   default:
@@ -198,7 +192,7 @@ func (p *Peer) Run(connAdd ConnAdder) {
   p.Picker    = NewPicker(p.Storage)
   p.Transport = p.Transport
   p.Manager   = NewConnectionManager()
-  p.Choker    = NewChoker(p.Manager, p.Time, p.Seed)
+  p.Choker    = NewChoker(p.Manager, p.Time)
 
   // Make connectors
   for _, id := range p.Ids {

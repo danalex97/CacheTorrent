@@ -44,18 +44,14 @@ type choker struct {
 
   time      func() int
   manager   Manager
-
-  seed      bool
 }
 
-func NewChoker(manager Manager, time func() int, seed bool) Choker {
+func NewChoker(manager Manager, time func() int) Choker {
   return &choker{
     Mutex:    new(sync.Mutex),
 
     time:     time,
     manager:  manager,
-
-    seed: seed,
   }
 }
 
@@ -79,16 +75,10 @@ func (c *choker) rechoke() {
     }
   }
 
-  if !c.seed {
-    // Sort the choked connections.
-    sort.Sort(byRate(interested))
-  } else {
-    // Shuffle the connections in case I am a seed.
-    for i := range interested {
-      j := rand.Intn(i + 1)
-      interested[i], interested[j] = interested[j], interested[i]
-    }
-  }
+  // Sort the choked connections
+  sort.Sort(byRate(interested))
+
+  // If we want to consider the seeds, we should use 2 separate lists.
 
   // Unchoke the pereferred connections
   unchoked := uploads.Int()

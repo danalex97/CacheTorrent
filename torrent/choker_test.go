@@ -25,7 +25,7 @@ func (c *mockChoker) Run() {}
 func makeChoker(uploads []Upload) ([]Upload, *choker) {
   return uploads, NewChoker(&mockManager{
     uploads : uploads,
-  }, func() int {return 0}, false).(*choker)
+  }, func() int {return 0} ).(*choker)
 }
 
 func TestRechokingDecreasingByRate(t *testing.T) {
