@@ -74,3 +74,5 @@ const LeaderPercent string = "LeaderPercent"
 const Bias string = "Bias"
 
 const AllNodesRun string = "AllNodesRun"
+
+const SeedUpload string = "SeedUpload"

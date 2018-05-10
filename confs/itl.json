@@ -27,6 +27,8 @@
   "minNodes" : 700,
   "seeds"    : 1,
 
+  "seedUpload" : 400,
+
   "pieceSize" : 1960000,
   "pieces"   : 400,
 

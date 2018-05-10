@@ -13,6 +13,8 @@ var inPeers  config.Const = config.NewConst(config.InPeers)
 var outPeers config.Const = config.NewConst(config.OutPeers)
 var progress config.Const = config.NewConst(config.AllNodesRun)
 
+var seedUpload config.Const = config.NewConst(config.SeedUpload)
+
 type Peer struct {
   *Components
 
@@ -164,6 +166,14 @@ func (p *Peer) Bind(m interface {}) (state int) {
     state = BindRun
 
     p.Pieces = msg.Pieces
+    if len(p.Pieces) > 0 {
+      // I am seed
+      upload := seedUpload.Int()
+      if upload > 0 {
+        // Set upload if configured.
+        p.Transport.SetUp(upload)
+      }
+    }
   default:
     if len(p.Connectors) > 0 {
       state = BindRecv

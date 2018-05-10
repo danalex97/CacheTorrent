@@ -34,6 +34,8 @@ func JSONConfig(path string) *Conf {
   raw = trimComments(raw)
 
   var conf Conf
+  conf.SeedUpload   = 0
+
   json.Unmarshal(raw, &conf)
 
   conf.AllNodesRun    = NewWGProgress(conf.MinNodes)
