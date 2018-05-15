@@ -13,6 +13,7 @@ const (
   GetTimeLeader = iota
   GetTraffic    = iota
   GetTimeCDF    = iota
+  GetLeaderCDF  = iota
   Stop          = iota
 )
 
@@ -158,7 +159,7 @@ func (l *Logger) getTime() {
   fmt.Println("90th percentile:", getPercentile(90.0, times))
 }
 
-func (l *Logger) getTimeLeader() {
+func (l *Logger) getLeaderTimes() ([]int, []int) {
   leaderTimes   := []int{}
   followerTimes := []int{}
 
@@ -177,10 +178,32 @@ func (l *Logger) getTimeLeader() {
     leaderTimes = append(leaderTimes, mnFollower)
   }
 
+  return leaderTimes, followerTimes
+}
+
+func (l *Logger) getTimeLeader() {
+  leaderTimes, followerTimes := l.getLeaderTimes()
+
   fmt.Println("Leader 50th percentile:", getPercentile(50.0, leaderTimes))
   fmt.Println("Leader 90th percentile:", getPercentile(90.0, leaderTimes))
   fmt.Println("Follower 50th percentile:", getPercentile(50.0, followerTimes))
   fmt.Println("Follower 90th percentile:", getPercentile(90.0, followerTimes))
+}
+
+func (l *Logger) getLeaderCDF() {
+  leaderTimes, followerTimes := l.getLeaderTimes()
+
+  fmt.Print("Leader time CDF: [")
+  for _, t := range normalize(leaderTimes) {
+    fmt.Print(t, ",")
+  }
+  fmt.Println("]")
+
+  fmt.Print("Follower time CDF: [")
+  for _, t := range normalize(followerTimes) {
+    fmt.Print(t, ",")
+  }
+  fmt.Println("]")
 }
 
 func (l *Logger) getTimeCDF() {
@@ -228,6 +251,8 @@ func (l *Logger) run() {
         l.getTraffic()
       case GetTimeCDF:
         l.getTimeCDF()
+      case GetLeaderCDF:
+        l.getLeaderCDF()
       case Stop:
         l.stopped = true
       }

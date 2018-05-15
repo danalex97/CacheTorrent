@@ -93,12 +93,15 @@ func getStats() {
   log.Query(log.GetTraffic)
   log.Query(log.GetTime)
 
-  if *timeCDF {
-    log.Query(log.GetTimeCDF)
-  }
-
   if *extension != MaxInt &&  *leaders {
     log.Query(log.GetTimeLeader)
+  }
+
+  if *timeCDF {
+    log.Query(log.GetTimeCDF)
+    if *extension != MaxInt &&  *leaders {
+      log.Query(log.GetLeaderCDF)
+    }
   }
 
   log.Query(log.Stop)
