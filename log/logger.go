@@ -169,6 +169,13 @@ func (l *Logger) getTimeLeader() {
       followerTimes = append(followerTimes, time)
     }
   }
+  mnLeader   := minSlice(leaderTimes)
+  mnFollower := minSlice(followerTimes)
+  if mnLeader < mnFollower {
+    followerTimes = append(followerTimes, mnLeader)
+  } else {
+    leaderTimes = append(leaderTimes, mnFollower)
+  }
 
   fmt.Println("Leader 50th percentile:", getPercentile(50.0, leaderTimes))
   fmt.Println("Leader 90th percentile:", getPercentile(90.0, leaderTimes))

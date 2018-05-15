@@ -22,6 +22,10 @@ KEYS = {
   "time" : "Average time",
   "50p"  : "50th percentile",
   "90p"  : "90th percentile",
+  "l50p" : "Leader 50th percentile",
+  "l90p" : "Leader 90th percentile",
+  "f50p" : "Follower 50th percentile",
+  "f90p" : "Follower 90th percentile",
 }
 
 random_id = lambda : ''.join(
@@ -84,7 +88,7 @@ def process_output(file):
     ans = {}
     for line in lines:
         for k, v in KEYS.items():
-            if v in line:
+            if v in line and k not in ans:
                 ans[k] = float(line.split(":")[1])
 
     if "red" not in ans:

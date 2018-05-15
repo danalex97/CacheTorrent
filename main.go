@@ -52,6 +52,12 @@ var verbose = flag.Bool(
   "Verbose output",
 )
 
+var leaders = flag.Bool(
+  "leaders",
+  false,
+  "Enable printing leader and follower times.",
+)
+
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
@@ -77,6 +83,10 @@ func getStats() {
 
   if *timeCDF {
     log.Query(log.GetTimeCDF)
+  }
+
+  if *extension != MaxInt &&  *leaders {
+    log.Query(log.GetTimeLeader)
   }
 
   log.Query(log.Stop)

@@ -34,13 +34,7 @@ func getAverage(data []int) float64 {
 }
 
 func normalize(data []int) []int {
-  mn := data[0]
-  for _, v := range data {
-    if v < mn {
-      mn = v
-    }
-  }
-
+  mn := minSlice(data)
   norm := []int{}
   for _, v := range data {
     norm = append(norm, v - mn)
@@ -49,6 +43,16 @@ func normalize(data []int) []int {
   sort.Ints(norm)
 
   return norm
+}
+
+func minSlice(slice []int) int {
+  min := slice[0]
+  for _, val := range slice {
+    if val < min {
+      min = val
+    }
+  }
+  return min
 }
 
 func toSlice(mp map[string]int) []int {
