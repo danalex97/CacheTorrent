@@ -58,6 +58,18 @@ var leaders = flag.Bool(
   "Enable printing leader and follower times.",
 )
 
+var pieces = flag.Int(
+  "pieces",
+  MaxInt,
+  "Number of pieces the file has.",
+)
+
+var pieceSize = flag.Int(
+  "pieceSize",
+  MaxInt,
+  "The size of a piece from the file.",
+)
+
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
@@ -156,6 +168,14 @@ func main() {
       WithParams(func(c *config.Conf) {
         c.Bias          = *biased
         c.LeaderPercent = *extension
+
+        if *pieces != MaxInt {
+          c.Pieces = *pieces
+        }
+
+        if *pieceSize != MaxInt {
+          c.PieceSize = *pieceSize
+        }
 
         c.SharedInit = func() {
           wg.Add(1)
