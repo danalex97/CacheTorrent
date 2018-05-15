@@ -8,5 +8,10 @@ type Transfer struct {
 }
 
 type Completed struct {
+  Id   string
   Time int
+}
+
+type Leader struct {
+  Id string
 }

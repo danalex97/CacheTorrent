@@ -50,3 +50,11 @@ func normalize(data []int) []int {
 
   return norm
 }
+
+func toSlice(mp map[string]int) []int {
+  slice := []int{}
+  for _, val := range mp {
+    slice = append(slice, val)
+  }
+  return slice
+}

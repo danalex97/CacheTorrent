@@ -108,6 +108,7 @@ func (s *storage) checkCompleted() {
     // Notify logger
     time := s.time()
     log.LogCompleted(log.Completed{
+      Id   : s.id,
       Time : time,
     })
 

@@ -10,6 +10,7 @@ var Log *Logger = NewLogger()
 const (
   GetRedundancy = iota
   GetTime       = iota
+  GetTimeLeader = iota
   GetTraffic    = iota
   GetTimeCDF    = iota
   Stop          = iota
@@ -26,10 +27,12 @@ type piece struct {
 type Logger struct {
   verbose    bool
 
+  isLeader   map[string]bool
   redundancy map[piece]int
   traffic    map[int]int
-  times     []int
+  times      map[string]int
 
+  leaders   chan Leader
   transfers chan Transfer
   completes chan Completed
   queries   chan int
@@ -41,10 +44,12 @@ func NewLogger() *Logger {
   logger := &Logger{
     verbose : false,
 
+    isLeader   : make(map[string]bool),
     redundancy : make(map[piece]int),
     traffic    : make(map[int]int),
-    times      : []int{},
+    times      : make(map[string]int),
 
+    leaders    : make(chan Leader, maxCompletes),
     transfers  : make(chan Transfer, maxTransfers),
     completes  : make(chan Completed, maxCompletes),
     queries    : make(chan int, 1),
@@ -60,6 +65,7 @@ func NewLogger() *Logger {
 /* Defaults*/
 func SetVerbose(verbose bool)  { Log.SetVerbose(verbose) }
 func Println(v ...interface{}) { Log.Println(v...) }
+func LogLeader(t Leader)       { Log.LogLeader(t) }
 func LogCompleted(t Completed) { Log.LogCompleted(t) }
 func LogTransfer(t Transfer)   { Log.LogTransfer(t) }
 func Query(q int)              { Log.Query(q) }
@@ -75,6 +81,10 @@ func (l *Logger) Println(v ...interface{}) {
   }
 }
 
+func (l *Logger) LogLeader(t Leader) {
+  l.leaders <- t
+}
+
 func (l *Logger) LogCompleted(t Completed) {
   l.completes <- t
 }
@@ -88,6 +98,11 @@ func (l *Logger) Query(q int) {
 }
 
 /* Handlers. */
+func (l *Logger) handleLeader(le Leader) {
+  leader := le.Id
+  l.isLeader[leader] = true
+}
+
 func (l *Logger) handleTransfer(t Transfer) {
   as := getAS(t.To)
   if as != getAS(t.From) {
@@ -109,7 +124,7 @@ func (l *Logger) handleTransfer(t Transfer) {
 }
 
 func (l *Logger) handleComplete(c Completed) {
-  l.times = append(l.times, c.Time)
+  l.times[c.Id] = c.Time
 }
 
 /* Queries. */
@@ -136,14 +151,34 @@ func (l *Logger) getTraffic() {
 }
 
 func (l *Logger) getTime() {
-  fmt.Println("Average time:", getAverage(l.times))
-  fmt.Println("50th percentile:", getPercentile(50.0, l.times))
-  fmt.Println("90th percentile:", getPercentile(90.0, l.times))
+  times := toSlice(l.times)
+
+  fmt.Println("Average time:", getAverage(times))
+  fmt.Println("50th percentile:", getPercentile(50.0, times))
+  fmt.Println("90th percentile:", getPercentile(90.0, times))
+}
+
+func (l *Logger) getTimeLeader() {
+  leaderTimes   := []int{}
+  followerTimes := []int{}
+
+  for id, time := range l.times {
+    if _, ok := l.isLeader[id]; ok {
+      leaderTimes = append(leaderTimes, time)
+    } else {
+      followerTimes = append(followerTimes, time)
+    }
+  }
+
+  fmt.Println("Leader 50th percentile:", getPercentile(50.0, leaderTimes))
+  fmt.Println("Leader 90th percentile:", getPercentile(90.0, leaderTimes))
+  fmt.Println("Follower 50th percentile:", getPercentile(50.0, followerTimes))
+  fmt.Println("Follower 90th percentile:", getPercentile(90.0, followerTimes))
 }
 
 func (l *Logger) getTimeCDF() {
   fmt.Print("Time CDF: [")
-  for _, t := range normalize(l.times) {
+  for _, t := range normalize(toSlice(l.times)) {
     fmt.Print(t, ",")
   }
   fmt.Println("]")
@@ -152,6 +187,13 @@ func (l *Logger) getTimeCDF() {
 /* Runner. */
 func (l *Logger) run() {
   for {
+    select {
+    case t := <-l.leaders:
+      l.handleLeader(t)
+      continue
+    default:
+    }
+
     select {
     case t := <-l.transfers:
       l.handleTransfer(t)
@@ -169,6 +211,8 @@ func (l *Logger) run() {
     select {
     case q := <-l.queries:
       switch q {
+      case GetTimeLeader:
+        l.getTimeLeader()
       case GetRedundancy:
         l.getRedundancy()
       case GetTime:

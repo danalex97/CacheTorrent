@@ -10,7 +10,7 @@ package cache_torrent
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
-  // "fmt"
+  "github.com/danalex97/nfsTorrent/log"
 )
 
 type Leader struct {
@@ -30,7 +30,9 @@ func NewLeader(p *Peer) *Leader {
 }
 
 func (l *Leader) Run() {
-  // log.Println("Leader running.")
+  log.LogLeader(log.Leader{
+    Id : l.Id,
+  })
   l.Peer.Run(l.outgoingConnection)
 
   l.Picker = NewPicker(l.Storage)
