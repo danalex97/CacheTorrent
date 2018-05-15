@@ -178,7 +178,10 @@ class Coordinator:
     def done(self, file):
         res = process_output(file)
         self.results.append(res)
-
+        
+        copy = "results/{}/runs/{}".format(self.id, file.split("/")[-1])
+        os.system(("cp {} {}").format(file, copy))
+        
         self.job_stats(file, res)
         self.fail(file)
 
