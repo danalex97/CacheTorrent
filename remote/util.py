@@ -61,8 +61,8 @@ def run_remote(id, host, command, file, server, port):
       export GOPATH=~/golang
       cd ~/golang/src/github.com/danalex97/nfsTorrent
 
-      nice nohup python3 remote/job.py -s={server} -p={port} -n={file} {command} > /dev/null 2>&1 &
-      # python3 remote/job.py -s={server} -p={port} -n={file} {command}
+      nice nohup python3 remote/job.py -s={server} -pp={port} -n={file} {command} > /dev/null 2>&1 &
+      # python3 remote/job.py -s={server} -pp={port} -n={file} {command}
       echo 'Finished dispaching at $where'
       exit
     "
