@@ -35,6 +35,11 @@ let GraphDrawer = function() {
   self.nodes = [];
   self.links = [];
 
+  self.force
+    .nodes(self.nodes)
+    .links(self.links)
+    .start();
+
   self.addNode = function(node) {
     self.nodes.push(node);
     console.log("Add node.");
@@ -45,6 +50,7 @@ let GraphDrawer = function() {
       .enter()
     self.nodeDrawer(data)
         .call(force.drag);
+    return self;
   }
 
   self.addLink = function(link) {
@@ -56,5 +62,9 @@ let GraphDrawer = function() {
       .data(self.links)
       .enter()
     self.linkDrawer(data);
+
+    return self;
   }
+
+  return self;
 }
