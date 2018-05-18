@@ -23,20 +23,38 @@ let LinkDrawer = function(link) {
 }
 
 let GraphDrawer = function() {
-  this.force = d3.layout.force()
+  let self = this;
+
+  self.force = d3.layout.force()
     .linkDistance(400)
     .size([width, height]);
 
-  this.nodeDrawer = NodeDrawer;
-  this.linkDrawer = LinkDrawer;
+  self.nodeDrawer = NodeDrawer;
+  self.linkDrawer = LinkDrawer;
 
-  this.nodes = [];
-  this.links = [];
+  self.nodes = [];
+  self.links = [];
 
-  this.addNode = function(node) {
-    console.log("Add node.")
+  self.addNode = function(node) {
+    self.nodes.push(node);
+    console.log("Add node.");
+
+    let data = svg
+      .selectAll(".node")
+      .data(self.nodes)
+      .enter()
+    self.nodeDrawer(data)
+        .call(force.drag);
   }
-  this.addLink = function(link) {
-    console.log("Add link.")
+
+  self.addLink = function(link) {
+    self.links.push(link);
+    console.log("Add link.");
+
+    let data = svg
+      .selectAll(".link")
+      .data(self.links)
+      .enter()
+    self.linkDrawer(data);
   }
 }
