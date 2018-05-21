@@ -10,16 +10,18 @@ const simulation = d3.forceSimulation()
   .force('center', d3.forceCenter(width / 2, height / 2))
 
 
-var nodes_data =  [
-  {"name": "Travis", "sex": "M"},
-  {"name": "Rake", "sex": "M"},
-  {"name": "Diana", "sex": "F"},
-  {"name": "Rachel", "sex": "F"},
-  {"name": "Shawn", "sex": "M"},
-  {"name": "Emerald", "sex": "F"}
+let nodes = [
+  Node(),
+  Node(),
+  Node(),
+  Node(),
+  Node()
 ]
 
-simulation.nodes(nodes_data)
+let nodes_data = nodes;
+
+console.log(nodes_data)
+simulation.nodes(nodes_data);
 
 var node = svg.append("g")
   .attr("class", "nodes")
@@ -32,8 +34,12 @@ var node = svg.append("g")
 
 function tickActions() {
   node
-    .attr("cx", function(d) { return d.x; })
-    .attr("cy", function(d) { return d.y; })
+    .attr("cx", function(d) {
+      return d.x;
+    })
+    .attr("cy", function(d) {
+      return d.y;
+    })
 }
 
-simulation.on("tick", tickActions );
+simulation.on("tick", tickActions);
