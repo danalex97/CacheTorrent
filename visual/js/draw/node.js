@@ -1,4 +1,4 @@
-NodeDrawer = function(ctx, nodes) {
+let NodeDrawer = function(ctx, nodes) {
   let self = this;
 
   let center = ctx.svg
@@ -39,7 +39,7 @@ NodeDrawer = function(ctx, nodes) {
   };
 
   self.addNode = function(node) {
-    self.nodes.push(Node());
+    self.nodes.push(node);
     restart();
   };
 
@@ -48,4 +48,4 @@ NodeDrawer = function(ctx, nodes) {
   };
 
   return self;
-}
+};

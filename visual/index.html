@@ -14,20 +14,23 @@
 
     <!-- Scripts -->
     <script src = "js/graph.js"></script>
-    <script src = "js/simulation.js"></script>
-    <script src = "js/draw.js"></script>
+    <script src = "js/draw/ctx.js"></script>
+    <script src = "js/draw/node.js"></script>
+    <script src = "js/draw/link.js"></script>
 
 <script>
   var ctx = Ctx();
   var nodes = [Node(), Node(), Node()];
 
-  let drawer = NodeDrawer(ctx, nodes);
+  let drawer  = NodeDrawer(ctx, nodes);
+  // let drawer2 = LinkDrawer(ctx, []);
   ctx.addTicker(drawer);
   ctx.addStarter(drawer);
 
   ctx.start();
   d3.timeout(function() {
     drawer.addNode(Node());
+    // drawer2.addLink(Link(nodes[0], nodes[1]));
   }, 1000);
 </script>
 

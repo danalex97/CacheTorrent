@@ -1,11 +1,11 @@
 let Node = function() {
   return {
-    node : this,
   };
-}
+};
 
-let Link = function() {
+let Link = function(src, dst) {
   return {
-    link : this,
+    src : src,
+    dst : dst,
   };
-}
+};

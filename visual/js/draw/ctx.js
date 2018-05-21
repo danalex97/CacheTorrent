@@ -1,4 +1,4 @@
-Ctx = function() {
+let Ctx = function() {
   self = this;
 
   function tick() {
@@ -39,4 +39,4 @@ Ctx = function() {
   };
 
   return self
-}
+};
