@@ -1,12 +1,6 @@
 let LinkDrawer = function(ctx, links) {
   let self = this;
 
-  let center = ctx.svg
-    .append("g")
-    .attr("transform", "translate(" +
-      ctx.width / 2 + "," +
-      ctx.height / 2 + ")");
-
   function draw(ctx) {
     return ctx
       .append("line");
@@ -19,27 +13,29 @@ let LinkDrawer = function(ctx, links) {
     self.link = draw(self.link.enter()).merge(self.link);
 
     // Update and restart the simulation.
-    ctx.simulation.nodes(self.nodes);
+    ctx.simulation.force("link").links(self.links);
     ctx.simulation.alpha(1).restart();
   }
 
   /* Fields. */
-  self.link = center
+  self.link = ctx.center
     .append("g")
+    .attr("stroke", "#000")
+    .attr("stroke-width", 1.5)
     .selectAll(".link");
   self.links = links;
 
   /* Interface. */
   self.tick = function() {
     self.link
-      .attr("x1", function(d) { return d.src.x; })
-      .attr("y1", function(d) { return d.src.y; })
-      .attr("x2", function(d) { return d.dst.x; })
-      .attr("y2", function(d) { return d.dst.y; });
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
   };
 
   self.addLink = function(link) {
-    self.nodes.push(link);
+    self.links.push(link);
     restart();
   };
 

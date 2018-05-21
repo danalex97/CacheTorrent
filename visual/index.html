@@ -20,18 +20,20 @@
 
 <script>
   var ctx = Ctx();
-  var nodes = [Node(), Node(), Node()];
+  var nodes = [Node(), Node()];
 
-  let drawer  = NodeDrawer(ctx, nodes);
-  // let drawer2 = LinkDrawer(ctx, []);
+  let drawer  = new NodeDrawer(ctx, nodes);
+  let drawer2 = new LinkDrawer(ctx, [Link(nodes[0], nodes[1])]);
+  ctx.addTicker(drawer2);
   ctx.addTicker(drawer);
   ctx.addStarter(drawer);
+  ctx.addStarter(drawer2);
 
   ctx.start();
-  d3.timeout(function() {
+  d3.interval(function() {
     drawer.addNode(Node());
-    // drawer2.addLink(Link(nodes[0], nodes[1]));
-  }, 1000);
+    drawer2.addLink(Link(nodes[0], nodes[nodes.length - 1]));
+  }, 2000);
 </script>
 
   </body>

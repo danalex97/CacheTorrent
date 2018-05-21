@@ -1,12 +1,6 @@
 let NodeDrawer = function(ctx, nodes) {
   let self = this;
 
-  let center = ctx.svg
-    .append("g")
-    .attr("transform", "translate(" +
-      ctx.width / 2 + "," +
-      ctx.height / 2 + ")");
-
   function draw(ctx) {
     return ctx
       .append("circle")
@@ -16,7 +10,7 @@ let NodeDrawer = function(ctx, nodes) {
 
   function restart() {
     // Apply the general update pattern to the nodes.
-    self.node = node.data(self.nodes);
+    self.node = self.node.data(self.nodes);
     self.node.exit().remove();
     self.node = draw(self.node.enter()).merge(self.node);
 
@@ -26,8 +20,10 @@ let NodeDrawer = function(ctx, nodes) {
   }
 
   /* Fields. */
-  self.node  = center
+  self.node = ctx.center
     .append("g")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 1.5)
     .selectAll(".node");
   self.nodes = nodes;
 

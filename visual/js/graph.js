@@ -5,7 +5,7 @@ let Node = function() {
 
 let Link = function(src, dst) {
   return {
-    src : src,
-    dst : dst,
+    source : src,
+    target : dst,
   };
 };

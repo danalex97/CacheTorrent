@@ -18,9 +18,17 @@ let Ctx = function() {
   self.width  = +self.svg.attr("width");
   self.height = +self.svg.attr("height");
 
+  self.center = self.svg
+    .append("g")
+    .attr("transform", "translate(" +
+      self.width / 2 + "," +
+      self.height / 2 + ")");
+
   self.simulation = d3.forceSimulation()
-      .force("charge", d3.forceManyBody())
-      .on("tick", tick);
+    .force("charge", d3.forceManyBody())
+    .force("link", d3.forceLink([]).distance(200))
+    .alphaTarget(1)
+    .on("tick", tick);
 
   self.tickers  = [];
   self.starters = [];
