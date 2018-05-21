@@ -23,10 +23,14 @@
 
   "capacityNodes" : [{
       "number"   : 1,
+      "upload"   : 0,
+      "download" : 0
+   }, {
+      "number"   : 1,
       "upload"   : 8000,
       "download" : 0
    }, {
-      "number"   : 700,
+      "number"   : 699,
       "upload"   : 2000,
       "download" : 6000
   }],
