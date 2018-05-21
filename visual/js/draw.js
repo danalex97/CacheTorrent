@@ -1,70 +1,39 @@
-let height = 600;
-let width = 1278;
+const width = window.innerWidth;
+const height = window.innerHeight;
 
-let svg = d3
-  .select("body")
-  .append("svg")
-  .attr("width", width)
-  .attr("height", height);
+const svg = d3.select('svg')
+  .attr('width', width)
+  .attr('height', height);
 
-let NodeDrawer = function(node) {
-  return node
-    .append("circle")
-    .attr("class", "node")
-    .attr("r", 5)
-    .style("fill", "red");
+const simulation = d3.forceSimulation()
+  .force('charge', d3.forceManyBody().strength(-20))
+  .force('center', d3.forceCenter(width / 2, height / 2))
+
+
+var nodes_data =  [
+  {"name": "Travis", "sex": "M"},
+  {"name": "Rake", "sex": "M"},
+  {"name": "Diana", "sex": "F"},
+  {"name": "Rachel", "sex": "F"},
+  {"name": "Shawn", "sex": "M"},
+  {"name": "Emerald", "sex": "F"}
+]
+
+simulation.nodes(nodes_data)
+
+var node = svg.append("g")
+  .attr("class", "nodes")
+  .selectAll("circle")
+  .data(nodes_data)
+  .enter()
+  .append("circle")
+  .attr("r", 5)
+  .attr("fill", "red");
+
+function tickActions() {
+  node
+    .attr("cx", function(d) { return d.x; })
+    .attr("cy", function(d) { return d.y; })
 }
 
-let LinkDrawer = function(link) {
-  return link
-   .append("line")
-   .attr("class", "link")
-   .style("stroke-width", 5)
-}
-
-let GraphDrawer = function() {
-  let self = this;
-
-  self.force = d3.layout.force()
-    .linkDistance(400)
-    .size([width, height]);
-
-  self.nodeDrawer = NodeDrawer;
-  self.linkDrawer = LinkDrawer;
-
-  self.nodes = [];
-  self.links = [];
-
-  self.force
-    .nodes(self.nodes)
-    .links(self.links)
-    .start();
-
-  self.addNode = function(node) {
-    self.nodes.push(node);
-    console.log("Add node.");
-
-    let data = svg
-      .selectAll(".node")
-      .data(self.nodes)
-      .enter()
-    self.nodeDrawer(data)
-        .call(force.drag);
-    return self;
-  }
-
-  self.addLink = function(link) {
-    self.links.push(link);
-    console.log("Add link.");
-
-    let data = svg
-      .selectAll(".link")
-      .data(self.links)
-      .enter()
-    self.linkDrawer(data);
-
-    return self;
-  }
-
-  return self;
-}
+simulation.on("tick", tickActions );
