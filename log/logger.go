@@ -2,6 +2,7 @@ package log
 
 import (
   "runtime"
+  "sync"
   "fmt"
 )
 
@@ -37,6 +38,11 @@ type Logger struct {
   transfers chan Transfer
   completes chan Completed
   queries   chan int
+  packets   chan Packet
+
+  logged    []Packet
+  lock      *sync.Mutex
+  logfile   string
 
   stopped   bool
 }
@@ -53,7 +59,12 @@ func NewLogger() *Logger {
     leaders    : make(chan Leader, maxCompletes),
     transfers  : make(chan Transfer, maxTransfers),
     completes  : make(chan Completed, maxCompletes),
+    packets    : make(chan Packet, maxTransfers),
     queries    : make(chan int, 1),
+
+    logged     : []Packet{},
+    logfile    : "",
+    lock       : new(sync.Mutex),
 
     stopped    : false,
   }
@@ -65,7 +76,10 @@ func NewLogger() *Logger {
 
 /* Defaults*/
 func SetVerbose(verbose bool)  { Log.SetVerbose(verbose) }
+func SetLogfile(logfile string){ Log.SetLogfile(logfile) }
+func HasLogfile() bool         { return Log.HasLogfile() }
 func Println(v ...interface{}) { Log.Println(v...) }
+func LogPacket(t Packet)       { Log.LogPacket(t) }
 func LogLeader(t Leader)       { Log.LogLeader(t) }
 func LogCompleted(t Completed) { Log.LogCompleted(t) }
 func LogTransfer(t Transfer)   { Log.LogTransfer(t) }
@@ -76,10 +90,28 @@ func (l *Logger) SetVerbose(verbose bool) {
   l.verbose = verbose
 }
 
+func (l *Logger) SetLogfile(logfile string) {
+  l.lock.Lock()
+  defer l.lock.Unlock()
+
+  l.logfile = logfile
+}
+
+func (l *Logger) HasLogfile() bool {
+  l.lock.Lock()
+  defer l.lock.Unlock()
+
+  return l.logfile != ""
+}
+
 func (l *Logger) Println(v ...interface{}) {
   if l.verbose {
     fmt.Println(v...)
   }
+}
+
+func (l *Logger) LogPacket(t Packet) {
+  l.packets <- t
 }
 
 func (l *Logger) LogLeader(t Leader) {
@@ -102,6 +134,11 @@ func (l *Logger) Query(q int) {
 func (l *Logger) handleLeader(le Leader) {
   leader := le.Id
   l.isLeader[leader] = true
+}
+
+func (l *Logger) handlePacket(p Packet) {
+  fmt.Println(p)
+  l.logged = append(l.logged, p)
 }
 
 func (l *Logger) handleTransfer(t Transfer) {
@@ -220,6 +257,13 @@ func (l *Logger) run() {
     select {
     case t := <-l.leaders:
       l.handleLeader(t)
+      continue
+    default:
+    }
+
+    select {
+    case t := <-l.packets:
+      l.handlePacket(t)
       continue
     default:
     }

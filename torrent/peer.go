@@ -6,7 +6,7 @@ import (
   "github.com/danalex97/nfsTorrent/log"
 
   "runtime"
-  // "reflect"
+  "reflect"
 )
 
 var inPeers  config.Const = config.NewConst(config.InPeers)
@@ -28,6 +28,9 @@ type Peer struct {
 
   // used only to identify tracker
   join    string
+
+  // used to keep if logging is on
+  logging bool
 }
 
 type Binder    func(m interface {}) int
@@ -85,6 +88,9 @@ func (p *Peer) Init() {
 
   // Send join message to the tracker
   p.Transport.ControlSend(p.Tracker, Join{p.Id})
+
+  // Initialize deatailed logging.
+  p.logging = log.HasLogfile();
 }
 
 func (p *Peer) CheckMessages(bind Binder, process Processor) {
@@ -125,6 +131,15 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
       }
 
       process(m, state)
+
+      // Log messages.
+      if p.logging {
+        log.LogPacket(log.Packet{
+          Src  : reflect.ValueOf(m).FieldByName("Id").String(),
+          Dst  : p.Id,
+          Type : reflect.TypeOf(m).String(),
+        })
+      }
     }
 
     // Notify progress properties.
@@ -205,7 +220,7 @@ func (p *Peer) Run(connAdd ConnAdder) {
   go p.Choker.Run()
 }
 
-func (p *Peer) GetId(m interface {}) (id string){
+func (p *Peer) GetId(m interface {}) (id string) {
   switch msg := m.(type) {
   case Choke:
     id = msg.Id

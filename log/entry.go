@@ -15,3 +15,9 @@ type Completed struct {
 type Leader struct {
   Id string
 }
+
+type Packet struct {
+  Src  string
+  Dst  string
+  Type string
+}

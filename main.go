@@ -70,8 +70,14 @@ var pieceSize = flag.Int(
   "The size of a piece from the file.",
 )
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var logfile = flag.String(
+  "log",
+  "",
+  "The packet log in `.json` format.",
+)
+
+var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to `file`.")
+var memprofile = flag.String("memprofile", "", "Write memory profile to `file`.")
 
 func makeMemprofile() {
   // Profiling
@@ -147,6 +153,9 @@ func main() {
 
   // Set verbosity
   log.SetVerbose(*verbose)
+
+  // Set log file
+  log.SetLogfile(*logfile)
 
   var wg sync.WaitGroup
 
