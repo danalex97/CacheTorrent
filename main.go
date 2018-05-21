@@ -110,7 +110,12 @@ func getStats() {
     }
   }
 
+  if *logfile != "" {
+    log.Query(log.GetLogged)
+  }
+
   log.Query(log.Stop)
+  log.Wait()
 }
 
 func main() {

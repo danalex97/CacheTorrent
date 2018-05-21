@@ -2,8 +2,10 @@ package log
 
 import (
   "runtime"
+  "encoding/json"
   "sync"
   "fmt"
+  "os"
 )
 
 var Log *Logger = NewLogger()
@@ -15,6 +17,7 @@ const (
   GetTraffic    = iota
   GetTimeCDF    = iota
   GetLeaderCDF  = iota
+  GetLogged     = iota
   Stop          = iota
 )
 
@@ -40,11 +43,12 @@ type Logger struct {
   queries   chan int
   packets   chan Packet
 
-  logged    []Packet
+  logged    []Packet    `json:"packets"`
   lock      *sync.Mutex
   logfile   string
 
   stopped   bool
+  wg        *sync.WaitGroup
 }
 
 func NewLogger() *Logger {
@@ -67,6 +71,7 @@ func NewLogger() *Logger {
     lock       : new(sync.Mutex),
 
     stopped    : false,
+    wg         : new(sync.WaitGroup),
   }
 
   go logger.run()
@@ -75,6 +80,7 @@ func NewLogger() *Logger {
 }
 
 /* Defaults*/
+func Wait()                    { Log.Wait() }
 func SetVerbose(verbose bool)  { Log.SetVerbose(verbose) }
 func SetLogfile(logfile string){ Log.SetLogfile(logfile) }
 func HasLogfile() bool         { return Log.HasLogfile() }
@@ -86,6 +92,10 @@ func LogTransfer(t Transfer)   { Log.LogTransfer(t) }
 func Query(q int)              { Log.Query(q) }
 
 /* Interface. */
+func (l *Logger) Wait() {
+  l.wg.Wait()
+}
+
 func (l *Logger) SetVerbose(verbose bool) {
   l.verbose = verbose
 }
@@ -137,7 +147,6 @@ func (l *Logger) handleLeader(le Leader) {
 }
 
 func (l *Logger) handlePacket(p Packet) {
-  fmt.Println(p)
   l.logged = append(l.logged, p)
 }
 
@@ -166,6 +175,20 @@ func (l *Logger) handleComplete(c Completed) {
 }
 
 /* Queries. */
+func (l *Logger) getLogged() {
+  b, err := json.Marshal(l.logged)
+
+  if err == nil {
+    f, err := os.Create(l.logfile)
+    if err == nil {
+      defer f.Close()
+      f.Write(b)
+
+      fmt.Printf("Logfile %s written.\n", l.logfile)
+    }
+  }
+}
+
 func (l *Logger) getRedundancy() {
   pieces := 0
   times  := 0
@@ -253,6 +276,8 @@ func (l *Logger) getTimeCDF() {
 
 /* Runner. */
 func (l *Logger) run() {
+  l.wg.Add(1)
+
   for {
     select {
     case t := <-l.leaders:
@@ -297,6 +322,8 @@ func (l *Logger) run() {
         l.getTimeCDF()
       case GetLeaderCDF:
         l.getLeaderCDF()
+      case GetLogged:
+        l.getLogged()
       case Stop:
         l.stopped = true
       }
@@ -310,4 +337,6 @@ func (l *Logger) run() {
     }
     runtime.Gosched()
   }
+
+  l.wg.Done()
 }

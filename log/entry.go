@@ -17,7 +17,7 @@ type Leader struct {
 }
 
 type Packet struct {
-  Src  string
-  Dst  string
-  Type string
+  Src  string `json:"src"`
+  Dst  string `json:"dst"`
+  Type string `json:"type"`
 }
