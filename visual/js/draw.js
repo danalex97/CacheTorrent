@@ -1,58 +1,31 @@
-let NodeDrawer = function(simulation, nodes) {
-  function draw(ctx) {
-    return ctx
-      .enter()
-      .append("circle")
-      .attr("fill", "red")
-      .attr("r", 5);
-  }
 
-  self = this;
+Drawer = function(svg, nodes) {
+  let self = this;
 
-  self.simulation = simulation;
-
-  self.simulation.force = self.simulation.force.nodes(nodes);
-  self.nodeGroup = draw(self.simulation.svg
+  let center = svg
     .append("g")
-    .attr("class", "nodes")
-    .selectAll("circle")
-    .data(nodes));
-
-  self.restart = function(nodes) {
-    self.nodeGroup = nodeGroup.data(nodes, function(d) {
-      return d.id;
-    });
-    self.nodeGroup.exit().remove();
-    self.nodeGroup = draw(self.nodeGroup).merge(self.nodeGroup);
-
-    self.simulation.force
-      .nodes(nodes);
-  };
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+  self.node  = center
+    .append("g")
+    .selectAll(".node");
+  self.nodes = nodes;
 
   self.tick = function() {
-    self.nodeGroup
-      .attr("cx", function(d) {
-        return d.x;
-      })
-      .attr("cy", function(d) {
-        return d.y;
-      });
-  };
+    self.node
+      .attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+  }
 
-  // Add self to simulation drawers.
-  self.simulation.drawers.push(self);
+  self.restart = function() {
+    // Apply the general update pattern to the nodes.
+    self.node = node.data(self.nodes);
+    self.node.exit().remove();
+    self.node = self.node.enter().append("circle").attr("fill", "red").attr("r", 8).merge(self.node);
+
+    // Update and restart the simulation.
+    simulation.nodes(self.nodes);
+    simulation.alpha(1).restart();
+  }
 
   return self;
-};
-
-let nodes = [
-  Node(),
-  Node(),
-  Node(),
-  Node()
-];
-
-let simulation = Simulation();
-let nodeDrawer = NodeDrawer(simulation, nodes);
-
-simulation.start();
+}

@@ -9,7 +9,7 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
 
-  <body>
+<body>
     <svg width="960" height="600"></svg>
 
     <!-- Scripts -->
@@ -17,7 +17,18 @@
     <script src = "js/simulation.js"></script>
     <script src = "js/draw.js"></script>
 
-    <script>
-    </script>
+<script>
+  let drawer = Drawer(svg, nodes);
+
+  drawer.restart();
+
+  console.log(node);
+
+  d3.timeout(function() {
+    drawer.nodes.push({id : "d"});
+    drawer.restart();
+  }, 1000);
+</script>
+
   </body>
 </html>
