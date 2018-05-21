@@ -18,14 +18,15 @@
     <script src = "js/draw.js"></script>
 
 <script>
-  let drawer = Drawer(svg, nodes);
+  var ctx = Ctx();
+  var nodes = [Node(), Node(), Node()];
+
+  let drawer = Drawer(ctx, nodes);
 
   drawer.restart();
 
-  console.log(node);
-
   d3.timeout(function() {
-    drawer.nodes.push({id : "d"});
+    drawer.nodes.push(Node());
     drawer.restart();
   }, 1000);
 </script>

@@ -1,10 +1,11 @@
-
-Drawer = function(svg, nodes) {
+Drawer = function(ctx, nodes) {
   let self = this;
 
-  let center = svg
+  let center = ctx.svg
     .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    .attr("transform", "translate(" +
+      ctx.width / 2 + "," +
+      ctx.height / 2 + ")");
   self.node  = center
     .append("g")
     .selectAll(".node");
@@ -23,8 +24,8 @@ Drawer = function(svg, nodes) {
     self.node = self.node.enter().append("circle").attr("fill", "red").attr("r", 8).merge(self.node);
 
     // Update and restart the simulation.
-    simulation.nodes(self.nodes);
-    simulation.alpha(1).restart();
+    ctx.simulation.nodes(self.nodes);
+    ctx.simulation.alpha(1).restart();
   }
 
   return self;
