@@ -21,13 +21,13 @@
   var ctx = Ctx();
   var nodes = [Node(), Node(), Node()];
 
-  let drawer = Drawer(ctx, nodes);
+  let drawer = NodeDrawer(ctx, nodes);
   ctx.addTicker(drawer);
-  drawer.restart();
+  ctx.addStarter(drawer);
 
+  ctx.start();
   d3.timeout(function() {
-    drawer.nodes.push(Node());
-    drawer.restart();
+    drawer.addNode(Node());
   }, 1000);
 </script>
 
