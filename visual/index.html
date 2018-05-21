@@ -9,7 +9,7 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
   </head>
 
-<body>
+  <body>
     <svg width="960" height="600"></svg>
 
     <!-- Scripts -->
@@ -17,24 +17,6 @@
     <script src = "js/draw/ctx.js"></script>
     <script src = "js/draw/node.js"></script>
     <script src = "js/draw/link.js"></script>
-
-<script>
-  var ctx = Ctx();
-  var nodes = [Node(), Node()];
-
-  let drawer  = new NodeDrawer(ctx, nodes);
-  let drawer2 = new LinkDrawer(ctx, [Link(nodes[0], nodes[1])]);
-  ctx.addTicker(drawer2);
-  ctx.addTicker(drawer);
-  ctx.addStarter(drawer);
-  ctx.addStarter(drawer2);
-
-  ctx.start();
-  d3.interval(function() {
-    drawer.addNode(Node());
-    drawer2.addLink(Link(nodes[0], nodes[nodes.length - 1]));
-  }, 2000);
-</script>
-
+    <script src = "js/main.js"></script>
   </body>
 </html>
