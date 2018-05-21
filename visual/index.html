@@ -22,7 +22,7 @@
   var nodes = [Node(), Node(), Node()];
 
   let drawer = Drawer(ctx, nodes);
-
+  ctx.addTicker(drawer);
   drawer.restart();
 
   d3.timeout(function() {

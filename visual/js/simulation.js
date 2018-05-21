@@ -1,20 +1,24 @@
 Ctx = function() {
-  var svg = d3.select("svg"),
-      width = +svg.attr("width"),
-      height = +svg.attr("height");
+  self = this;
 
-  var simulation = d3.forceSimulation()
-      .force("charge", d3.forceManyBody())
-      .on("tick", ticked);
-
-  return {
-    "svg" : svg,
-    "width" : width,
-    "height" : height,
-    "simulation" : simulation
+  function tick() {
+    self.tickers.forEach(function(ticker) {
+      ticker.tick();
+    });
   }
-}
 
-function ticked() {
-  drawer.tick();
+  self.svg    = d3.select("svg");
+  self.width  = +self.svg.attr("width");
+  self.height = +self.svg.attr("height");
+  self.simulation = d3.forceSimulation()
+      .force("charge", d3.forceManyBody())
+      .on("tick", tick);
+
+  self.tickers = [];
+
+  self.addTicker = function(ticker) {
+    self.tickers.push(ticker);
+  }
+
+  return self
 }
