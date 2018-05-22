@@ -10,15 +10,17 @@ function main(log) {
   console.log(env);
 
   let ctx = new Ctx();
-  let nodes = env.nodes;
-  let links = env.links;
 
-  let linkDrawer = new LinkDrawer(ctx, links);
-  let nodeDrawer = new NodeDrawer(ctx, nodes);
+  let linkDrawer  = new LinkDrawer(ctx, env.links);
+  let nodeDrawer  = new NodeDrawer(ctx, env.nodes);
+  let groupDrawer = new GroupDrawer(ctx, env.groups);
+
   ctx.addTicker(nodeDrawer);
   ctx.addTicker(linkDrawer);
+  
   ctx.addStarter(nodeDrawer);
   ctx.addStarter(linkDrawer);
+  ctx.addStarter(groupDrawer);
 
   ctx.start();
 }

@@ -1,6 +1,11 @@
 let Node = function(id) {
+  function get_domain(id) {
+    return id.split(".")[0];
+  }
+
   return {
-    id : id,
+    id     : id,
+    group  : get_domain(id),
   };
 };
 

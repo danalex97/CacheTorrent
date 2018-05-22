@@ -26,7 +26,9 @@ let Ctx = function() {
 
   self.simulation = d3.forceSimulation()
     .force("charge", d3.forceManyBody())
-    .force("link", d3.forceLink([]).distance(500))
+    .force("link", d3.forceLink([]).distance(function (d) {
+      return 300 + 200 * Math.random();
+    }))
     .alphaTarget(1)
     .on("tick", tick);
 

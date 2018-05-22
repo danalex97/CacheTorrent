@@ -63,9 +63,11 @@ function get_env(log) {
     map[obj.id] = obj;
     return map;
   }, {}));
+  let groups = Array.from(new Set(nodes.map(node => node.group)));
 
   return {
-    "nodes" : nodes,
-    "links" : links,
+    "nodes"   : nodes,
+    "links"   : links,
+    "groups"  : groups,
   }
 }
