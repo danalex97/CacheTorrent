@@ -22,6 +22,17 @@ let GroupDrawer = function(ctx, groups, nodeDrawer) {
   let coords = getCoords();
 
   /* Curve. */
+  let curve = d3.curveCardinalClosed.tension(0.3);
+  let drawLine = d3.line().curve(curve);
+
+  function draw(toDraw) {
+     return toDraw
+       .attr("fill-opacity", 0.1)
+       .attr("fill", "red")
+       .attr("stroke-opacity", 1)
+       .classed('hull', true);
+  }
+
   function get_hull(id) {
     let coords = nodeDrawer.node
       .filter(d => d.group == id)
@@ -31,43 +42,34 @@ let GroupDrawer = function(ctx, groups, nodeDrawer) {
     return d3.polygonHull(coords);
   }
 
-  let curve = d3.curveCardinalClosed.tension(0.3);
-  let drawLine = d3.line().curve(curve);
-
-  function draw(toDraw) {
-     return toDraw
-       .append('path')
-       .attr("fill-opacity", 0.1)
-       .attr("fill", "red")
-       .attr("stroke-opacity", 1)
-       .classed('hull', true)
-       .attr('d', function(points){
-         return drawLine(points);
-       });
-  }
-
   function restart() {
     // Create force centers.
     ctx.simulation.force('x', d3.forceX().x(function(d) {
       return coords[d.group].x;
-    }))
+    }));
     ctx.simulation.force('y', d3.forceY().y(function(d) {
       return coords[d.group].y;
-    }))
+    }));
 
     // Calculate convex hulls.
     self.hulls = groups.map(id => get_hull(id));
-
-    // Draw convex hulls.
-    self.hull = self.hull.data(self.hulls);
-    self.hull.exit().remove();
-    self.hull = draw(self.hull.enter()).merge(self.hull);
   }
 
+
   /* Fields. */
-  self.hull = ctx.center
-    .append("g")
-    .selectAll('.hulls');
+  // We make a group of other elements.
+  self.groups = ctx.center
+    .append('g')
+    .attr('class', 'groups');
+  // We make a hull for each group.
+  // Since the number of groups remains unchanged, we make this static.
+  self.hull = self.groups
+    .selectAll(".hulls")
+    .data(groups)
+    .enter()
+    .append('g')
+    .attr('class', 'hulls')
+    .append('path');
 
   /* Interface. */
   self.start = function() {
@@ -75,6 +77,15 @@ let GroupDrawer = function(ctx, groups, nodeDrawer) {
   };
 
   self.tick = function() {
+    // Update data for each id.
+    groups.forEach(function(groupId) {
+      draw(self.hull
+        .filter(id => id == groupId))
+        .attr('d', function(id) {
+          let points = get_hull(id);
+          return drawLine(points);
+        });
+    });
   };
 
   return self;
