@@ -3,8 +3,13 @@ let Feed = function (feedArray, interval, nbr) {
 
   function process(activeLink) {
     activeLink.active = true;
+
+    activeLink.target.pieces += 1;
+    activeLink.target.active = true;
+
     d3.timeout(function() {
       activeLink.active = false;
+      activeLink.target.active = false;
     }, interval - interval / 10);
   }
 

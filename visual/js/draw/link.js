@@ -5,13 +5,13 @@ let LinkDrawer = function(ctx, links) {
     return ctx.attrs(function(d) {
       if (!d.active) {
         return {
-          "stroke" : "#9ecae1",
+          "stroke" : colors.links.inactive,
           "stroke-width" : "1.5px",
           "stroke-opacity" : "0.3"
         }
       } else {
         return {
-          "stroke" : "red",
+          "stroke" : colors.links.active,
           "stroke-width" : "2px",
           "stroke-opacity" : "0.8"
         }

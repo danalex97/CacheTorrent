@@ -1,6 +1,34 @@
 let NodeDrawer = function(ctx, nodes) {
   let self = this;
 
+  function color(ctx) {
+    return ctx.attrs(function(d) {
+      if (!d.active) {
+        return {
+          "stroke" : colors.nodes.border.inactive,
+          "stroke-width" : "1px",
+          "stroke-opacity" : "1",
+        }
+      } else {
+        return {
+          "stroke" : colors.nodes.border.active,
+          "stroke-width" : "5px",
+          "stroke-opacity" : "1",
+        }
+      }
+    }).attrs(function(d) {
+      if (!d.leader) {
+        return {
+          "fill" : colors.nodes.fill.inactive,
+        }
+      } else {
+        return {
+          "fill" : colors.nodes.fill.active,
+        }
+      }
+    })
+  }
+
   function draw(toDraw) {
     function dragstarted(d) {
       if (!d3.event.active) {
@@ -23,32 +51,12 @@ let NodeDrawer = function(ctx, nodes) {
       d.fy = null;
     }
 
-    function leader(ctx) {
-      return ctx.attrs(function(d) {
-        if (!d.leader) {
-          return {
-            "stroke" : "#9ecae1",
-            "stroke-width" : "1px",
-            "stroke-opacity" : "1",
-            "fill" : "#3182bd",
-          }
-        } else {
-          return {
-            "stroke" : "#9ecae1",
-            "stroke-width" : "1px",
-            "stroke-opacity" : "1",
-            "fill" : "#ff8c00"
-          }
-        }
-      })
-    }
-
     // Make a group with circle and text.
     let group = toDraw
         .append("g")
         .attr("class", "node");
     // Add text to the group.
-    let circle = leader(group.append("circle"))
+    let circle = color(group.append("circle"))
       .attr("r", 20)
       .call(d3.drag()
           .on("start", dragstarted)
@@ -57,11 +65,11 @@ let NodeDrawer = function(ctx, nodes) {
     // Add circle to the group.
     let text = group
       .append("text")
-      .attr("text-anchor", "middle")
-      .attr("dx", 12)
+      // .attr("text-anchor", "left")
+      .attr("dx", "-.35em")
       .attr("dy", ".35em")
       .attr("color", "black")
-      .text(function(d) { return d.id });
+      .text(d => d.pieces);
     return group;
   }
 
@@ -102,7 +110,9 @@ let NodeDrawer = function(ctx, nodes) {
     self.node
       .selectAll("text")
       .attr("x", getX)
-      .attr("y", getY);
+      .attr("y", getY)
+      .text(d => d.pieces);
+    color(self.node.selectAll("circle"));
   };
 
   self.addNode = function(node) {

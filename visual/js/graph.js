@@ -7,6 +7,8 @@ let Node = function(id) {
     id     : id,
     group  : get_domain(id),
     leader : false,
+    active : false,
+    pieces : 0,
   };
 };
 

@@ -27,8 +27,8 @@ let GroupDrawer = function(ctx, groups, nodeDrawer) {
 
   function draw(toDraw) {
      return toDraw
-       .attr("fill-opacity", 0.1)
-       .attr("fill", "red")
+       .attr("fill-opacity", colors.groupOpacity)
+       .attr("fill", colors.group)
        .attr("stroke-opacity", 1)
        .classed('hull', true);
   }
