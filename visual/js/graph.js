@@ -6,6 +6,7 @@ let Node = function(id) {
   return {
     id     : id,
     group  : get_domain(id),
+    leader : false,
   };
 };
 

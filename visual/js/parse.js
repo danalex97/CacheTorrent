@@ -77,7 +77,17 @@ function get_env(log) {
     }, {});
   }
 
-  let nodes  = get_nodes(log);
+  function set_leaders(log, node_map) {
+    log.forEach(function(entry) {
+      if (valid(entry.dst) && entry.type == "cache_torrent.LeaderStart") {
+        node_map[entry.dst].leader = true;
+      }
+    });
+  }
+
+  let nodes = get_nodes(log);
+  set_leaders(log, to_map(nodes, node => node.id));
+
   let links  = get_links(log, to_map(nodes, node => node.id));
   let groups = Array.from(new Set(nodes.map(node => node.group)));
   let feed   = get_feed(log,

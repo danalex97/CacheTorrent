@@ -23,12 +23,27 @@ let NodeDrawer = function(ctx, nodes) {
       d.fy = null;
     }
 
-    return toDraw
-      .append("circle")
-      .attr("stroke", "#9ecae1")
-      .attr("stroke-width", "1px")
-      .attr("stroke-opacity", "1")
-      .attr("fill", "#3182bd")
+    function leader(ctx) {
+      return ctx.attrs(function(d) {
+        if (!d.leader) {
+          return {
+            "stroke" : "#9ecae1",
+            "stroke-width" : "1px",
+            "stroke-opacity" : "1",
+            "fill" : "#3182bd"
+          }
+        } else {
+          return {
+            "stroke" : "#9ecae1",
+            "stroke-width" : "1px",
+            "stroke-opacity" : "1",
+            "fill" : "#ff8c00"
+          }
+        }
+      })
+    }
+
+    return leader(toDraw.append("circle"))
       .attr("r", 20)
       .call(d3.drag()
           .on("start", dragstarted)

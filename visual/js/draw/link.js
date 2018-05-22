@@ -13,7 +13,7 @@ let LinkDrawer = function(ctx, links) {
         return {
           "stroke" : "red",
           "stroke-width" : "2px",
-          "stroke-opacity" : "1"
+          "stroke-opacity" : "0.8"
         }
       }
     })
