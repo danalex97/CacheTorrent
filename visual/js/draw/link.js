@@ -3,7 +3,22 @@ let LinkDrawer = function(ctx, links) {
 
   function draw(ctx) {
     return ctx
-      .append("line");
+      .append("line")
+      .attrs(function(d) {
+        if (!d.active) {
+          return {
+            "stroke" : "#9ecae1",
+            "stroke-width" : "1.5px",
+            "stroke-opacity" : "0.3"
+          }
+        } else {
+          return {
+            "stroke" : "#9ecae1",
+            "stroke-width" : "1.5px",
+            "stroke-opacity" : "1"
+          }
+        }
+      });
   }
 
   function restart() {
@@ -20,9 +35,6 @@ let LinkDrawer = function(ctx, links) {
   /* Fields. */
   self.link = ctx.center
     .append("g")
-    .attr("stroke", "#9ecae1")
-    .attr("stroke-width", "1.5px")
-    .attr("stroke-opacity", "0.3")
     .selectAll(".link");
   self.links = links;
 

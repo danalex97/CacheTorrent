@@ -24,4 +24,5 @@ function main(log) {
   ctx.addStarter(groupDrawer);
 
   ctx.start();
+  console.log(env.feed);
 }
