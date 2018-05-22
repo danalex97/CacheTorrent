@@ -14,6 +14,7 @@ function main(log) {
   let linkDrawer  = new LinkDrawer(ctx, env.links);
   let nodeDrawer  = new NodeDrawer(ctx, env.nodes);
   let groupDrawer = new GroupDrawer(ctx, env.groups, nodeDrawer);
+  let feed = new Feed(env.feed, 1000, 5);
 
   ctx.addTicker(nodeDrawer);
   ctx.addTicker(linkDrawer);
@@ -24,5 +25,5 @@ function main(log) {
   ctx.addStarter(groupDrawer);
 
   ctx.start();
-  console.log(env.feed);
+  feed.start();
 }

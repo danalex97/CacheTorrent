@@ -1,24 +1,26 @@
 let LinkDrawer = function(ctx, links) {
   let self = this;
 
-  function draw(ctx) {
-    return ctx
-      .append("line")
-      .attrs(function(d) {
-        if (!d.active) {
-          return {
-            "stroke" : "#9ecae1",
-            "stroke-width" : "1.5px",
-            "stroke-opacity" : "0.3"
-          }
-        } else {
-          return {
-            "stroke" : "#9ecae1",
-            "stroke-width" : "1.5px",
-            "stroke-opacity" : "1"
-          }
+  function active(ctx) {
+    return ctx.attrs(function(d) {
+      if (!d.active) {
+        return {
+          "stroke" : "#9ecae1",
+          "stroke-width" : "1.5px",
+          "stroke-opacity" : "0.3"
         }
-      });
+      } else {
+        return {
+          "stroke" : "red",
+          "stroke-width" : "2px",
+          "stroke-opacity" : "1"
+        }
+      }
+    })
+  }
+
+  function draw(ctx) {
+    return active(ctx.append("line"));
   }
 
   function restart() {
@@ -45,6 +47,8 @@ let LinkDrawer = function(ctx, links) {
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; });
+
+    active(self.link);
   };
 
   self.addLink = function(link) {
