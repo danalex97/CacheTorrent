@@ -34,10 +34,18 @@ let GroupDrawer = function(ctx, groups, nodeDrawer) {
   }
 
   function get_hull(id) {
+    let bound = 50;
+
     let coords = nodeDrawer.node
       .filter(d => d.group == id)
       .data()
-      .map(d => [d.x, d.y]);
+      .map(d => [
+        [d.x - bound, d.y],
+        [d.x, d.y - bound],
+        [d.x + bound, d.y],
+        [d.x, d.y + bound]
+      ])
+      .reduce((arr, curr) => arr.concat(curr), []);
 
     return d3.polygonHull(coords);
   }
