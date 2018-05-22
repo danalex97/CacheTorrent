@@ -1,8 +1,8 @@
 // Simple configuration used only for testing purposes.
 
 {
-  "outPeers" : 10,
-  "inPeers"  : 10,
+  "outPeers" : 5,
+  "inPeers"  : 5,
 
   "minNodes" : 20,
   "seeds"    : 1,

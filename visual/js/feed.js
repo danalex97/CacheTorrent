@@ -2,6 +2,10 @@ let Feed = function (feedArray, interval, nbr) {
   let self = this;
 
   function process(activeLink) {
+    if (activeLink.target.pieces == self.pieces) {
+      return;
+    }
+
     activeLink.active = true;
 
     activeLink.target.pieces += 1;
@@ -19,7 +23,7 @@ let Feed = function (feedArray, interval, nbr) {
       .map(l => l.target.id)
       .filter(l => l == id)
       .length);
-    return Math.max.apply(null, pieces);
+    return Math.min.apply(null, pieces);
   }
 
   self.feedArray = feedArray;
