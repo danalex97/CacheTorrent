@@ -13,10 +13,23 @@ let Feed = function (feedArray, interval, nbr) {
     }, interval - interval / 10);
   }
 
+  function get_pieces(feed) {
+    let ids    = Array.from(new Set(feed.map(l => l.target.id)));
+    let pieces = ids.map(id => feed
+      .map(l => l.target.id)
+      .filter(l => l == id)
+      .length);
+    return Math.max.apply(null, pieces);
+  }
+
   self.feedArray = feedArray;
   self.pos       = 0;
   self.interval  = interval;
   self.nbr       = nbr;
+  self.pieces    = get_pieces(self.feedArray);
+
+  // Initialize seed.
+  self.feedArray[0].source.pieces = self.pieces;
 
   self.next = function() {
     for (let i = 0; i < nbr; i++) {
