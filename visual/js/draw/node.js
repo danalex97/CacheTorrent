@@ -30,7 +30,7 @@ let NodeDrawer = function(ctx, nodes) {
             "stroke" : "#9ecae1",
             "stroke-width" : "1px",
             "stroke-opacity" : "1",
-            "fill" : "#3182bd"
+            "fill" : "#3182bd",
           }
         } else {
           return {
@@ -43,12 +43,26 @@ let NodeDrawer = function(ctx, nodes) {
       })
     }
 
-    return leader(toDraw.append("circle"))
+    // Make a group with circle and text.
+    let group = toDraw
+        .append("g")
+        .attr("class", "node");
+    // Add text to the group.
+    let circle = leader(group.append("circle"))
       .attr("r", 20)
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
           .on("end", dragended));
+    // Add circle to the group.
+    let text = group
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("dx", 12)
+      .attr("dy", ".35em")
+      .attr("color", "black")
+      .text(function(d) { return d.id });
+    return group;
   }
 
   function restart() {
@@ -70,17 +84,25 @@ let NodeDrawer = function(ctx, nodes) {
 
   /* Interface. */
   self.tick = function() {
+    let getX = function(d) {
+      if (d.x < -ctx.width * 0.4) { d.x = -ctx.width * 0.4; }
+      if (d.x >  ctx.width * 0.4) { d.x =  ctx.width * 0.4; }
+      return d.x;
+    };
+    let getY = function(d) {
+      if (d.y < -ctx.height * 0.4) { d.y = -ctx.height * 0.4; }
+      if (d.y >  ctx.height * 0.4) { d.y =  ctx.height * 0.4; }
+      return d.y;
+    };
+
     self.node
-      .attr("cx", function(d) {
-        if (d.x < -ctx.width * 0.4) { d.x = -ctx.width * 0.4; }
-        if (d.x >  ctx.width * 0.4) { d.x =  ctx.width * 0.4; }
-        return d.x;
-      })
-      .attr("cy", function(d) {
-        if (d.y < -ctx.height * 0.4) { d.y = -ctx.height * 0.4; }
-        if (d.y >  ctx.height * 0.4) { d.y =  ctx.height * 0.4; }
-        return d.y;
-      })
+      .selectAll("circle")
+      .attr("cx", getX)
+      .attr("cy", getY);
+    self.node
+      .selectAll("text")
+      .attr("x", getX)
+      .attr("y", getY);
   };
 
   self.addNode = function(node) {
