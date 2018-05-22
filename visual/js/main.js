@@ -1,23 +1,24 @@
-var ctx = new Ctx();
-var nodes = [new Node(), new Node()];
+/* Default trigger. */
+let event = new Event('start');
+inputElement.dispatchEvent(event);
 
-let drawer  = new NodeDrawer(ctx, nodes);
-let drawer2 = new LinkDrawer(ctx, [Link(nodes[0], nodes[1])]);
-ctx.addTicker(drawer2);
-ctx.addTicker(drawer);
-ctx.addStarter(drawer);
-ctx.addStarter(drawer2);
+/* Main. */
+function main(log) {
+  d3.select("svg").selectAll("*").remove();
 
-ctx.start();
-d3.interval(function() {
-  drawer.addNode(new Node());
+  let env = get_env(log);
+  console.log(env);
 
-  for (let i = 0; i < 3; i++) {
-    let idx1 = Math.floor(Math.random() * nodes.length);
-    let idx2 = Math.floor(Math.random() * nodes.length);
+  let ctx = new Ctx();
+  let nodes = env.nodes;
+  let links = env.links;
 
-    if (idx1 != idx2) {
-      drawer2.addLink(Link(nodes[idx1], nodes[idx2]));
-    }
-  }
-}, 1000);
+  let nodeDrawer = new NodeDrawer(ctx, nodes);
+  let linkDrawer = new LinkDrawer(ctx, links);
+  ctx.addTicker(linkDrawer);
+  ctx.addTicker(nodeDrawer);
+  ctx.addStarter(nodeDrawer);
+  ctx.addStarter(linkDrawer);
+
+  ctx.start();
+}
