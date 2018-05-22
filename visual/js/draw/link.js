@@ -20,8 +20,9 @@ let LinkDrawer = function(ctx, links) {
   /* Fields. */
   self.link = ctx.center
     .append("g")
-    .attr("stroke", "#000")
-    .attr("stroke-width", 1.5)
+    .attr("stroke", "#9ecae1")
+    .attr("stroke-width", "1.5px")
+    .attr("stroke-opacity", "0.3")
     .selectAll(".link");
   self.links = links;
 

@@ -25,8 +25,11 @@ let NodeDrawer = function(ctx, nodes) {
 
     return toDraw
       .append("circle")
-      .attr("fill", "red")
-      .attr("r", 8)
+      .attr("stroke", "#9ecae1")
+      .attr("stroke-width", "1px")
+      .attr("stroke-opacity", "1")
+      .attr("fill", "#3182bd")
+      .attr("r", 20)
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -47,8 +50,6 @@ let NodeDrawer = function(ctx, nodes) {
   /* Fields. */
   self.node = ctx.center
     .append("g")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 1.5)
     .selectAll(".node");
   self.nodes = nodes;
 

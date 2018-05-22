@@ -13,10 +13,10 @@ function main(log) {
   let nodes = env.nodes;
   let links = env.links;
 
-  let nodeDrawer = new NodeDrawer(ctx, nodes);
   let linkDrawer = new LinkDrawer(ctx, links);
-  ctx.addTicker(linkDrawer);
+  let nodeDrawer = new NodeDrawer(ctx, nodes);
   ctx.addTicker(nodeDrawer);
+  ctx.addTicker(linkDrawer);
   ctx.addStarter(nodeDrawer);
   ctx.addStarter(linkDrawer);
 
