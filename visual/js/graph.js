@@ -1,5 +1,6 @@
-let Node = function() {
+let Node = function(id) {
   return {
+    id : id,
   };
 };
 
