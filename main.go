@@ -76,6 +76,12 @@ var logfile = flag.String(
   "The packet log in `.json` format.",
 )
 
+var latency = flag.Bool(
+  "latency",
+  false,
+  "Enable control packet latency.",
+)
+
 var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to `file`.")
 var memprofile = flag.String("memprofile", "", "Write memory profile to `file`.")
 
@@ -185,6 +191,7 @@ func main() {
       WithParams(func(c *config.Conf) {
         c.Bias          = *biased
         c.LeaderPercent = *extension
+        c.Latency       = *latency
 
         if *pieces != MaxInt {
           c.Pieces = *pieces

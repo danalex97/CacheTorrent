@@ -39,6 +39,7 @@ func JSONConfig(path string) *Conf {
   conf.AllNodesRun    = NewWGProgress(conf.MinNodes)
   conf.SharedCallback = func () {}
   conf.SharedInit     = func () {}
+  conf.Latency        = false
 
   return &conf
 }

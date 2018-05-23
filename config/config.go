@@ -48,6 +48,9 @@ type Conf struct {
   // Progress properties
   AllNodesRun         *WGProgress
   AllNodesRunInterval int `json:allNodesRunInterval`
+
+  // Latency support
+  Latency bool
 }
 
 /**

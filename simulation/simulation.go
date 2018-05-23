@@ -29,6 +29,10 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
     WithTransferInterval(
       config.Config.TransferInterval)
 
+  if config.Config.Latency {
+    builder = builder.WithLatency()
+  }
+
   for _, tuple := range config.Config.CapacityNodes {
     builder = builder.WithCapacityNodes(
       tuple.Number,
