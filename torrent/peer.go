@@ -97,7 +97,7 @@ func (p *Peer) Init() {
     }
   }
 
-  // Send all the responses for TrackerReq
+  // Send all the responses for TrackerReq to other peers.
   for _, msg := range queue {
     p.Transport.ControlSend(msg.From, TrackerRes{p.Tracker})
   }

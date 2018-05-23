@@ -27,8 +27,10 @@ func (p *Peer) OnJoin() {
     return
   }
 
-  p.Init()
-  go p.CheckMessages(p.Bind, p.Process)
+  go func() {
+    p.Init()
+    go p.CheckMessages(p.Bind, p.Process)
+  }()
 }
 
 func (p *Peer) Process(m interface {}, state int) {
