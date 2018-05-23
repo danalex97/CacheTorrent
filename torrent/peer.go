@@ -52,8 +52,11 @@ func (p *Peer) OnJoin() {
     return
   }
 
-  p.Init()
-  go p.CheckMessages(p.Bind, p.Process)
+  // We need to make this unblocking for latency support.
+  go func() {
+    p.Init()
+    go p.CheckMessages(p.Bind, p.Process)
+  }()
 }
 
 func (p *Peer) OnLeave() {
@@ -80,8 +83,24 @@ func (p *Peer) Init() {
   // Find out who the tracker is
   p.Transport.ControlSend(p.join, TrackerReq{p.Id})
 
-  msg := <-p.Transport.ControlRecv()
-  p.Tracker = msg.(TrackerRes).Id
+  queue    := []TrackerReq{}
+  response := false
+  for !response {
+    m := <-p.Transport.ControlRecv()
+    switch msg := m.(type) {
+    case TrackerRes:
+      p.Tracker = msg.Id
+      response  = true
+    case TrackerReq:
+      // We may receive TrackerReq while waiting for our own response.
+      queue = append(queue, msg)
+    }
+  }
+
+  // Send all the responses for TrackerReq
+  for _, msg := range queue {
+    p.Transport.ControlSend(msg.From, TrackerRes{p.Tracker})
+  }
 
   // The peer should be initialized
   log.Println("Node", p.Id, "started with tracker", p.Tracker)
