@@ -1,5 +1,11 @@
 package config
 
+import (
+  "github.com/danalex97/Speer/interfaces"
+)
+
+type GroupProgress interfaces.GroupProgress
+
 type NodeConf struct {
   Number    int `json:"number"`
   Upload    int `json:"upload"`
@@ -46,7 +52,7 @@ type Conf struct {
   CapacityNodes      []NodeConf `json:"capacityNodes"`
 
   // Progress properties
-  AllNodesRun         *WGProgress
+  AllNodesRun         GroupProgress
   AllNodesRunInterval int `json:allNodesRunInterval`
 
   // Latency support

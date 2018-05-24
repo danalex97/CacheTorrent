@@ -1,6 +1,8 @@
 package config
 
 import (
+  "github.com/danalex97/Speer/sdk/go"
+
   "encoding/json"
   "io/ioutil"
   "strings"
@@ -36,7 +38,7 @@ func JSONConfig(path string) *Conf {
   var conf Conf
   json.Unmarshal(raw, &conf)
 
-  conf.AllNodesRun    = NewWGProgress(conf.MinNodes)
+  conf.AllNodesRun    = sdk.NewWGProgress(conf.MinNodes)
   conf.SharedCallback = func () {}
   conf.SharedInit     = func () {}
   conf.Latency        = false
