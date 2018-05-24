@@ -130,7 +130,7 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
     // No new messages, so we can let somebody else run
     if len(messages) == 0 {
       // Notify progress properties.
-      progress.Ref().(config.GroupProgress).Progress(p.Id)
+      progress.Ref().(*config.WGProgress).Progress(p.Id)
 
       runtime.Gosched()
       continue
@@ -146,7 +146,7 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
 
       if state == BindRun {
         // Notify the progress properties.
-        progress.Ref().(config.GroupProgress).Add()
+        progress.Ref().(*config.WGProgress).Add()
       }
 
       process(m, state)
@@ -162,7 +162,7 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
     }
 
     // Notify progress properties.
-    progress.Ref().(config.GroupProgress).Progress(p.Id)
+    progress.Ref().(*config.WGProgress).Progress(p.Id)
 
     // No useful work done
     if !any {
