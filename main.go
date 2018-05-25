@@ -82,6 +82,18 @@ var latency = flag.Bool(
   "Enable control packet latency.",
 )
 
+var procs = flag.Int(
+  "procs",
+  runtime.NumCPU(),
+  "GOMAXPROCS",
+)
+
+var parallel = flag.Bool(
+  "parallel",
+  false,
+  "Run the simulator's event queue with support for parallel events.",
+)
+
 var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to `file`.")
 var memprofile = flag.String("memprofile", "", "Write memory profile to `file`.")
 
@@ -125,6 +137,8 @@ func getStats() {
 }
 
 func main() {
+  runtime.GOMAXPROCS(*procs)
+
   fmt.Println("Running:", os.Args[1:])
 
   // Parsing the flags
@@ -193,6 +207,8 @@ func main() {
         c.LeaderPercent = *extension
         c.Latency       = *latency
 
+        c.Parallel      = *parallel
+
         if *pieces != MaxInt {
           c.Pieces = *pieces
         }
@@ -219,6 +235,11 @@ func main() {
   // Wait for all nodes to finish.
   wg.Done()
   wg.Wait()
+
+  if *latency {
+    // Handle late message delivery
+    wg.Add(100)
+  }
 
   s.Stop()
   t := s.Time()

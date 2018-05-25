@@ -51,6 +51,9 @@ type Conf struct {
 
   // Latency support
   Latency bool
+
+  // Run the simulator's event queue with support for parallel events.
+  Parallel bool
 }
 
 /**
