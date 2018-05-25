@@ -7,7 +7,7 @@
   "minNodes" : 100,
   "seeds"    : 1,
 
-  "pieceSize" : 196,
+  "pieceSize" : 1960000,
   "pieces"   : 1000,
 
   "uploads"     : 4,
@@ -21,13 +21,13 @@
   "stubDomains"       : 10,
   "stubDomainSize"    : 20,
 
-  "transferInterval"  : 10,
+  "transferInterval"  : 1500,
 
   "capacityNodes" : [{
       "number"   : 101,
-      "upload"   : 10,
-      "download" : 20
+      "upload"   : 2000,
+      "download" : 6000
   }],
 
-  "allNodesRunInterval" : 10
+  "allNodesRunInterval" : 500
 }
