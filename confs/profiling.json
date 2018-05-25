@@ -1,0 +1,33 @@
+// Configuration used for profiling.
+
+{
+  "outPeers" : 7,
+  "inPeers"  : 7,
+
+  "minNodes" : 50,
+  "seeds"    : 1,
+
+  "pieceSize" : 196,
+  "pieces"   : 1000,
+
+  "uploads"     : 4,
+  "optimistics" : 1,
+  "interval"    : 10000,
+
+  "backlog" : 10,
+
+  "transitDomains"    : 10,
+  "transitDomainSize" : 20,
+  "stubDomains"       : 10,
+  "stubDomainSize"    : 20,
+
+  "transferInterval"  : 10,
+
+  "capacityNodes" : [{
+      "number"   : 51,
+      "upload"   : 10,
+      "download" : 20
+  }],
+
+  "allNodesRunInterval" : 10
+}
