@@ -18,7 +18,13 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
       config.Config.TransitDomains,
       config.Config.TransitDomainSize,
       config.Config.StubDomains,
-      config.Config.StubDomainSize).
+      config.Config.StubDomainSize)
+
+  if config.Config.Parallel {
+    builder = builder.WithParallelSimulation()
+  }
+
+  capBuilder := builder.
     WithDefaultQueryGenerator().
     WithLimitedNodes(config.Config.MinNodes + 1).
     WithProgress(
@@ -30,15 +36,15 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
       config.Config.TransferInterval)
 
   if config.Config.Latency {
-    builder = builder.WithLatency()
+    capBuilder = capBuilder.WithLatency()
   }
 
   for _, tuple := range config.Config.CapacityNodes {
-    builder = builder.WithCapacityNodes(
+    capBuilder = capBuilder.WithCapacityNodes(
       tuple.Number,
       tuple.Upload,
       tuple.Download)
   }
 
-  return builder.Build()
+  return capBuilder.Build()
 }
