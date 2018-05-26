@@ -1,4 +1,4 @@
-// Asymetric network with big seed.
+// Asymetric network with small seed.
 
 {
   "outPeers" : 20,
@@ -24,19 +24,11 @@
   "transferInterval"  : 1500,
 
   "capacityNodes" : [{
-    "number"   : 1,
-    "upload"   : 0,
-    "download" : 0
-  },{
-    "number"   : 1,
-    "upload"   : 10000,
-    "download" : 0
+      "number"   : 351,
+      "upload"   : 2000,
+      "download" : 6000
   }, {
     "number"   : 350,
-    "upload"   : 2000,
-    "download" : 6000
-  }, {
-    "number"   : 349,
     "upload"   : 10000,
     "download" : 10000
   }],
