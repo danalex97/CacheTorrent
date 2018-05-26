@@ -8,16 +8,23 @@ red_bit = [46.89975] * 5
 
 cac90 = [2795154.6, 2264567.0, 2075675.0, 1900072.0, 1764484.2]
 cac50 = [2088354.6, 1712567.0, 1631675.0, 1545172.0, 1421284.2]
+cacavg = [2174415.2, 1754970.4, 1633130.4, 1575467.7, 1506736.4]
 red_cac = [4.369384835479256, 9.310080011430205, 14.231714285714286, 19.28725882460992, 24.299842857142856]
 
 scac90  = [2465663.4, 1943782.8, 1718132.6, 1497803.8, 1383119.8]
 scac50  = [1789485.6, 1382782.8, 1254632.6, 1183403.8, 1112819.8]
-scacavg = [2174415.2, 1754970.4, 1633130.4, 1575467.7, 1506736.4]
+scacavg = [1822004.1, 1377073.8, 1228353.1, 1145023.0, 1127055.5]
 red_scac = [4.135685973400614, 7.3762265684246815, 9.225472757071612, 10.801587820403821, 13.72113847664711]
+
+sbia90  = [1283063.8, 1260930.5, 1252211.6, 1244652.5, 1244943.6]
+sbia50  = [1264162.0, 1243663.7, 1235390.8, 1227402.5, 1227938.0]
+sbiaavg = [1243139.3, 1224210.7, 1215837.3, 1209452.0, 1209937.8]
+red_sbia = [11.08978937342432, 13.988364442537366, 14.439521789585445, 15.932816840853652, 17.56879524217716]
 
 sbit90  = [1413451.2] * 5
 sbit50  = [1406051.2] * 5
 sbitavg = [1404587.0] * 5
+red_sbit = [46.32947142857143] * 5
 
 acac90 = [1311858.6, 1269271.8, 1261899.4, 1268813.4, 1294926.0]
 acac50 = [1261158.6, 1264171.8, 1257930.6, 1265213.4, 1291426.0]
@@ -34,6 +41,7 @@ pic50 = [2329785.6, 1880715.6, 1461679.8, 1428877.2, 1408510.0]
 from plot import *
 
 plots = [
+	# Intro
 	TimePlot(type="Bias")
 		.plot(idx, bia90, color='black', linestyle='-', label="Biased selection 90th percentile")
 		.plot(idx, bia50, color='black', linestyle='--', label="Biased selection 50th percentile")
@@ -50,9 +58,11 @@ plots = [
 		.plot(idx, red_cac, color='black', linestyle='-', label="CacheTorrent")
 		.save("plots/red.png"),
 	TimePlot(type="Cache")
-		.plot(idx, scacavg, color='black', linestyle='-', label="CacheTorrent average")
+		.plot(idx, cacavg, color='black', linestyle='-', label="CacheTorrent average")
 		.plot(idx, cac50, color='black', linestyle='--', label="CacheTorrent 50th percentile")
 		.save("plots/cactime2.png"),
+
+	# Big seed
 	TimePlot(type="Cache")
 		.plot(idx, scac90, color='black', linestyle='-', label="CacheTorrent 90th percentile - 8Mbps seed")
 		.plot(idx, scac50, color='black', linestyle=':', label="CacheTorrent 50th percentile - 8Mbps seed")
@@ -63,6 +73,26 @@ plots = [
 		.plot(idx, red_scac, color='black', linestyle='-', label="CacheTorrent - 8Mbps seed")
 		.plot(idx, red_cac, color='black', linestyle='--', label="CacheTorrent - 2Mbps seed")
 		.save("plots/scacred.png"),
+
+	# Biased
+	TimePlot(type="Both")
+		.plot(idx, scac50, color='black', linestyle='-', label="CacheTorrent 50th percentile")
+		.plot(idx, sbia50, color='black', linestyle='--', label="Biased selection 50th percentile")
+		.plot(idx, sbit50, color='black', linestyle=':', label="BitTorrent 50th percentile")
+		.save("plots/biaCache.png"),
+	TimePlot(type="Both")
+		.plot(idx, scac90, color='black', linestyle='-', label="CacheTorrent 90th percentile")
+		.plot(idx, sbia90, color='black', linestyle='--', label="Biased selection 90th percentile")
+		.plot(idx, sbit90, color='black', linestyle=':', label="BitTorrent 90th percentile")
+		.save("plots/biaCache90.png"),
+	RedPlot(type="Both")
+		.plot(idx, red_scac, color='black', linestyle='-', label="CacheTorrent")
+		.plot(idx, red_sbia, color='black', linestyle='--', label="Biased selection")
+		.plot(idx, red_sbit, color='black', linestyle=':', label="BitTorrent")
+		.setLoc(1)
+		.save("plots/cacred.png"),
+
+	# Hetero
 	TimePlot(type="Both")
 		.plot(idx[1:], abia50, color='black', linestyle='-', label="Biased selection 50th percentile")
 		.plot([20, 30, 35, 40, 50], acac90, color='black', linestyle='-.', label="CacheTorrent 90th percentile")
@@ -72,6 +102,8 @@ plots = [
 		.plot(idx, red_bia, color='black', linestyle='--', label="Biased selection")
 		.plot(idx, red_cac, color='black', linestyle='-', label="CacheTorrent")
 		.save("plots/biaCacheAsymRed.png"),
+
+	# Pieces
 	PiecePlot()
 		.plot([i * 20 for i in idx], pic50, color='black', linestyle='-', label="50th percentile")
 		.plot([i * 20 for i in idx], pic90, color='black', linestyle='--', label="90th percentile")

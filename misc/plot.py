@@ -19,6 +19,8 @@ def setup(plt):
     plt.rcParams['axes.linewidth'] = 1
     plt.rcParams['lines.markeredgewidth'] = 1
 
+    plt.margins(0.02, 0.02)
+
 class Plot():
     def __init__(self):
         self.plt = plt
@@ -80,6 +82,10 @@ class RedPlot(Plot):
         self.ylabel("Redundant transmissions")
         self.loc = 4
         types[type](self)
+
+    def setLoc(self, loc):
+        self.loc = loc
+        return self
 
 class PiecePlot(Plot):
     def __init__(self):
