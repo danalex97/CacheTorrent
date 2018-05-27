@@ -60,7 +60,7 @@ class LeaderPlot(Plot):
         super().__init__()
         self.xlabel("Full file download time(ms)")
         self.ylabel("Peer percent with download finished")
-        self.plt.xlim((1200000,2000000))
+        self.plt.xlim((800000,2000000))
         self.loc = 4
 
 types = {

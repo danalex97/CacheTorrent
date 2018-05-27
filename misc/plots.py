@@ -33,6 +33,22 @@ abia50 = [1268404.4, 1267638.0, 1280000.0, 1284261.5]
 red_abia = [14.371836096967177, 16.073892809320004, 17.98625134264232, 20.011821596975324]
 red_acac = [9.568944996001083, 13.641038166719099, 18.308232016698877, 24.228285714285715]
 
+# Asym. big seed
+sacac90 = [820490.6, 717618.0, 662806.5, 653595.0]
+sacac50 = [609990.6, 554118.0, 536056.5, 512595.0]
+sacacavg = [600125.8, 525791.9, 487413.7, 475073.5]
+red_sacac = [7.296506708965068, 11.170763380130067, 15.82682142857143, 21.0987]
+
+sabia90 = [626446.6, 632804.5, 643868.3, 634731.0]
+sabia50 = [495946.6, 485804.5, 527868.3, 509106.0]
+sabiaavg = [483029.2, 490061.9, 506963.9, 496343.3]
+red_sabia = [11.688949840165073, 15.105469430672786, 17.38205260239677,  19.994200748891423]
+
+sabit90  = [633349.0] * 4
+sabit50  = [514099.0] * 4
+sabitavg = [493678.3642857143] * 4
+red_sabit = [47.1781428571428] * 4
+
 idx = [10, 20, 30, 40, 50]
 
 pic90 = [2674485.6, 2156115.6, 1803175.2, 1754077.2, 1779010.0]
@@ -93,6 +109,20 @@ plots = [
 		.save("plots/cacred.png"),
 
 	# Hetero
+	TimePlot(type="Both")
+		.plot(idx[1:], sabiaavg, color='black', linestyle=':', label="Biased selection average")
+		.plot(idx[1:], sacacavg, color='black', linestyle='-', label="CacheTorrent average")
+		.plot(idx[1:], sabitavg, color='black', linestyle='--', label="BitTorrent average")
+		.save("plots/asymAvg.png"),
+	RedPlot(type="Both")
+		.plot(idx[1:], red_sabia, color='black', linestyle=':', label="Biased selection")
+		.plot(idx[1:], red_sacac, color='black', linestyle='-', label="CacheTorrent")
+		.save("plots/asymRed.png"),
+	TimePlot(type="Cache")
+		.plot(idx[1:], sacac90, color='black', linestyle='--', label="CacheTorrent 90th percentile")
+		.plot(idx[1:], sacac50, color='black', linestyle='-', label="CacheTorrent 50th percentile")
+		.save("plots/asymPer.png"),
+
 	TimePlot(type="Both")
 		.plot(idx[1:], abia50, color='black', linestyle='-', label="Biased selection 50th percentile")
 		.plot([20, 30, 35, 40, 50], acac90, color='black', linestyle='-.', label="CacheTorrent 90th percentile")
