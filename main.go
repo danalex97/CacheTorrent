@@ -193,8 +193,13 @@ func main() {
       template = new(simulation.SimulatedBiasedNode)
     }
   } else {
-    template = new(simulation.SimulatedCachedNode)
-    fmt.Println("Running with extension.")
+    if *biased == MaxInt {
+      template = new(simulation.SimulatedCachedNode)
+      fmt.Println("Running with extension.")
+    } else {
+      template = new(simulation.SimulatedBiasedCachedNode)
+      fmt.Println("Running with extension and biased selection.")
+    }
   }
 
   // Run with configuration

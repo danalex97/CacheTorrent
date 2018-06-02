@@ -3,7 +3,7 @@ package simulation
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
-  
+
   "github.com/danalex97/nfsTorrent/torrent"
   "github.com/danalex97/nfsTorrent/cache_torrent"
   "github.com/danalex97/nfsTorrent/bias_torrent"
@@ -40,6 +40,18 @@ type SimulatedCachedNode struct {
 func (s *SimulatedCachedNode) New(util TorrentNodeUtil) TorrentNode {
   if util.Join() == "" {
     return new(cache_torrent.Tracker).New(util)
+  } else {
+    config.Config.SharedInit()
+    return new(cache_torrent.Peer).New(util)
+  }
+}
+
+type SimulatedBiasedCachedNode struct {
+}
+
+func (s *SimulatedBiasedCachedNode) New(util TorrentNodeUtil) TorrentNode {
+  if util.Join() == "" {
+    return new(bias_torrent.CacheTracker).New(util)
   } else {
     config.Config.SharedInit()
     return new(cache_torrent.Peer).New(util)
