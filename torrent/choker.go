@@ -1,24 +1,5 @@
 package torrent
 
-/*
- * We consider only the rate heuristic used for peers rather than
- * the heuristic used for seeds. That is, we use the connections with
- * the highest upload rate.
- *
- * We do not model snubbing.
- *
- * For modelling simplicity, we randomize the optimistics.
- *
- * Version 5.3.0 uses allocates 30% of the slots to seeds and 70% to other
- * peers.
- *
- * The seeder will have no upload made to it. The seeder can either:
- *  - upload to best download rates
- *  - upload randomly
- * For the moment our implementation is random.
- *
- */
-
 import (
   "github.com/danalex97/nfsTorrent/config"
   "math/rand"
@@ -32,6 +13,27 @@ var uploads     config.Const = config.NewConst(config.Uploads)
 var optimistics config.Const = config.NewConst(config.Optimistics)
 var interval    config.Const = config.NewConst(config.Interval)
 
+// A Choker is a structure which periodically chokes and unchokes connections
+// based on the Tit-for-Tat strategy. When an Upload component is unchoked,
+// the respective upload component is allowed to upload new pieces to other
+// peers. Furthermore, the Choker reacts to Interested and NotInterested
+// notifications arriving from Upload components.
+//
+// We consider only the rate heuristic used for peers rather than
+// the heuristic used for seeds. That is, we use the connections with
+// the highest upload rate.
+//
+// We do not model snubbing.
+//
+// For modelling simplicity, we randomize the optimistics.
+//
+// Version 5.3.0 uses allocates 30% of the slots to seeds and 70% to other
+// peers.
+//
+// The seeder will have no upload made to it. The seeder can either:
+//  - upload to best download rates
+//  - upload randomly
+// For the moment our implementation is random.
 type Choker interface {
   Interested(conn Upload)
   NotInterested(conn Upload)
