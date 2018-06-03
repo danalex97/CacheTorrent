@@ -7,6 +7,8 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
 )
 
+// The CacheTracker is component which allows usage of bias neighbour election
+// together with the CacheTorrent protocol.
 type CacheTracker struct {
   election *cache_torrent.Election
 

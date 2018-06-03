@@ -1,12 +1,10 @@
 package cache_torrent
 
-/**
- * A leader can:
- *  - download from anybody
- *  - upload to anybody(see race condition)
- * A leader can not:
- *  - upload to different AS via an indirect connection
- */
+// A leader can:
+//  - download from anybody
+//  - upload to anybody(see race condition)
+// A leader can not:
+//  - upload to different AS via an indirect connection
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
@@ -106,8 +104,6 @@ func (l *Leader) registerForwarder(follower, peer string) {
 }
 
 func (l *Leader) outgoingConnection(id string) {
-  // log.Println(l.Id, "<->", id)
-
   // A leader has the initial protocol capabilities, that is
   // it's able to upload to anybody for outgoing connections.
   torrent.

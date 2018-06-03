@@ -1,8 +1,6 @@
 package cache_torrent
 
-/**
- * Indirect requests extension.
- */
+// -- Indirect requests extension --
 
 type LeaderStart struct {
   Id   string // the ID of the local node
@@ -14,9 +12,7 @@ type Miss struct {
   Index int
 }
 
-/**
- * Location awareness extension.
- */
+// -- Location awareness extension --
 
 type Neighbours struct {
   Ids []string

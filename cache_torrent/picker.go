@@ -2,7 +2,6 @@ package cache_torrent
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
-  // "fmt"
 )
 
 type CachePicker struct {
@@ -34,18 +33,13 @@ func (p *CachePicker) Next(peer string) (int, bool) {
   return p.IterateBuckers(peer, p.SelectBucket)
 }
 
-/* We use a different bucket selection which takes into account
- * the indirect requested that were made as well.
- */
+// We use a different bucket selection which takes into account
+// the indirect requested that were made as well.
 func (p *CachePicker) SelectBucket(bucket map[int]bool,
                               haves map[int]bool,
                               tiebreaks map[int]int) (int, bool) {
-  /*
-   * @haves: set of pieces remote peer has
-   * @tiebreaks: set of pieces with active started requested
-   */
-
-  // fmt.Println(len(p.requested), len(haves), len(bucket))
+  // @haves: set of pieces remote peer has
+  // @tiebreaks: set of pieces with active started requested
 
   iterate := bucket
   check1  := haves

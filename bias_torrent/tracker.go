@@ -12,6 +12,10 @@ import (
 
 var KPercent config.Const = config.NewConst(config.Bias)
 
+// The Tracker implements the biased selection protocol. Instead of providing
+// unbiased selection, when asked for a node's neighbours the Tracker returns
+// KPercent% external(different ISP) neighbours and (100 - KPercent)% internal
+// neighbours.
 type Tracker struct {
   asId map[string][]string
 
@@ -31,7 +35,7 @@ func (t *Tracker) OnJoin() {
 
 func (t *Tracker) Recv(m interface {}) {
   switch msg := m.(type) {
-  /* New Protocol. */
+  // -- New Protocol --
   case torrent.Join:
     id := msg.Id
     as := getAS(id)
@@ -42,7 +46,7 @@ func (t *Tracker) Recv(m interface {}) {
 
     t.Join(msg, t.Neighbours)
   default:
-    /* Backward compatibility. */
+    // -- Backward compatibility. --
     t.Tracker.Recv(m)
   }
 }

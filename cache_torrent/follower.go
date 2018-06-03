@@ -1,15 +1,12 @@
 package cache_torrent
 
-/**
- * A follower can:
- *   - upload to anybody
- *   - download only from same AS
- */
+// A follower can:
+//   - upload to anybody
+//   - download only from same AS
 
 import (
   "github.com/danalex97/nfsTorrent/torrent"
   "math/rand"
-  // "fmt"
 )
 
 type Follower struct {
@@ -23,7 +20,6 @@ func NewFollower(p *Peer) *Follower {
 }
 
 func (f *Follower) Run() {
-  // log.Println("Follower running.")
   f.Peer.Run(f.outgoingConnection)
 }
 

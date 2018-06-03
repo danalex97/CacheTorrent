@@ -49,7 +49,7 @@ func (p *Peer) Process(m interface {}, state int) {
 
 func (p *Peer) Bind(m interface {}) (state int) {
   switch msg := m.(type) {
-  /* New Protocol. */
+  // -- New Protocol --
   case Neighbours:
     // Location awareness extension
     state = torrent.BindDone
@@ -71,7 +71,7 @@ func (p *Peer) Bind(m interface {}) (state int) {
     }
     // Check if I am a seed
     p.Transport.ControlSend(p.Tracker, torrent.SeedReq{p.Id})
-  /* Backward compatible. */
+  // -- Backward compatible --
   default:
     state = p.Peer.Bind(m)
   }
