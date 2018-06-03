@@ -1,10 +1,8 @@
 package torrent
 
-/**
- * This file follows the 'Upload' BitTorrent 5.3.0 release.
- *
- * The connector is only an interface towards upload and download.
- */
+// The Connector is only an interface towards Upload and Download components.
+//
+// This file follows the 'Upload' BitTorrent 5.3.0 release.
 type Connector struct {
   *Components
 
@@ -49,6 +47,8 @@ func (c *Connector) Register(p *Peer) *Connector {
   return c
 }
 
+// The Connector is a Runner, thus having the Run and Recv(m interface {})
+// methods. The Run method should be called when the connector is registered.
 func (c *Connector) Run() {
   if c.Upload != nil {
     go c.Upload.Run()
@@ -59,6 +59,8 @@ func (c *Connector) Run() {
   }
 }
 
+// The Recv method is called whenever a message is dispached for processing
+// towards the Connector. 
 func (c *Connector) Recv(m interface {}) {
   if c.Upload != nil {
     c.Upload.Recv(m)

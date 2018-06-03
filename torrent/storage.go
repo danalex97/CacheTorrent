@@ -51,9 +51,7 @@ func NewStorage(id string, pieces []PieceMeta, time func() int) Storage {
   return storage
 }
 
-/*
- * Returns if I have a piece(I have it downloaded and stored).
- */
+// Returns if I have a piece(I have it downloaded and stored).
 func (s *storage) Have(index int) (PieceMeta, bool) {
   s.RLock()
   defer s.RUnlock()
@@ -62,9 +60,7 @@ func (s *storage) Have(index int) (PieceMeta, bool) {
   return p, ok
 }
 
-/*
- * Store a piece from a `piece` message.
- */
+// Store a piece from a `piece` message.
 func (s *storage) Store(p Piece) {
   s.Lock()
   defer s.Unlock()
@@ -78,9 +74,7 @@ func (s *storage) Store(p Piece) {
   s.checkCompleted()
 }
 
-/*
- * Return a list of all indexes of the pieces currently stored.
- */
+// Return a list of all indexes of the pieces currently stored.
 func (s *storage) Pieces() []int {
   s.RLock()
   defer s.RUnlock()

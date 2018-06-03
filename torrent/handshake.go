@@ -2,10 +2,17 @@ package torrent
 
 import (
   . "github.com/danalex97/Speer/interfaces"
+
   "runtime"
   "sync"
 )
 
+// A Handshake is used to establish a connection between 2 peers. The Handshake
+// handles the communication between 2 Peer instances, exchanging their
+// link references. The Handshake provides a Downlink(created at construction)
+// and an Uplink(transfered via a control message from the other peer). The
+// Handshake hides the connection establishment, blocking until all the
+// necessary control messages were received.
 type Handshake interface {
   Runner
 

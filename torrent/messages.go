@@ -4,7 +4,7 @@ import (
   . "github.com/danalex97/Speer/interfaces"
 )
 
-/* Original BitTorrent protocol messages. */
+// -- Original BitTorrent protocol messages --
 type Choke struct { Id string }
 type Unchoke struct { Id string }
 type Interested struct { Id string }
@@ -36,7 +36,7 @@ type Piece struct {
 
 // We do not model endgame mode, so we have no `cancel` message
 
-/* Tracker control messages. */
+// -- Tracker control messages. --
 type Join struct {
   Id string
 }
@@ -53,10 +53,9 @@ type TrackerRes struct {
   Id string
 }
 
-/* Used to model seeds:
-    - each peers sends a seed request
-    - in seed response finds if its a seed how many pieces it has
- */
+// Used to model seeds:
+//  - each peers sends a seed request
+//  - in seed response finds if its a seed how many pieces it has
 type SeedReq struct {
   From string
 }
@@ -65,8 +64,7 @@ type SeedRes struct {
   Pieces []PieceMeta
 }
 
-/* Connections */
-
+// Connection establishment
 type ConnReq struct {
   Id   string
   Link Link

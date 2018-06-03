@@ -4,6 +4,7 @@ package torrent
 
 import (
   . "github.com/danalex97/Speer/interfaces"
+
   "strconv"
   "sync"
 )
@@ -80,9 +81,7 @@ func (u *TorrentUpload) Recv(m interface {}) {
   }
 }
 
-/*
- * Function called when we want to choke the upload connection.
- */
+// Function called when we want to choke the upload connection.
 func (u *TorrentUpload) Choke() {
   u.chokeLock.Lock()
   defer u.chokeLock.Unlock()
@@ -95,9 +94,7 @@ func (u *TorrentUpload) Choke() {
   u.handshake.Uplink().Clear()
 }
 
-/*
- * Function called when we want to unchoke an upload.
- */
+// Function called when we want to unchoke an upload.
 func (u *TorrentUpload) Unchoke() {
   u.chokeLock.Lock()
   defer u.chokeLock.Unlock()
@@ -120,23 +117,17 @@ func (u *TorrentUpload) interested(interested bool) {
   }
 }
 
-/*
- * The ID of the peer that uploads.
- */
+// The ID of the peer that uploads.
 func (u *TorrentUpload) Me() string {
   return u.me
 }
 
-/*
- * The ID of the peer that I upload to.
- */
+// The ID of the peer that I upload to.
 func (u *TorrentUpload) To() string {
   return u.to
 }
 
-/*
- * Return if I am choking the connection.
- */
+// Return if I am choking the connection.
 func (u *TorrentUpload) Choking() bool {
   u.chokeLock.Lock()
   defer u.chokeLock.Unlock()
@@ -144,9 +135,7 @@ func (u *TorrentUpload) Choking() bool {
   return u.choke
 }
 
-/*
- * Return if the other peer is interested in my pieces.
- */
+// Return if the other peer is interested in my pieces.
 func (u *TorrentUpload) IsInterested() bool {
   u.interestedLock.Lock()
   defer u.interestedLock.Unlock()
@@ -154,9 +143,7 @@ func (u *TorrentUpload) IsInterested() bool {
   return u.isInterested
 }
 
-/*
- * Returns the downoad rate of the connection.
- */
+// Returns the downoad rate of the connection.
 func (u *TorrentUpload) Rate() float64 {
   if u.connector.Download == nil {
     return 0

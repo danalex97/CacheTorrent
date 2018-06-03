@@ -1,24 +1,22 @@
 package torrent
 
-/**
- * This file follows the 'PiecePicker.py' file from BitTorrent 5.3.0 release.
- *
- * We follow the description in Bram Cohen's Incentives Build Robustness
- * in BitTorrent, that is:
- * - the policy is rarest first
- * - first pieces are provided in random order rather than by rarest first policy
- *
- * We do not model endgame mode.
- *
- * Some reponsibilities of the 'RequestManager.py' have been moved to this file,
- * that is the accounting of active requests.
- */
+
+// This file follows the 'PiecePicker.py' file from BitTorrent 5.3.0 release.
+//
+// We follow the description in Bram Cohen's Incentives Build Robustness
+// in BitTorrent, that is:
+// - the policy is rarest first
+// - first pieces are provided in random order rather than by rarest first policy
+//
+// We do not model endgame mode.
+//
+// Some reponsibilities of the 'RequestManager.py' have been moved to this file,
+// that is the accounting of active requests.
 
 import (
   "sync"
 )
 
-/* See comments below for the interface. */
 type Picker interface {
   GotHave(peer string, index int)
 
@@ -55,9 +53,7 @@ func NewPicker(Storage Storage) Picker {
   }
 }
 
-/*
- * Handler for receiving a `have` message.
- */
+// Handler for receiving a `have` message.
 func (p *TorrentPicker) GotHave(peer string, index int) {
   p.Lock()
   defer p.Unlock()
@@ -89,10 +85,8 @@ func (p *TorrentPicker) GotHave(peer string, index int) {
   }
 }
 
-/*
- * Mark a certain pice as being in an active request -- that is the transfer
- * has been scheduled, but it is not yet finished.
- */
+// Mark a certain pice as being in an active request -- that is the transfer
+// has been scheduled, but it is not yet finished.
 func (p *TorrentPicker) Active(index int) {
   p.Lock()
   defer p.Unlock()
@@ -103,10 +97,8 @@ func (p *TorrentPicker) Active(index int) {
   p.active[index] = p.active[index] + 1
 }
 
-/*
- * Mark a piece as inactive -- that is the request has been eliminated or
- * the piece transfer has finished. (see `download.go`)
- */
+// Mark a piece as inactive -- that is the request has been eliminated or
+// the piece transfer has finished. (see `download.go`)
 func (p *TorrentPicker) Inactive(index int) {
   p.Lock()
   defer p.Unlock()
@@ -114,9 +106,7 @@ func (p *TorrentPicker) Inactive(index int) {
   p.active[index] = p.active[index] - 1
 }
 
-/*
- * Return the next piece for a certain peer.
- */
+// Return the next piece for a certain peer.
 func (p *TorrentPicker) Next(peer string) (int, bool) {
   p.RLock()
   defer p.RUnlock()
@@ -127,10 +117,8 @@ func (p *TorrentPicker) Next(peer string) (int, bool) {
 type Selector func (b, h map[int]bool, t map[int]int) (int, bool)
 
 func (p *TorrentPicker) IterateBuckers(peer string, selector Selector) (int, bool) {
-  /*
-   * @haves: set of pieces remote peer has
-   * @tiebreaks: set of pieces with active started requests
-   */
+  // @haves: set of pieces remote peer has
+  // @tiebreaks: set of pieces with active started requests
 
   haves := p.Have[peer]
   if haves == nil {
@@ -143,7 +131,7 @@ func (p *TorrentPicker) IterateBuckers(peer string, selector Selector) (int, boo
     return 0, false
   }
 
-  // find maximum frequency
+  // Find maximum frequency
   mx := -1
   for fr, _ := range p.buckets {
     if mx == -1 {
@@ -155,7 +143,7 @@ func (p *TorrentPicker) IterateBuckers(peer string, selector Selector) (int, boo
     }
   }
 
-  // itereate through buckets from rarest to most common piece
+  // Itereate through buckets from rarest to most common piece
   for fr := 1; fr <= mx; fr++ {
     bucket := p.buckets[fr]
     if bucket == nil {
@@ -168,13 +156,11 @@ func (p *TorrentPicker) IterateBuckers(peer string, selector Selector) (int, boo
     }
   }
 
-  /**
-   * We do not request a piece that was already requested. This sould not
-   * increase the download time significantly assuming a small request queue
-   * size.
-   *
-   * To fully eliminate this effect we can use config.Config.Backlog = 1.
-   */
+  // We do not request a piece that was already requested. This sould not
+  // increase the download time significantly assuming a small request queue
+  // size.
+  //
+  // To fully eliminate this effect we can use config.Config.Backlog = 1.
 
   return 0, false
 }
@@ -183,10 +169,8 @@ func (p *TorrentPicker) SelectBucket(bucket map[int]bool,
                               haves map[int]bool,
                               tiebreaks map[int]int) (int, bool) {
 
-  /*
-   * @haves: set of pieces remote peer has
-   * @tiebreaks: set of pieces with active started requests
-   */
+  // @haves: set of pieces remote peer has
+  // @tiebreaks: set of pieces with active started requests
 
   iterate := bucket
   check   := haves
@@ -222,10 +206,10 @@ func (p *TorrentPicker) IsBanned(index int) bool {
       p.Unlock()
       p.RLock()
     }()
-    // we cache only positives
+    // We cache only positives
     p.Bans[index] = true
 
-    // once we have a piece we can save some memory by deleting the haves of
+    // Once we have a piece we can save some memory by deleting the haves of
     // those pieces
     for _, have := range p.Have {
       delete(have, index)

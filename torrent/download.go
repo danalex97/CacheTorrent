@@ -43,11 +43,9 @@ type TorrentDownload struct {
   interested bool // if I am interested in uploader's pieces
   choked     bool // if the peer that uploads to me chokes me
 
+  // Requests that were made, but we still did not received a piece
+  // back as a response.
   ActiveRequests map[int]bool
-  /*
-   * Requests that were made, but we still did not received a piece
-   * back as a response.
-   */
 
   handshake Handshake
 
@@ -73,41 +71,33 @@ func NewDownload(connector *Connector) Download {
   }
 }
 
-/*
- * Returns if the peer that uploads to me chokes me.
- */
+// Returns if the peer that uploads to me chokes me.
 func (d *TorrentDownload) Choked() bool {
   return d.choked
 }
 
-/*
- *  Returns if I'm interested in the uploader's piece.
- */
+// Returns if I'm interested in the uploader's piece.
 func (d *TorrentDownload) Interested() bool {
   return d.interested
 }
 
-/*
- * The ID of the peer that downloads.
- */
+// The ID of the peer that downloads.
 func (d *TorrentDownload) Me() string {
   return d.me
 }
 
-/*
- * The ID of the peer that I download from.
- */
+// The ID of the peer that I download from.
 func (d *TorrentDownload) From() string {
   return d.from
 }
 
 func (d *TorrentDownload) Run() {
-  // Watch the link to deliver the piece messages
+  // Watch the link to deliver the piece messages.
   for {
     data := <-d.handshake.Downlink().Download()
     piece := pieceFromDownload(d.from, data)
 
-    // send message to myself (to avoid races)
+    // Send message to myself (to avoid races)
     d.Transport.ControlSend(d.me, piece)
   }
 }
@@ -244,11 +234,9 @@ func (d *TorrentDownload) gotHave(msg Have) {
   d.Picker.GotHave(d.from, index)
 }
 
-/*
- * Request more pieces from a the peer.
- *
- * The pieces are chosen using the Picker.
- */
+// Request more pieces from a the peer.
+//
+// The pieces are chosen using the Picker.
 func (d *TorrentDownload) RequestMore() {
   size := backlog.Int()
   if len(d.ActiveRequests) >= size {
@@ -309,9 +297,7 @@ func pieceFromDownload(from string, data Data) Piece {
   }
 }
 
-/*
- * Calculate the download rate as a moving average.
- */
+// Calculate the download rate as a moving average.
 func (d *TorrentDownload) Rate() float64 {
   d.rateLock.Lock()
   defer d.rateLock.Unlock()
@@ -331,11 +317,9 @@ func (d *TorrentDownload) updateRate() {
   }
 }
 
-/**
- * We moved some of the responsibility in 'MultiDownload.py',
- * 'download.py' and 'RequestManager.py' in the downloader as we only
- * need a struct which references the list of connections.
- */
+// We moved some of the responsibility in 'MultiDownload.py',
+// 'download.py' and 'RequestManager.py' in the downloader as we only
+// need a struct which references the list of connections.
 func (d *TorrentDownload) lost() {
   for _, conn := range d.Manager.Downloads() {
     // We try to request more pieces only if the connection is not choked

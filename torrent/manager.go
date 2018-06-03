@@ -4,8 +4,10 @@ import (
   "sync"
 )
 
+// A manager is a central concurrent-safe connection keeper.
 type Manager interface {
   AddConnector(conn *Connector)
+  
   Uploads() []Upload
   Downloads() []Download
 }
