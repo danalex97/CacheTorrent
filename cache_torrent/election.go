@@ -3,7 +3,7 @@ package cache_torrent
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
-  
+
   "sync"
   "sort"
 )
@@ -42,6 +42,22 @@ func (e *Election) Recv(m interface {}) {
   case Candidate:
     e.RegisterCandidate(candidate)
   }
+}
+
+func (e *Election) RemoveCandidate(toRemove Candidate) {
+  e.Lock()
+  defer e.Unlock()
+
+  as := getAS(toRemove.Id)
+
+  candidates    := e.candidates[as]
+  newCandidates := []Candidate{}
+  for _, candidate := range candidates {
+    if candidate.Id != toRemove.Id {
+      newCandidates = append(newCandidates, candidate)
+    }
+  }
+  e.candidates[as] = newCandidates
 }
 
 func (e *Election) RegisterCandidate(candidate Candidate) {
