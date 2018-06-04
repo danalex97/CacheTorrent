@@ -23,6 +23,9 @@ func NewPeerProxy(util TorrentNodeUtil, id string, piecesFrom, piecesTo int) *Pe
     piecesTo   : piecesTo,
   }
 
+  proxy.Peer      = proxy.Peer.New(util).(*cache_torrent.Peer)
+  proxy.Transport = NewTransportProxy(proxy.Transport, id) 
+
   return proxy
 }
 
