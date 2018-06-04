@@ -131,5 +131,5 @@ func (t *Tracker) seedRequest(req SeedReq) SeedRes {
       }
     }
   }
-  panic("Seed request: from ID not found!")
+  panic("Seed request: from " + req.From + " not found!")
 }

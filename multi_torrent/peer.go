@@ -8,6 +8,7 @@ import (
   "github.com/danalex97/nfsTorrent/config"
 
   "strconv"
+  "reflect"
   "fmt"
 )
 
@@ -59,7 +60,7 @@ func (p *MultiPeer) OnJoin() {
 
     // Register new peer proxy
     peer := NewPeerProxy(p.util, internalId, piecesFrom, piecesTo)
-    p.peers[peer.Id] = peer
+    p.peers[internalId] = peer
   }
 
   go func() {
@@ -78,8 +79,21 @@ func (p *MultiPeer) OnJoin() {
   }()
 }
 
+func (p *MultiPeer) getId(m interface {}) string {
+  switch msg := m.(type) {
+  case cache_torrent.Leaders:
+    if len(msg.Ids) == 0 {
+      return ""
+    } else {
+      return msg.Ids[0]
+    }
+  default:
+    return p.Peer.GetId(m)
+  }
+}
+
 func (p *MultiPeer) Bind(m interface {}) int {
-  id := p.GetId(m)
+  id := InternId(p.getId(m))
   if peer, ok := p.peers[id]; ok {
     return peer.Bind(m)
   } else {
@@ -99,15 +113,15 @@ func (p *MultiPeer) Bind(m interface {}) int {
       }
       return ret
     default:
+      fmt.Println("Unexpected messsage.", m, reflect.TypeOf(m).String())
       return 0
-      fmt.Println("Unexpected messsage.")
     }
   }
   return 0
 }
 
 func (p *MultiPeer) Process(m interface {}, state int) {
-  id := p.GetId(m)
+  id := InternId(p.getId(m))
   if peer, ok := p.peers[id]; ok {
     peer.Process(m, state)
   }

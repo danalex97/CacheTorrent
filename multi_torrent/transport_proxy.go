@@ -16,6 +16,13 @@ func FullId(id string, id2 string) string {
   return id + ":" + id2
 }
 
+func InternId(id string) string {
+  if !strings.Contains(id, ":") {
+    return ""
+  }
+  return strings.Split(id, ":")[1]
+}
+
 type StripProxy struct {
   Transport
 }

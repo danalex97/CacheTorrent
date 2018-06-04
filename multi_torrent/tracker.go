@@ -45,6 +45,10 @@ func (t *MultiTracker) Recv(m interface {}) {
       t.joined[id] = true
       t.Join(torrent.Join{id}, t.Neighbours)
     }
+  case torrent.SeedReq:
+    t.Tracker.Recv(torrent.SeedReq{
+      From : ExternId(msg.From),
+    })
   default:
     t.Tracker.Recv(m)
   }
