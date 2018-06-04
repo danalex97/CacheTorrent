@@ -76,5 +76,12 @@ func (p *MultiPeer) OnJoin() {
   }()
 }
 
-func (p *MultiPeer) OnLeave() {
+func (p *MultiPeer) Bind(m interface {}) int {
+  id := p.GetId(m)
+  return p.peers[id].Bind(m)
+}
+
+func (p *MultiPeer) Process(m interface {}, state int) {
+  id := p.GetId(m)
+  p.peers[id].Process(m, state)
 }

@@ -15,21 +15,21 @@ func NewTransportProxy(t Transport) *TransportProxy {
   }
 }
 
-func ConvertId(id string) string {
+func ExternId(id string) string {
   if !strings.Contains(id, ":") {
     return id
   }
-  return strings.Split(id, ":")[1]
+  return strings.Split(id, ":")[0]
 }
 
 func (t *TransportProxy) Connect(id string) Link {
-  return t.Transport.Connect(ConvertId(id))
+  return t.Transport.Connect(ExternId(id))
 }
 
 func (t *TransportProxy) ControlPing(id string) bool {
-  return t.Transport.ControlPing(ConvertId(id))
+  return t.Transport.ControlPing(ExternId(id))
 }
 
 func (t *TransportProxy) ControlSend(id string, m interface {}) {
-  t.Transport.ControlSend(ConvertId(id), m)
+  t.Transport.ControlSend(ExternId(id), m)
 }
