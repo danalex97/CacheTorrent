@@ -7,7 +7,7 @@ import (
 
   "runtime"
   "reflect"
-  "fmt"
+  // "fmt"
 )
 
 var inPeers  config.Const = config.NewConst(config.InPeers)
@@ -175,7 +175,7 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
     // Process all pending messages
     any := false
     for _, m := range messages {
-      fmt.Println(reflect.TypeOf(m).String(), m)
+      // fmt.Println(reflect.TypeOf(m).String(), m)
 
       state := bind(m)
       if state != BindNone {
@@ -269,7 +269,7 @@ func (p *Peer) Run(connAdd ConnAdder) {
   // Make per peer components.
   p.Storage   = NewStorage(p.Id, p.Pieces, p.Time)
   p.Picker    = NewPicker(p.Storage)
-  p.Transport = p.Transport
+  // p.Transport = p.Transport
   p.Manager   = NewConnectionManager()
   p.Choker    = NewChoker(p.Manager, p.Time)
 

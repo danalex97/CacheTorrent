@@ -124,5 +124,11 @@ func (p *MultiPeer) Process(m interface {}, state int) {
   id := InternId(p.getId(m))
   if peer, ok := p.peers[id]; ok {
     peer.Process(m, state)
+  } else {
+    // Broadcast the message if it is not adressed to
+    // a particular node
+    for _, peer := range p.peers {
+      peer.Process(m, state)
+    }
   }
 }
