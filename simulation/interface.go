@@ -65,7 +65,7 @@ type SimulatedMultiNode struct {
 func (s *SimulatedMultiNode) New(util TorrentNodeUtil) TorrentNode {
   if util.Join() == "" {
     // This will be replaced with the new tracker
-    return new(cache_torrent.Tracker).New(util)
+    return new(multi_torrent.MultiTracker).New(util)
   } else {
     config.Config.SharedInit()
     return new(multi_torrent.MultiPeer).New(util)

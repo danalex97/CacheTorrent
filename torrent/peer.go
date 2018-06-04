@@ -7,6 +7,7 @@ import (
 
   "runtime"
   "reflect"
+  "fmt"
 )
 
 var inPeers  config.Const = config.NewConst(config.InPeers)
@@ -174,6 +175,8 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
     // Process all pending messages
     any := false
     for _, m := range messages {
+      fmt.Println(reflect.TypeOf(m).String(), m)
+
       state := bind(m)
       if state != BindNone {
         any = true

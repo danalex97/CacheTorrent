@@ -4,6 +4,7 @@ import (
   . "github.com/danalex97/Speer/interfaces"
 
   "github.com/danalex97/nfsTorrent/cache_torrent"
+  "github.com/danalex97/nfsTorrent/torrent"
   "github.com/danalex97/nfsTorrent/log"
 )
 
@@ -37,5 +38,13 @@ func (p *PeerProxy) Init(trackerId string) {
 
   log.Println("MultiTorrent node", p.Id, "started with tracker", p.Tracker)
 
-  // p.Transport.ControlSend(p.Tracker, Join{p.Id})
+  p.Transport.ControlSend(p.Tracker, Join{p.Id})
+}
+
+func (p *PeerProxy) SetPieces(pieces []torrent.PieceMeta) {
+  for _, piece := range pieces {
+    if piece.Index >= p.piecesFrom && piece.Index < p.piecesTo {
+      p.Pieces = append(p.Pieces, piece)
+    }
+  }
 }

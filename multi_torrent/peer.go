@@ -4,9 +4,11 @@ import (
   . "github.com/danalex97/Speer/interfaces"
 
   "github.com/danalex97/nfsTorrent/cache_torrent"
+  "github.com/danalex97/nfsTorrent/torrent"
   "github.com/danalex97/nfsTorrent/config"
 
   "strconv"
+  "fmt"
 )
 
 var pieceNumber config.Const = config.NewConst(config.Pieces)
@@ -78,10 +80,35 @@ func (p *MultiPeer) OnJoin() {
 
 func (p *MultiPeer) Bind(m interface {}) int {
   id := p.GetId(m)
-  return p.peers[id].Bind(m)
+  if peer, ok := p.peers[id]; ok {
+    return peer.Bind(m)
+  } else {
+    switch m.(type) {
+    case torrent.TrackerReq:
+      return p.Peer.Bind(m)
+    case torrent.SeedRes:
+      ret := p.Peer.Bind(m)
+      for _, peer := range p.peers {
+        peer.SetPieces(p.Pieces)
+      }
+      return ret
+    case cache_torrent.Neighbours:
+      ret := p.Peer.Bind(m)
+      for _, peer := range p.peers {
+        peer.Ids = p.Ids
+      }
+      return ret
+    default:
+      return 0
+      fmt.Println("Unexpected messsage.")
+    }
+  }
+  return 0
 }
 
 func (p *MultiPeer) Process(m interface {}, state int) {
   id := p.GetId(m)
-  p.peers[id].Process(m, state)
+  if peer, ok := p.peers[id]; ok {
+    peer.Process(m, state)
+  }
 }
