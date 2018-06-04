@@ -39,9 +39,6 @@ func (t *MultiTracker) Recv(m interface {}) {
   case torrent.Join:
     // We ignore torrent.Join messages
   case Join:
-    // Notify the election
-    t.election.NewJoin(msg.Id)
-
     // We do not repeat the join messages
     id := ExternId(msg.Id)
     if _, ok := t.joined[id]; !ok {
@@ -57,6 +54,8 @@ func (t *MultiTracker) Recv(m interface {}) {
 
 func (t *MultiTracker) Neighbours(id string) interface {} {
   ids := (t.Tracker.Neighbours(id)).(torrent.Neighbours).Ids
+
+  t.election.NewJoin(id)
 
   // Keep message type compatible with cache_torrent protocol
   return cache_torrent.Neighbours{

@@ -95,7 +95,7 @@ func (p *MultiPeer) Bind(m interface {}) int {
     case cache_torrent.Neighbours:
       ret := p.Peer.Bind(m)
       for _, peer := range p.peers {
-        peer.Ids = p.Ids
+        peer.SetIds(p.Ids)
       }
       return ret
     default:

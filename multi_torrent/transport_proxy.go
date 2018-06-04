@@ -22,6 +22,10 @@ func ExternId(id string) string {
   return strings.Split(id, ":")[0]
 }
 
+func FullId(id string, id2 string) string {
+  return id + ":" + id2
+}
+
 func (t *TransportProxy) Connect(id string) Link {
   return t.Transport.Connect(ExternId(id))
 }

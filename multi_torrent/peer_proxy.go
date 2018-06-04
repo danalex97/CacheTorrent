@@ -27,7 +27,7 @@ func NewPeerProxy(util TorrentNodeUtil, id string, piecesFrom, piecesTo int) *Pe
 
   proxy.Peer      = proxy.Peer.New(util).(*cache_torrent.Peer)
 
-  proxy.Id        = proxy.Id + ":" + id
+  proxy.Id        = FullId(proxy.Id, id)
   proxy.Transport = NewTransportProxy(proxy.Transport)
 
   return proxy
@@ -46,5 +46,11 @@ func (p *PeerProxy) SetPieces(pieces []torrent.PieceMeta) {
     if piece.Index >= p.piecesFrom && piece.Index < p.piecesTo {
       p.Pieces = append(p.Pieces, piece)
     }
+  }
+}
+
+func (p *PeerProxy) SetIds(ids []string) {
+  for _, id := range ids {
+    p.Ids = append(p.Ids, FullId(id, p.id))
   }
 }

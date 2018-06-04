@@ -4,7 +4,7 @@ import (
   . "github.com/danalex97/Speer/interfaces"
 
   "github.com/danalex97/nfsTorrent/cache_torrent"
-  "fmt"
+  "strconv"
 )
 
 type MultiElection struct {
@@ -26,6 +26,9 @@ func (e *MultiElection) Run() {
 }
 
 func (e *MultiElection) NewJoin(id string) {
+  for i, election := range e.elections {
+    election.NewJoin(FullId(id, strconv.Itoa(i)))
+  }
 }
 
 func (e *MultiElection) Recv(m interface {}) {
@@ -36,5 +39,7 @@ func (e *MultiElection) Recv(m interface {}) {
 }
 
 func (e *MultiElection) RegisterCandidate(candidate cache_torrent.Candidate) {
-  fmt.Println(candidate)
+  for _, election := range e.elections {
+    election.RegisterCandidate(candidate)
+  }
 }
