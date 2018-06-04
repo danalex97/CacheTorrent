@@ -5,16 +5,6 @@ import (
   "strings"
 )
 
-type TransportProxy struct {
-  Transport
-}
-
-func NewTransportProxy(t Transport) *TransportProxy {
-  return &TransportProxy{
-    Transport : t,
-  }
-}
-
 func ExternId(id string) string {
   if !strings.Contains(id, ":") {
     return id
@@ -26,14 +16,24 @@ func FullId(id string, id2 string) string {
   return id + ":" + id2
 }
 
-func (t *TransportProxy) Connect(id string) Link {
+type StripProxy struct {
+  Transport
+}
+
+func NewStripProxy(t Transport) *StripProxy {
+  return &StripProxy{
+    Transport : t,
+  }
+}
+
+func (t *StripProxy) Connect(id string) Link {
   return t.Transport.Connect(ExternId(id))
 }
 
-func (t *TransportProxy) ControlPing(id string) bool {
+func (t *StripProxy) ControlPing(id string) bool {
   return t.Transport.ControlPing(ExternId(id))
 }
 
-func (t *TransportProxy) ControlSend(id string, m interface {}) {
+func (t *StripProxy) ControlSend(id string, m interface {}) {
   t.Transport.ControlSend(ExternId(id), m)
 }

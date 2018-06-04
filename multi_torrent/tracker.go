@@ -18,7 +18,7 @@ func (t *MultiTracker) New(util TorrentNodeUtil) TorrentNode {
   tracker := new(MultiTracker)
 
   tracker.Tracker   = (tracker.Tracker.New(util)).(*torrent.Tracker)
-  tracker.Transport = NewTransportProxy(tracker.Transport)
+  tracker.Transport = NewStripProxy(tracker.Transport)
 
   tracker.election = NewMultiElection(
     MultiPeerMembers,

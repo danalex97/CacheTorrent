@@ -8,16 +8,23 @@ import (
 )
 
 type MultiElection struct {
-  elections []*cache_torrent.Election
+  limit int
+  nodes int
+
+  elections map[string]*cache_torrent.Election
 }
 
 func NewMultiElection(elections int, limit int, transport Transport) *MultiElection {
   e := &MultiElection{
-    elections : []*cache_torrent.Election{},
+    limit : limit,
+    nodes : 0,
+
+    elections : make(map[string]*cache_torrent.Election),
   }
 
+  proxy := NewStripProxy(transport)
   for i := 0; i < elections; i++ {
-    e.elections = append(e.elections, cache_torrent.NewElection(limit, transport))
+    e.elections[strconv.Itoa(i)] = cache_torrent.NewElection(limit, proxy)
   }
   return e
 }
@@ -27,7 +34,7 @@ func (e *MultiElection) Run() {
 
 func (e *MultiElection) NewJoin(id string) {
   for i, election := range e.elections {
-    election.NewJoin(FullId(id, strconv.Itoa(i)))
+    election.NewJoin(FullId(id, i))
   }
 }
 
@@ -39,7 +46,16 @@ func (e *MultiElection) Recv(m interface {}) {
 }
 
 func (e *MultiElection) RegisterCandidate(candidate cache_torrent.Candidate) {
-  for _, election := range e.elections {
-    election.RegisterCandidate(candidate)
+  e.nodes++
+  for i, election := range e.elections {
+    election.RegisterCandidate(cache_torrent.Candidate{
+      Id   : FullId(candidate.Id, i),
+      Up   : candidate.Up,
+      Down : candidate.Down,
+    })
+
+    if e.nodes == e.limit {
+
+    }
   }
 }
