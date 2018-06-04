@@ -52,7 +52,7 @@ func (p *MultiPeer) OnJoin() {
 
     // Register new peer proxy
     peer := NewPeerProxy(p.util, internalId, piecesFrom, piecesTo)
-    p.peers[peer.FullId()] = peer
+    p.peers[peer.Id] = peer
   }
 }
 
