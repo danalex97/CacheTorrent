@@ -44,16 +44,27 @@ func (e *Election) Recv(m interface {}) {
   }
 }
 
-func (e *Election) RemoveCandidate(toRemove Candidate) {
+func (e *Election) GetElected() []string {
   e.Lock()
   defer e.Unlock()
 
-  as := getAS(toRemove.Id)
+  allElected := []string{}
+  for _, elected := range e.elected {
+    allElected = append(allElected, elected...)
+  }
+  return allElected
+}
+
+func (e *Election) RemoveCandidate(toRemove string) {
+  e.Lock()
+  defer e.Unlock()
+
+  as := getAS(toRemove)
 
   candidates    := e.candidates[as]
   newCandidates := []Candidate{}
   for _, candidate := range candidates {
-    if candidate.Id != toRemove.Id {
+    if candidate.Id != toRemove {
       newCandidates = append(newCandidates, candidate)
     }
   }

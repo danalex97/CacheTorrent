@@ -55,7 +55,15 @@ func (e *MultiElection) RegisterCandidate(candidate cache_torrent.Candidate) {
     })
 
     if e.nodes == e.limit {
-
+      // Eliminate the already elected candidates
+      toRemove := election.GetElected()
+      for j, curr := range e.elections {
+        if i != j {
+          for _, id := range toRemove {
+            curr.RemoveCandidate(FullId(ExternId(id), j))
+          }
+        }
+      }
     }
   }
 }
