@@ -7,6 +7,7 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
   "github.com/danalex97/nfsTorrent/cache_torrent"
   "github.com/danalex97/nfsTorrent/bias_torrent"
+  "github.com/danalex97/nfsTorrent/multi_torrent"
 )
 
 type SimulatedNode struct {
@@ -55,5 +56,18 @@ func (s *SimulatedBiasedCachedNode) New(util TorrentNodeUtil) TorrentNode {
   } else {
     config.Config.SharedInit()
     return new(cache_torrent.Peer).New(util)
+  }
+}
+
+type SimulatedMultiNode struct {
+}
+
+func (s *SimulatedMultiNode) New(util TorrentNodeUtil) TorrentNode {
+  if util.Join() == "" {
+    // This will be replaced with the new tracker
+    return new(cache_torrent.Tracker).New(util)
+  } else {
+    config.Config.SharedInit()
+    return new(multi_torrent.MultiPeer).New(util)
   }
 }

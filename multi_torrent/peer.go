@@ -28,10 +28,14 @@ type MultiPeer struct {
 }
 
 func (p *MultiPeer) New(util TorrentNodeUtil) TorrentNode {
-  return &MultiPeer{
+  multiPeer := &MultiPeer{
     peers : make(map[string]*PeerProxy),
     util  : util,
   }
+
+  multiPeer.Peer = multiPeer.Peer.New(util).(*cache_torrent.Peer)
+
+  return multiPeer
 }
 
 func (p *MultiPeer) OnJoin() {
@@ -39,6 +43,7 @@ func (p *MultiPeer) OnJoin() {
     return
   }
 
+  // Build all the PeerProxies
   totalPieceNbr := pieceNumber.Int()
   pieceNbr      := totalPieceNbr / MultiPeerMembers
   for i := 0; i < MultiPeerMembers; i++ {
@@ -54,6 +59,21 @@ func (p *MultiPeer) OnJoin() {
     peer := NewPeerProxy(p.util, internalId, piecesFrom, piecesTo)
     p.peers[peer.Id] = peer
   }
+
+  go func() {
+    // We initalize the Tracker requests only once
+    p.Init()
+
+    // Since Join messages will be ignored by the new Tracker,
+    // we will run the initialization for the PeerProxies
+    for _, proxy := range p.peers {
+      proxy.Init(p.Tracker)
+    }
+
+    // Start checking messages and redirecting them to the
+    // respective PeerProxy
+    go p.CheckMessages(p.Bind, p.Process)
+  }()
 }
 
 func (p *MultiPeer) OnLeave() {

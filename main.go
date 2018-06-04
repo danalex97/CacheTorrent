@@ -94,6 +94,12 @@ var parallel = flag.Bool(
   "Run the simulator's event queue with support for parallel events.",
 )
 
+var multi = flag.Int(
+  "multi",
+  MaxInt,
+  "The number of subnodes of a virtual node as part of the extension for CacheTorrent protocol.",
+)
+
 var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to `file`.")
 var memprofile = flag.String("memprofile", "", "Write memory profile to `file`.")
 
@@ -193,12 +199,17 @@ func main() {
       template = new(simulation.SimulatedBiasedNode)
     }
   } else {
-    if *biased == MaxInt {
-      template = new(simulation.SimulatedCachedNode)
-      fmt.Println("Running with extension.")
+    if *multi == MaxInt {
+      if *biased == MaxInt {
+        template = new(simulation.SimulatedCachedNode)
+        fmt.Println("Running with CacheTorrent extension.")
+      } else {
+        template = new(simulation.SimulatedBiasedCachedNode)
+        fmt.Println("Running with CacheTorrent extension and biased selection.")
+      }
     } else {
-      template = new(simulation.SimulatedBiasedCachedNode)
-      fmt.Println("Running with extension and biased selection.")
+      template = new(simulation.SimulatedMultiNode)
+      fmt.Println("Running with multiTorrent extension.")
     }
   }
 

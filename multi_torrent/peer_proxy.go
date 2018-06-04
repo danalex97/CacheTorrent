@@ -4,6 +4,7 @@ import (
   . "github.com/danalex97/Speer/interfaces"
 
   "github.com/danalex97/nfsTorrent/cache_torrent"
+  "github.com/danalex97/nfsTorrent/log"
 )
 
 type PeerProxy struct {
@@ -29,4 +30,12 @@ func NewPeerProxy(util TorrentNodeUtil, id string, piecesFrom, piecesTo int) *Pe
   proxy.Transport = NewTransportProxy(proxy.Transport)
 
   return proxy
+}
+
+func (p *PeerProxy) Init(trackerId string) {
+  p.Tracker = trackerId
+
+  log.Println("MultiTorrent node", p.Id, "started with tracker", p.Tracker)
+
+  // p.Transport.ControlSend(p.Tracker, Join{p.Id})
 }
