@@ -8,7 +8,8 @@ import (
 )
 
 type MultiTracker struct {
-  election *cache_torrent.Election
+  election *MultiElection
+  joined   map[string]bool
 
   *torrent.Tracker
 }
@@ -19,7 +20,11 @@ func (t *MultiTracker) New(util TorrentNodeUtil) TorrentNode {
   tracker.Tracker   = (tracker.Tracker.New(util)).(*torrent.Tracker)
   tracker.Transport = NewTransportProxy(tracker.Transport)
 
-  tracker.election = cache_torrent.NewElection(tracker.Limit, tracker.Transport)
+  tracker.election = NewMultiElection(
+    MultiPeerMembers,
+    tracker.Limit,
+    tracker.Transport)
+  tracker.joined   = make(map[string]bool)
 
   return tracker
 }
@@ -34,8 +39,15 @@ func (t *MultiTracker) Recv(m interface {}) {
   case torrent.Join:
     // We ignore torrent.Join messages
   case Join:
-    // Override the Neighbours method so we can send the notify the election.
-    t.Join(torrent.Join{msg.Id}, t.Neighbours)
+    // Notify the election
+    t.election.NewJoin(msg.Id)
+
+    // We do not repeat the join messages
+    id := ExternId(msg.Id)
+    if _, ok := t.joined[id]; !ok {
+      t.joined[id] = true
+      t.Join(torrent.Join{id}, t.Neighbours)
+    }
   default:
     t.Tracker.Recv(m)
   }
@@ -45,9 +57,6 @@ func (t *MultiTracker) Recv(m interface {}) {
 
 func (t *MultiTracker) Neighbours(id string) interface {} {
   ids := (t.Tracker.Neighbours(id)).(torrent.Neighbours).Ids
-
-  // Notify the election.
-  t.election.NewJoin(id)
 
   // Keep message type compatible with cache_torrent protocol
   return cache_torrent.Neighbours{
