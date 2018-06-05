@@ -15,6 +15,8 @@ type PeerProxy struct {
 
   piecesFrom int
   piecesTo   int
+
+  bind bool
 }
 
 func NewPeerProxy(util TorrentNodeUtil, id string, piecesFrom, piecesTo int) *PeerProxy {
@@ -23,6 +25,8 @@ func NewPeerProxy(util TorrentNodeUtil, id string, piecesFrom, piecesTo int) *Pe
 
     piecesFrom : piecesFrom,
     piecesTo   : piecesTo,
+
+    bind : false,
   }
 
   proxy.Peer      = proxy.Peer.New(util).(*cache_torrent.Peer)
@@ -42,6 +46,7 @@ func (p *PeerProxy) Init(trackerId string) {
 }
 
 func (p *PeerProxy) SetPieces(pieces []torrent.PieceMeta) {
+  p.Pieces = []torrent.PieceMeta{}
   for _, piece := range pieces {
     if piece.Index >= p.piecesFrom && piece.Index < p.piecesTo {
       p.Pieces = append(p.Pieces, piece)
@@ -52,5 +57,17 @@ func (p *PeerProxy) SetPieces(pieces []torrent.PieceMeta) {
 func (p *PeerProxy) SetIds(ids []string) {
   for _, id := range ids {
     p.Ids = append(p.Ids, FullId(id, p.id))
+  }
+}
+
+func (p *PeerProxy) Process(m interface {}, state int) {
+  switch state {
+  case torrent.BindRun:
+    if !p.bind {
+      p.bind = true
+      p.Run(p.AddConnector)
+    }
+  case torrent.BindRecv:
+    p.RunRecv(p.GetId(m), m, p.AddConnector)
   }
 }

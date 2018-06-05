@@ -43,5 +43,7 @@ func JSONConfig(path string) *Conf {
   conf.Latency  = false
   conf.Parallel = false
 
+  conf.StoragePieces = conf.Pieces
+
   return &conf
 }

@@ -13,8 +13,7 @@ import (
 )
 
 var pieceNumber config.Const = config.NewConst(config.Pieces)
-
-var MultiPeerMembers int = 1
+var multi       config.Const = config.NewConst(config.Multi)
 
 // A MultiPeer is wrapper over multiple Peers which follow the CacheTorrent
 // protocol. The Original message IDs are decorated with an internal ID, each
@@ -48,8 +47,8 @@ func (p *MultiPeer) OnJoin() {
 
   // Build all the PeerProxies
   totalPieceNbr := pieceNumber.Int()
-  pieceNbr      := totalPieceNbr / MultiPeerMembers
-  for i := 0; i < MultiPeerMembers; i++ {
+  pieceNbr      := totalPieceNbr / multi.Int()
+  for i := 0; i < multi.Int(); i++ {
     piecesFrom := pieceNbr * i
     piecesTo   := piecesFrom + pieceNbr
     if totalPieceNbr < piecesTo {

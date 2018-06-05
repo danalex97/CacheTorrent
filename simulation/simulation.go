@@ -27,9 +27,9 @@ func NewSimulation(template interface {}, newConfig *config.Conf) Simulation {
   capBuilder := builder.
     WithDefaultQueryGenerator().
     WithLimitedNodes(config.Config.MinNodes + 1).
-    WithProgress(
-      config.Config.AllNodesRun,
-      config.Config.AllNodesRunInterval).
+    // WithProgress(
+    //   config.Config.AllNodesRun,
+    //   config.Config.AllNodesRunInterval).
     //====================================
     WithCapacities().
     WithTransferInterval(

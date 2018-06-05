@@ -54,6 +54,10 @@ type Conf struct {
 
   // Run the simulator's event queue with support for parallel events.
   Parallel bool
+
+  // Multi-Torrent extension
+  Multi         int
+  StoragePieces int
 }
 
 /**

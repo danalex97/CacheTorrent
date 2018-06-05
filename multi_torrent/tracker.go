@@ -21,7 +21,7 @@ func (t *MultiTracker) New(util TorrentNodeUtil) TorrentNode {
   tracker.Transport = NewStripProxy(tracker.Transport)
 
   tracker.election = NewMultiElection(
-    MultiPeerMembers,
+    multi.Int(),
     tracker.Limit,
     tracker.Transport)
   tracker.joined   = make(map[string]bool)

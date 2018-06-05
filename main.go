@@ -96,7 +96,7 @@ var parallel = flag.Bool(
 
 var multi = flag.Int(
   "multi",
-  MaxInt,
+  0,
   "The number of subnodes of a virtual node as part of the extension for CacheTorrent protocol.",
 )
 
@@ -199,7 +199,7 @@ func main() {
       template = new(simulation.SimulatedBiasedNode)
     }
   } else {
-    if *multi == MaxInt {
+    if *multi == 0 {
       if *biased == MaxInt {
         template = new(simulation.SimulatedCachedNode)
         fmt.Println("Running with CacheTorrent extension.")
@@ -227,6 +227,11 @@ func main() {
 
         if *pieces != MaxInt {
           c.Pieces = *pieces
+        }
+
+        if *multi != 0 {
+          c.Multi         = *multi
+          c.StoragePieces = c.Pieces / c.Multi
         }
 
         if *pieceSize != MaxInt {
