@@ -4,7 +4,6 @@ import (
   "github.com/danalex97/nfsTorrent/config"
   "github.com/danalex97/nfsTorrent/log"
   "sync"
-  "fmt"
 )
 
 var pieceNumber config.Const = config.NewConst(config.StoragePieces)
@@ -38,9 +37,6 @@ func NewStorage(id string, pieces []PieceMeta, time func() int) Storage {
   storage.completed = false
   storage.time = time
 
-  if len(pieces) > 0 {
-    fmt.Println(id, "Pieces: ", len(pieces))
-  }
   storage.pieces = make(map[int]PieceMeta)
   for _, p := range pieces {
     storage.pieces[p.Index] = p

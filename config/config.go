@@ -58,6 +58,9 @@ type Conf struct {
   // Multi-Torrent extension
   Multi         int
   StoragePieces int
+
+  // Choker strategy(e.g. TitForTat, Random)
+  ChokerStrategy string
 }
 
 /**

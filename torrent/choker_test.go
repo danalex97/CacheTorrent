@@ -1,6 +1,7 @@
 package torrent
 
 import (
+  "github.com/danalex97/nfsTorrent/config"
   "testing"
 )
 
@@ -9,8 +10,13 @@ type mockConst struct {
   value interface {}
 }
 
+func init() {
+  strategy = &mockConst{config.TitForTat}
+}
+
 func (c *mockConst) Ref() interface {} { return c.value }
 func (c *mockConst) Int() int          { return c.value.(int) }
+func (c *mockConst) String() string    { return c.value.(string) }
 
 type mockChoker struct {
   interestedCalled    bool

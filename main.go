@@ -100,6 +100,12 @@ var multi = flag.Int(
   "The number of subnodes of a virtual node as part of the extension for CacheTorrent protocol.",
 )
 
+var choker = flag.String(
+  "choker",
+  "TitForTat",
+  "The strategy used by the Choker. We support TitForTat and Random.",
+)
+
 var cpuprofile = flag.String("cpuprofile", "", "Write cpu profile to `file`.")
 var memprofile = flag.String("memprofile", "", "Write memory profile to `file`.")
 
@@ -219,11 +225,13 @@ func main() {
     config.
       JSONConfig(*confPath).
       WithParams(func(c *config.Conf) {
-        c.Bias          = *biased
-        c.LeaderPercent = *extension
-        c.Latency       = *latency
+        c.Bias           = *biased
+        c.LeaderPercent  = *extension
+        c.Latency        = *latency
 
-        c.Parallel      = *parallel
+        c.Parallel       = *parallel
+
+        c.ChokerStrategy = *choker
 
         if *pieces != MaxInt {
           c.Pieces        = *pieces

@@ -6,8 +6,9 @@ import (
 )
 
 type Const interface {
-  Ref() interface {}
-  Int()  int
+  Ref()    interface {}
+  Int()    int
+  String() string
 }
 
 type constant struct {
@@ -52,6 +53,10 @@ func (c *constant) Int() int {
   return c.Ref().(int)
 }
 
+func (c *constant) String() string {
+  return c.Ref().(string)
+}
+
 /**
  * Constant values to pass to "config.NewConst".
  */
@@ -77,3 +82,8 @@ const AllNodesRun string = "AllNodesRun"
 
 const Multi string = "Multi"
 const StoragePieces string = "StoragePieces"
+
+const ChokerStrategy string = "ChokerStrategy"
+// Choker strategies
+const TitForTat string = "TitForTat"
+const Random    string = "Random"

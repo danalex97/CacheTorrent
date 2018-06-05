@@ -13,6 +13,8 @@ var uploads     config.Const = config.NewConst(config.Uploads)
 var optimistics config.Const = config.NewConst(config.Optimistics)
 var interval    config.Const = config.NewConst(config.Interval)
 
+var strategy config.Const = config.NewConst(config.ChokerStrategy)
+
 // A Choker is a structure which periodically chokes and unchokes connections
 // based on the Tit-for-Tat strategy. When an Upload component is unchoked,
 // the respective upload component is allowed to upload new pieces to other
@@ -77,33 +79,53 @@ func (c *choker) rechoke() {
     }
   }
 
-  // Sort the choked connections
-  sort.Sort(byRate(interested))
+  if strategy.String() == config.Random {
+    // -- Random strategy --
+    // We choose the optimistics randomly for simplicity of modelling
+    unchoked := uploads.Int() + optimistics.Int()
+    if unchoked > len(interested) {
+      unchoked = len(interested)
+    }
 
-  // If we want to consider the seeds, we should use 2 separate lists.
+    // Unchoke randomly from the interested connections
+    perm := rand.Perm(len(interested))
+    for i := 0; i < unchoked; i++ {
+      interested[perm[i]].Unchoke()
+    }
+    for i := unchoked; i < len(interested); i++ {
+      interested[perm[i]].Choke()
+    }
+  } else {
+    // -- TitForTat strategy --
 
-  // Unchoke the pereferred connections
-  unchoked := uploads.Int()
-  if unchoked > len(interested) {
-    unchoked = len(interested)
-  }
-  for i := 0; i < unchoked; i++ {
-    interested[i].Unchoke()
-  }
+    // Sort the choked connections
+    sort.Sort(byRate(interested))
 
-  // Chocke the rest and handle optimistics
-  rest := interested[unchoked:]
-  unchoked = optimistics.Int()
-  if unchoked > len(rest) {
-    unchoked = len(rest)
-  }
-  // We choose the optimistics randomly for simplicity of modelling
-  perm := rand.Perm(len(rest))
-  for i := 0; i < unchoked; i++ {
-    rest[perm[i]].Unchoke()
-  }
-  for i := unchoked; i < len(rest); i++ {
-    rest[perm[i]].Choke()
+    // If we want to consider the seeds, we should use 2 separate lists.
+
+    // Unchoke the pereferred connections
+    unchoked := uploads.Int()
+    if unchoked > len(interested) {
+      unchoked = len(interested)
+    }
+    for i := 0; i < unchoked; i++ {
+      interested[i].Unchoke()
+    }
+
+    // Chocke the rest and handle optimistics
+    rest := interested[unchoked:]
+    unchoked = optimistics.Int()
+    if unchoked > len(rest) {
+      unchoked = len(rest)
+    }
+    // We choose the optimistics randomly for simplicity of modelling
+    perm := rand.Perm(len(rest))
+    for i := 0; i < unchoked; i++ {
+      rest[perm[i]].Unchoke()
+    }
+    for i := unchoked; i < len(rest); i++ {
+      rest[perm[i]].Choke()
+    }
   }
 }
 
