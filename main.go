@@ -167,7 +167,7 @@ func main() {
   signal.Notify(c, os.Interrupt)
   go func(){
     for sig := range c {
-      fmt.Println("Singal received:", sig)
+      fmt.Println("Signal received:", sig)
       if *cpuprofile != "" {
         pprof.StopCPUProfile()
       }
@@ -239,7 +239,12 @@ func main() {
         }
 
         c.SharedInit = func() {
-          wg.Add(1)
+          if *multi == 0 {
+            wg.Add(1)
+          } else {
+            fmt.Println("Added ", *multi)
+            wg.Add(*multi)
+          }
         }
         c.SharedCallback = func() {
           wg.Done()
@@ -254,7 +259,13 @@ func main() {
   fmt.Println("Init period done.")
 
   // Wait for all nodes to finish.
-  wg.Done()
+  if *multi == 0 {
+    wg.Done()
+  } else {
+    for i := 0; i < *multi; i++ {
+      wg.Done()
+    }
+  }
   wg.Wait()
 
   if *latency {

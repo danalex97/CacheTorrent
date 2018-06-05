@@ -102,7 +102,7 @@ func (s *storage) checkCompleted() {
     }
   }
 
-  if len(s.pieces) == pieceNumber.Int() && !s.completed {
+  if len(s.pieces) >= pieceNumber.Int() && !s.completed {
     // Notify logger
     time := s.time()
     log.LogCompleted(log.Completed{
