@@ -9,6 +9,8 @@ package cache_torrent
 import (
   "github.com/danalex97/nfsTorrent/torrent"
   "github.com/danalex97/nfsTorrent/log"
+
+  "fmt"
 )
 
 type Leader struct {
@@ -31,6 +33,8 @@ func (l *Leader) Run() {
   log.LogLeader(log.Leader{
     Id : l.Id,
   })
+  fmt.Println("New leader:", l.Id)
+
   l.Peer.Run(l.outgoingConnection)
 
   l.Picker = NewPicker(l.Storage)
@@ -41,6 +45,8 @@ func (l *Leader) Recv(m interface {}) {
   case LeaderStart:
     follower := msg.Id
     peer     := msg.Dest
+
+    fmt.Println("Leader start:", follower, peer)
 
     // Make bidirectional connection to follower
     if _, ok := l.Connectors[follower]; !ok {

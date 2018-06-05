@@ -63,9 +63,9 @@ func (p *PeerProxy) Process(m interface {}, state int) {
   case torrent.BindRun:
     if !p.bind {
       p.bind = true
-      p.Run(p.AddConnector)
+      p.Peer.Process(m, state)
     }
   case torrent.BindRecv:
-    p.RunRecv(p.GetId(m), m, p.AddConnector)
+    p.Peer.Process(m, state)
   }
 }

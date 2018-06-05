@@ -151,8 +151,6 @@ func (l *Logger) handlePacket(p Packet) {
 }
 
 func (l *Logger) handleTransfer(t Transfer) {
-  fmt.Println("Transfer", t)
-
   // Support for MultiTorrents
   t.From = stripId(t.From)
   t.To   = stripId(t.To)
