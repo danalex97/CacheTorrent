@@ -62,3 +62,10 @@ func toSlice(mp map[string]int) []int {
   }
   return slice
 }
+
+func stripId(id string) string {
+  if !strings.Contains(id, ":") {
+    return id
+  }
+  return strings.Split(id, ":")[0]
+}
