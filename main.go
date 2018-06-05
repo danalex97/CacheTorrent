@@ -226,7 +226,8 @@ func main() {
         c.Parallel      = *parallel
 
         if *pieces != MaxInt {
-          c.Pieces = *pieces
+          c.Pieces        = *pieces
+          c.StoragePieces = c.Pieces
         }
 
         if *multi != 0 {
