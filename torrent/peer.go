@@ -37,6 +37,10 @@ type Peer struct {
   // Used to keep if logging is on. Logs can be visualized via the vizualtion
   // tool in 'visual' folder.
   logging bool
+
+  // Used to support multiple message arrival(which indirectly offers support
+  // for MultiTorrents)
+  bound bool
 }
 
 type Binder    func(m interface {}) int
@@ -99,6 +103,8 @@ func (p *Peer) New(util TorrentNodeUtil) TorrentNode {
   peer.Connectors = make(map[string]Runner)
 
   peer.Time = util.Time()
+
+  peer.bound = false
 
   return peer
 }
@@ -183,8 +189,11 @@ func (p *Peer) CheckMessages(bind Binder, process Processor) {
       }
 
       if state == BindRun {
-        // Notify the progress properties.
-        progress.Ref().(*config.WGProgress).Add()
+        if !p.bound {
+          // Notify the progress properties.
+          progress.Ref().(*config.WGProgress).Add()
+          p.bound = true
+        }
       }
 
       process(m, state)

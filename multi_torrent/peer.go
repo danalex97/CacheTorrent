@@ -66,6 +66,9 @@ func (p *MultiPeer) OnJoin() {
     // We initalize the Tracker requests only once
     p.Init()
 
+    // Send Join request
+    p.Transport.ControlSend(p.Tracker, Join{p.Id})
+
     // Since Join messages will be ignored by the new Tracker,
     // we will run the initialization for the PeerProxies
     for _, proxy := range p.peers {
@@ -99,18 +102,21 @@ func (p *MultiPeer) Bind(m interface {}) int {
     switch m.(type) {
     case torrent.TrackerReq:
       return p.Peer.Bind(m)
+
     case torrent.SeedRes:
       ret := p.Peer.Bind(m)
       for _, peer := range p.peers {
         peer.SetPieces(p.Pieces)
       }
       return ret
+
     case cache_torrent.Neighbours:
       ret := p.Peer.Bind(m)
       for _, peer := range p.peers {
         peer.SetIds(p.Ids)
       }
       return ret
+
     default:
       fmt.Println("Unexpected messsage.", m, reflect.TypeOf(m).String())
       return 0

@@ -41,8 +41,6 @@ func (p *PeerProxy) Init(trackerId string) {
   p.Tracker = trackerId
 
   log.Println("MultiTorrent node", p.Id, "started with tracker", p.Tracker)
-
-  p.Transport.ControlSend(p.Tracker, Join{p.Id})
 }
 
 func (p *PeerProxy) SetPieces(pieces []torrent.PieceMeta) {

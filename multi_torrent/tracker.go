@@ -9,7 +9,6 @@ import (
 
 type MultiTracker struct {
   election *MultiElection
-  joined   map[string]bool
 
   *torrent.Tracker
 }
@@ -24,7 +23,6 @@ func (t *MultiTracker) New(util TorrentNodeUtil) TorrentNode {
     multi.Int(),
     tracker.Limit,
     tracker.Transport)
-  tracker.joined   = make(map[string]bool)
 
   return tracker
 }
@@ -38,13 +36,9 @@ func (t *MultiTracker) Recv(m interface {}) {
   switch msg := m.(type) {
   case torrent.Join:
     // We ignore torrent.Join messages
+    return
   case Join:
-    // We do not repeat the join messages
-    id := ExternId(msg.Id)
-    if _, ok := t.joined[id]; !ok {
-      t.joined[id] = true
-      t.Join(torrent.Join{id}, t.Neighbours)
-    }
+    t.Join(torrent.Join{msg.Id}, t.Neighbours)
   case torrent.SeedReq:
     t.Tracker.Recv(torrent.SeedReq{
       From : ExternId(msg.From),
