@@ -5,6 +5,8 @@ from flask import Blueprint
 from flask import Flask
 from flask import request
 
+from flask_cors import CORS
+
 class Server():
     """
     A server builder class.
@@ -20,6 +22,8 @@ class Server():
     """
     def __init__(self, name, port):
         self.app = Flask(name)
+        CORS(self.app)
+
         self.name = name
         self.port = port
         self.components = []

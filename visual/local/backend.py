@@ -30,15 +30,21 @@ class Backend:
             }
 
         def process(self, message):
+            print("Job received: {}".format(message))
+            if message is None:
+                return self.fail(message)
             if "log" not in message:
-                fail(message)
+                return self.fail(message)
             log  = message["log"]
-            args = []
+            args = [("log", message["log"])]
 
-            for k, v in message:
+            for k, v in message.items():
                 if k != "log":
                     args.append((k, v))
-            os.system("go run main.go {}".format(format_args(args)))
+
+            command = "go run main.go {}".format(format_args(args))
+            print("> {}".format(command))
+            os.system(command)
 
             return {
                 "ok" : "true",
