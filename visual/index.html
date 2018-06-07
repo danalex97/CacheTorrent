@@ -31,7 +31,7 @@
     <script>
       let mySVG = document.getElementById("mySVG");
       mySVG.setAttribute("width",  10 * window.innerWidth / 12);
-      mySVG.setAttribute("height", 80 * window.innerHeight / 100);
+      mySVG.setAttribute("height", 78 * window.innerHeight / 100);
     </script>
 
     <!-- Scripts -->
@@ -46,7 +46,7 @@
     <script src = "js/main.js"></script>
 
     <div class="row">
-        <div class="col-md-2"></div>
+        <div class="col-md-1"></div>
         <div id="bit" type="button" class="btn btn-primary btn-lg col-md-2">
           BitTorrent</div>
         <div class="col-md-1"></div>
@@ -55,7 +55,39 @@
         <div class="col-md-1"></div>
         <div id="cache" type="button" class="btn btn-primary btn-lg col-md-2">
           CacheTorrent</div>
-        <div class="col-md-2"></div>
+        <div class="col-md-1"></div>
+        <div class="btn-group btn-group-toggle col-md-2" data-toggle="buttons">
+          <label class="btn btn-primary btn-lg active" id="option1">
+            <input type="radio" name="options" autocomplete="off" onclick="handleClick(this);" value="1" >
+              Restart
+            </label>
+          <label class="btn btn-primary btn-lg" id="option2">
+            <input type="radio" name="options" autocomplete="off" onclick="handleClick(this);" value="2">
+              Simulate
+          </label>
+        </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-2"></div>
+      <h1 class="col-md-1 col-align--center"><div id="sliderText" class="btn btn-primary btn-lg">
+        Piece size</div></h1>
+      <div id="sl1" class="slidecontainer col-md-7" style="transform: translateY(100%);">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md-2"></div>
+      <h1 class="col-md-1 col-align--center"><div id="sliderText" class="btn btn-primary btn-lg">
+        Pieces</div></h1>
+      <div id="sl2" class="slidecontainer col-md-7" style="transform: translateY(100%);">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+      </div>
+      <div class="col-md-2"></div>
     </div>
 
     <script src = "js/interaction.js"></script>
