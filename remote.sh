@@ -11,6 +11,14 @@ then
 elif [ "$1" = '--help' ]
 then
   python3 remote/remote.py -h
+elif [ "$1" = "-k" ]
+then
+  echo "Killing all remote jobs..."
+  python3 remote/remote.py -k > /dev/null 2>&1 &
+elif [ "$1" = "--kill" ]
+then
+  echo "Killing all remote jobs..."
+  python3 remote/remote.py -k > /dev/null 2>&1 &
 else
   pid=$$
   echo "Dispaching job: $ARGS"

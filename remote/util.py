@@ -51,6 +51,22 @@ def test_remote(id, host):
     except:
         return False
 
+def kill_remote(id, host):
+    SSH_RUN = """
+    where={id}@{host}
+    ssh -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1 $where "
+      echo 'Killing remote jobs at $where'
+      pkill -9 main
+      echo 'Finished killing jobs at $where'
+      exit
+    "
+    """
+    to_run = SSH_RUN.format(
+        id      = id,
+        host    = host
+    )
+    os.system(to_run)
+
 def run_remote(id, host, command, file, server, port):
     print("Run remote.")
     SSH_RUN = """

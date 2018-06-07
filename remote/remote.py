@@ -5,6 +5,8 @@ from util import random_id
 from util import ID
 from util import KEYS as keys
 
+from kill import kill_all
+
 from coordinator import Coordinator
 
 import os
@@ -54,13 +56,22 @@ if __name__ == "__main__":
         help="Number of times that the job runs.")
     parser.add_argument("-notify", type=int, default=0,
         help="The PID of process to be notified when all jobs were dispached.")
+    parser.add_argument("-k", "--kill", dest='kill', action='store_true',
+        help="Use this flag to kill all remote jobs.")
     parser.add_argument('command', nargs='*')
+    parser.set_defaults(kill=False)
 
     args, command_flags = parser.parse_known_args()
 
     notify  = args.notify
     runs    = args.runs
     name    = args.name
+    kill    = args.kill
+
+    if kill:
+        kill_all()
+        sys.exit(0)
+
     command = " ".join(args.command + command_flags)
 
     print("Running remote command: {}".format(command))
