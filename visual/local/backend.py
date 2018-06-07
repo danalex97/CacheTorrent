@@ -51,7 +51,7 @@ class Backend:
             }
 
     def __init__(self, port=8080):
-        self.server = Server("coordinator", port)
+        self.server = Server("coordinator", port, cors=True)
         self.server.add_component_post("/job", Backend.OnJob(self))
 
     def run(self):

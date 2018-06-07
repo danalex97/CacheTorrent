@@ -20,9 +20,10 @@ class Server():
         .add_component_post("/post_route", post_component)
         .run()
     """
-    def __init__(self, name, port):
+    def __init__(self, name, port, cors=False):
         self.app = Flask(name)
-        CORS(self.app)
+        if cors:
+            CORS(self.app)
 
         self.name = name
         self.port = port
