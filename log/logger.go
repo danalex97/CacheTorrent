@@ -175,6 +175,9 @@ func (l *Logger) handleTransfer(t Transfer) {
 }
 
 func (l *Logger) handleComplete(c Completed) {
+  // Support for MultiTorrents
+  c.Id = stripId(c.Id)
+
   l.times[c.Id] = c.Time
 }
 

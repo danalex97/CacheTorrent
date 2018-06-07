@@ -251,7 +251,6 @@ func main() {
           if *multi == 0 {
             wg.Add(1)
           } else {
-            fmt.Println("Added ", *multi)
             wg.Add(*multi)
           }
         }
