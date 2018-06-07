@@ -6,6 +6,13 @@
   -->
 
   <head>
+    <!-- Style -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous"/>
+
     <!-- Libraries -->
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
@@ -13,9 +20,19 @@
   </head>
 
   <body>
-    <input type="text" id="input" value="logs/cache.json">
+    <input type="text" id="input" style="display: none" value="logs/cache.json">
     <!-- <input type="text" id="input" value="logs/torrent.json"> -->
-    <svg width="960" height="600"></svg>
+    <div class="row">
+      <div class="col-md-1"></div>
+      <svg id="mySVG" class="col-md-10"></svg>
+      <div class="col-md-1"></div>
+    </div>
+
+    <script>
+      let mySVG = document.getElementById("mySVG");
+      mySVG.setAttribute("width",  10 * window.innerWidth / 12);
+      mySVG.setAttribute("height", 80 * window.innerHeight / 100);
+    </script>
 
     <!-- Scripts -->
     <script src = "js/graph.js"></script>
@@ -27,5 +44,18 @@
     <script src = "js/parse.js"></script>
     <script src = "js/feed.js"></script>
     <script src = "js/main.js"></script>
+
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div id="bit" type="button" class="btn btn-primary btn-lg col-md-2">
+          BitTorrent</div>
+        <div class="col-md-1"></div>
+        <div id="bias" type="button" class="btn btn-primary btn-lg col-md-2">
+          BiasTorrent</div>
+        <div class="col-md-1"></div>
+        <div id="cache" type="button" class="btn btn-primary btn-lg col-md-2">
+          CacheTorrent</div>
+        <div class="col-md-2"></div>
+    </div>
   </body>
 </html>

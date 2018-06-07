@@ -1,0 +1,9 @@
+@import url('http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css');
+
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow-x: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
