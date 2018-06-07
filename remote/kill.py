@@ -31,5 +31,8 @@ def kill_all():
     while pool.next() != None:
         pass
 
+def kill_job(name):
+    kill_remote(ID, name)
+
 if __name__ == "__main__":
     kill_all()
