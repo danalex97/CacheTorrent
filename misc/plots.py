@@ -54,88 +54,118 @@ idx = [10, 20, 30, 40, 50]
 pic90 = [2674485.6, 2156115.6, 1803175.2, 1754077.2, 1779010.0]
 pic50 = [2329785.6, 1880715.6, 1461679.8, 1428877.2, 1408510.0]
 
+multi2_90  = [2290000.0, 1810500.0, 1658800.0, 1595500.0, 1565375.0]
+multi2_50  = [1733125.0, 1469500.0, 1383700.0, 1348500.0, 1318250.0]
+multi2_avg = [1812855.7, 1494886.4, 1399024.7, 1364757.1, 1346980.714285714]
+multi2_red = [4.350125405908605, 7.352818223986509, 8.715263940917538, 9.834774046871459, 11.580178429992902]
+
+multi3_90  = [2293250.0, 1785333.3, 1665750.0, 1677333.3, 1731833.3]
+multi3_50  = [1739000.0, 1507833.3, 1436250.0, 1425833.3, 1478455.7]
+multi3_avg = [1819113.2, 1522245.7, 1448213.7, 1449160.9, 1456833.3]
+multi3_red = [4.037169839838482, 6.683063728897484, 8.11444742916304, 9.258826708650659, 10.216138696101217]
+
 from plot import *
 
 plots = [
-	# Intro
-	TimePlot(type="Bias")
-		.plot(idx, bia90, color='black', linestyle='-', label="Biased selection 90th percentile")
-		.plot(idx, bia50, color='black', linestyle='--', label="Biased selection 50th percentile")
-		.plot(idx, bit90, color='black', linestyle='-.', label="BitTorrent 90th percentile")
-		.plot(idx, bit50, color='black', linestyle=':', label="BitTorrent 50th percentile")
-		.save("plots/timeBias.png"),
-	TimePlot(type="Cache")
-		.plot(idx, cac90, color='black', linestyle='-', label="CacheTorrent 90th percentile")
-		.plot(idx, cac50, color='black', linestyle='--', label="CacheTorrent 50th percentile")
-		.plot(idx, bit90, color='black', linestyle='-.', label="BitTorrent 90th percentile")
-		.save("plots/timeSlowSeed.png"),
-	RedPlot(type="Cache")
-		.plot(idx, red_bit, color='black', linestyle='--', label="BitTorrent")
-		.plot(idx, red_cac, color='black', linestyle='-', label="CacheTorrent")
-		.save("plots/red.png"),
-	TimePlot(type="Cache")
-		.plot(idx, cacavg, color='black', linestyle='-', label="CacheTorrent average")
-		.plot(idx, cac50, color='black', linestyle='--', label="CacheTorrent 50th percentile")
-		.save("plots/cactime2.png"),
+	# # Intro
+	# TimePlot(type="Bias")
+	# 	.plot(idx, bia90, color='black', linestyle='-', label="Biased selection 90th percentile")
+	# 	.plot(idx, bia50, color='black', linestyle='--', label="Biased selection 50th percentile")
+	# 	.plot(idx, bit90, color='black', linestyle='-.', label="BitTorrent 90th percentile")
+	# 	.plot(idx, bit50, color='black', linestyle=':', label="BitTorrent 50th percentile")
+	# 	.save("plots/timeBias.png"),
+	# TimePlot(type="Cache")
+	# 	.plot(idx, cac90, color='black', linestyle='-', label="CacheTorrent 90th percentile")
+	# 	.plot(idx, cac50, color='black', linestyle='--', label="CacheTorrent 50th percentile")
+	# 	.plot(idx, bit90, color='black', linestyle='-.', label="BitTorrent 90th percentile")
+	# 	.save("plots/timeSlowSeed.png"),
+	# RedPlot(type="Cache")
+	# 	.plot(idx, red_bit, color='black', linestyle='--', label="BitTorrent")
+	# 	.plot(idx, red_cac, color='black', linestyle='-', label="CacheTorrent")
+	# 	.save("plots/red.png"),
+	# TimePlot(type="Cache")
+	# 	.plot(idx, cacavg, color='black', linestyle='-', label="CacheTorrent average")
+	# 	.plot(idx, cac50, color='black', linestyle='--', label="CacheTorrent 50th percentile")
+	# 	.save("plots/cactime2.png"),
+	#
+	# # Big seed
+	# TimePlot(type="Cache")
+	# 	.plot(idx, scac90, color='black', linestyle='-', label="CacheTorrent 90th percentile - 8Mbps seed")
+	# 	.plot(idx, scac50, color='black', linestyle=':', label="CacheTorrent 50th percentile - 8Mbps seed")
+	# 	.plot(idx, cac90, color='black', linestyle='--', label="CacheTorrent 90th percentile - 2Mbps seed")
+	# 	.plot(idx, cac50, color='black', linestyle='-.', label="CacheTorrent 50th percentile - 2Mbps seed")
+	# 	.save("plots/scactime.png"),
+	# RedPlot(type="Cache")
+	# 	.plot(idx, red_scac, color='black', linestyle='-', label="CacheTorrent - 8Mbps seed")
+	# 	.plot(idx, red_cac, color='black', linestyle='--', label="CacheTorrent - 2Mbps seed")
+	# 	.save("plots/scacred.png"),
+	#
+	# # Biased
+	# TimePlot(type="Both")
+	# 	.plot(idx, scac50, color='black', linestyle='-', label="CacheTorrent 50th percentile")
+	# 	.plot(idx, sbia50, color='black', linestyle='--', label="Biased selection 50th percentile")
+	# 	.plot(idx, sbit50, color='black', linestyle=':', label="BitTorrent 50th percentile")
+	# 	.save("plots/biaCache.png"),
+	# TimePlot(type="Both")
+	# 	.plot(idx, scac90, color='black', linestyle='-', label="CacheTorrent 90th percentile")
+	# 	.plot(idx, sbia90, color='black', linestyle='--', label="Biased selection 90th percentile")
+	# 	.plot(idx, sbit90, color='black', linestyle=':', label="BitTorrent 90th percentile")
+	# 	.save("plots/biaCache90.png"),
+	# RedPlot(type="Both")
+	# 	.plot(idx, red_scac, color='black', linestyle='-', label="CacheTorrent")
+	# 	.plot(idx, red_sbia, color='black', linestyle='--', label="Biased selection")
+	# 	.plot(idx, red_sbit, color='black', linestyle=':', label="BitTorrent")
+	# 	.setLoc(1)
+	# 	.save("plots/cacred.png"),
+	#
+	# # Hetero
+	# TimePlot(type="Both")
+	# 	.plot(idx[1:], sabiaavg, color='black', linestyle=':', label="Biased selection average")
+	# 	.plot(idx[1:], sacacavg, color='black', linestyle='-', label="CacheTorrent average")
+	# 	.plot(idx[1:], sabitavg, color='black', linestyle='--', label="BitTorrent average")
+	# 	.save("plots/asymAvg.png"),
+	# RedPlot(type="Both")
+	# 	.plot(idx[1:], red_sabia, color='black', linestyle=':', label="Biased selection")
+	# 	.plot(idx[1:], red_sacac, color='black', linestyle='-', label="CacheTorrent")
+	# 	.save("plots/asymRed.png"),
+	# TimePlot(type="Cache")
+	# 	.plot(idx[1:], sacac90, color='black', linestyle='--', label="CacheTorrent 90th percentile")
+	# 	.plot(idx[1:], sacac50, color='black', linestyle='-', label="CacheTorrent 50th percentile")
+	# 	.save("plots/asymPer.png"),
+	#
+	# TimePlot(type="Both")
+	# 	.plot(idx[1:], abia50, color='black', linestyle='-', label="Biased selection 50th percentile")
+	# 	.plot([20, 30, 35, 40, 50], acac90, color='black', linestyle='-.', label="CacheTorrent 90th percentile")
+	# 	.plot([20, 30, 35, 40, 50], acac50, color='black', linestyle=':', label="CacheTorrent 50th percentile")
+	# 	.save("plots/biaCacheAsym.png"),
+	# RedPlot(type="Both")
+	# 	.plot(idx, red_bia, color='black', linestyle='--', label="Biased selection")
+	# 	.plot(idx, red_cac, color='black', linestyle='-', label="CacheTorrent")
+	# 	.save("plots/biaCacheAsymRed.png"),
+	#
+	# # Pieces
+	# PiecePlot()
+	# 	.plot([i * 20 for i in idx], pic50, color='black', linestyle='-', label="50th percentile")
+	# 	.plot([i * 20 for i in idx], pic90, color='black', linestyle='--', label="90th percentile")
+	# 	.save("plots/pieces.png"),
 
-	# Big seed
+	# MultiExtension
 	TimePlot(type="Cache")
-		.plot(idx, scac90, color='black', linestyle='-', label="CacheTorrent 90th percentile - 8Mbps seed")
-		.plot(idx, scac50, color='black', linestyle=':', label="CacheTorrent 50th percentile - 8Mbps seed")
-		.plot(idx, cac90, color='black', linestyle='--', label="CacheTorrent 90th percentile - 2Mbps seed")
-		.plot(idx, cac50, color='black', linestyle='-.', label="CacheTorrent 50th percentile - 2Mbps seed")
-		.save("plots/scactime.png"),
-	RedPlot(type="Cache")
-		.plot(idx, red_scac, color='black', linestyle='-', label="CacheTorrent - 8Mbps seed")
-		.plot(idx, red_cac, color='black', linestyle='--', label="CacheTorrent - 2Mbps seed")
-		.save("plots/scacred.png"),
+		.plot(idx[:4], scac90[:4], color='black', linestyle='-', label="CacheTorrent 90th percentile")
+		.plot(idx[:4], multi2_90[:4], color='black', linestyle=':', label="MultiTorrent(2 sub-torrents) 90th percentile")
+		.plot(idx[:4], multi3_90[:4], color='black', linestyle='--', label="MultiTorrent(3 sub-torrents) 90th percentile")
+		.save("plots/multi90.png"),
 
-	# Biased
-	TimePlot(type="Both")
+	TimePlot(type="Cache")
+		.plot(idx, multi2_50, color='black', linestyle='-.', label="MultiTorrent 50th percentile")
+		.plot(idx, multi2_90, color='black', linestyle=':', label="MultiTorrent 90th percentile")
 		.plot(idx, scac50, color='black', linestyle='-', label="CacheTorrent 50th percentile")
-		.plot(idx, sbia50, color='black', linestyle='--', label="Biased selection 50th percentile")
-		.plot(idx, sbit50, color='black', linestyle=':', label="BitTorrent 50th percentile")
-		.save("plots/biaCache.png"),
-	TimePlot(type="Both")
-		.plot(idx, scac90, color='black', linestyle='-', label="CacheTorrent 90th percentile")
-		.plot(idx, sbia90, color='black', linestyle='--', label="Biased selection 90th percentile")
-		.plot(idx, sbit90, color='black', linestyle=':', label="BitTorrent 90th percentile")
-		.save("plots/biaCache90.png"),
-	RedPlot(type="Both")
-		.plot(idx, red_scac, color='black', linestyle='-', label="CacheTorrent")
-		.plot(idx, red_sbia, color='black', linestyle='--', label="Biased selection")
-		.plot(idx, red_sbit, color='black', linestyle=':', label="BitTorrent")
-		.setLoc(1)
-		.save("plots/cacred.png"),
+		.plot(idx, scac90, color='black', linestyle='--', label="CacheTorrent 90th percentile")
+		.save("plots/multiDiff.png"),
 
-	# Hetero
-	TimePlot(type="Both")
-		.plot(idx[1:], sabiaavg, color='black', linestyle=':', label="Biased selection average")
-		.plot(idx[1:], sacacavg, color='black', linestyle='-', label="CacheTorrent average")
-		.plot(idx[1:], sabitavg, color='black', linestyle='--', label="BitTorrent average")
-		.save("plots/asymAvg.png"),
-	RedPlot(type="Both")
-		.plot(idx[1:], red_sabia, color='black', linestyle=':', label="Biased selection")
-		.plot(idx[1:], red_sacac, color='black', linestyle='-', label="CacheTorrent")
-		.save("plots/asymRed.png"),
-	TimePlot(type="Cache")
-		.plot(idx[1:], sacac90, color='black', linestyle='--', label="CacheTorrent 90th percentile")
-		.plot(idx[1:], sacac50, color='black', linestyle='-', label="CacheTorrent 50th percentile")
-		.save("plots/asymPer.png"),
-
-	TimePlot(type="Both")
-		.plot(idx[1:], abia50, color='black', linestyle='-', label="Biased selection 50th percentile")
-		.plot([20, 30, 35, 40, 50], acac90, color='black', linestyle='-.', label="CacheTorrent 90th percentile")
-		.plot([20, 30, 35, 40, 50], acac50, color='black', linestyle=':', label="CacheTorrent 50th percentile")
-		.save("plots/biaCacheAsym.png"),
-	RedPlot(type="Both")
-		.plot(idx, red_bia, color='black', linestyle='--', label="Biased selection")
-		.plot(idx, red_cac, color='black', linestyle='-', label="CacheTorrent")
-		.save("plots/biaCacheAsymRed.png"),
-
-	# Pieces
-	PiecePlot()
-		.plot([i * 20 for i in idx], pic50, color='black', linestyle='-', label="50th percentile")
-		.plot([i * 20 for i in idx], pic90, color='black', linestyle='--', label="90th percentile")
-		.save("plots/pieces.png"),
+	RedPlot(type="Cache")
+		.plot(idx[:4], red_scac[:4], color='black', linestyle='-', label="CacheTorrent")
+		.plot(idx[:4], multi2_red[:4], color='black', linestyle=':', label="MultiTorrent(2 sub-torrents)")
+		.plot(idx[:4], multi3_red[:4], color='black', linestyle='--', label="MultiTorrent(3 sub-torrents)")
+		.save("plots/multiRed.png"),
 ]
