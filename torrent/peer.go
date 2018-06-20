@@ -42,8 +42,15 @@ type Peer struct {
   bound bool
 }
 
+// A Binder is a function which associates a state by using a Peer's internal
+// state and a message m. See Peer's Bind function for more details.
 type Binder    func(m interface {}) int
+// A Processor is a function which processes a message only if the Peer is
+// in a correct state. To see the possible states, see Constants.
 type Processor func(m interface {}, state int)
+// A connection adder is a function which should be called when a new peer is
+// added. We only define a separate type for making the peer internals
+// extensible by introducing seams.
 type ConnAdder func(id string)
 
 // The Bind states of a peer are:
@@ -229,6 +236,11 @@ func (p *Peer) Process(m interface {}, state int) {
   }
 }
 
+// A Bind function associates a state by using a Peer's internal state
+// and a received message m. The messages handled are TrackerReq, Neighbours,
+// SeedRes. The rest of messages will be further processed in case the Peer's
+// Connectors were initalized. For more details on the returned states, see
+// the Constants.
 func (p *Peer) Bind(m interface {}) (state int) {
   state = BindNone
 
@@ -292,7 +304,10 @@ func (p *Peer) Run(connAdd ConnAdder) {
   go p.Choker.Run()
 }
 
-// A function used to extract the Id from an incoming message.
+// A function used to extract the Id from an incoming message. The GetId
+// function is also a mechanism used to filter messages outside the established
+// protocol since it checks the message types explicitly, rather than using
+// reflection.
 func (p *Peer) GetId(m interface {}) (id string) {
   switch msg := m.(type) {
   case Choke:
