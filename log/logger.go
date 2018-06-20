@@ -10,6 +10,10 @@ import (
 
 var Log *Logger = NewLogger()
 
+var print   = fmt.Print
+var printf  = fmt.Printf
+var println = fmt.Println
+
 const (
   GetRedundancy = iota
   GetTime       = iota
@@ -191,7 +195,7 @@ func (l *Logger) getLogged() {
       defer f.Close()
       f.Write(b)
 
-      fmt.Printf("Logfile %s written.\n", l.logfile)
+      printf("Logfile %s written.\n", l.logfile)
     }
   }
 }
@@ -204,7 +208,7 @@ func (l *Logger) getRedundancy() {
     times  += ctr
   }
   redundancy := float64(times) / float64(pieces)
-  fmt.Println("Redundancy:", redundancy)
+  println("Redundancy:", redundancy)
 }
 
 func (l *Logger) getTraffic() {
@@ -215,15 +219,15 @@ func (l *Logger) getTraffic() {
     peers += 1
   }
   traffic := float64(total) / float64(peers)
-  fmt.Println("Traffic:", traffic)
+  println("Traffic:", traffic)
 }
 
 func (l *Logger) getTime() {
   times := toSlice(l.times)
 
-  fmt.Println("Average time:", getAverage(times))
-  fmt.Println("50th percentile:", getPercentile(50.0, times))
-  fmt.Println("90th percentile:", getPercentile(90.0, times))
+  println("Average time:", getAverage(times))
+  println("50th percentile:", getPercentile(50.0, times))
+  println("90th percentile:", getPercentile(90.0, times))
 }
 
 func (l *Logger) getLeaderTimes() ([]int, []int) {
@@ -251,34 +255,34 @@ func (l *Logger) getLeaderTimes() ([]int, []int) {
 func (l *Logger) getTimeLeader() {
   leaderTimes, followerTimes := l.getLeaderTimes()
 
-  fmt.Println("Leader 50th percentile:", getPercentile(50.0, leaderTimes))
-  fmt.Println("Leader 90th percentile:", getPercentile(90.0, leaderTimes))
-  fmt.Println("Follower 50th percentile:", getPercentile(50.0, followerTimes))
-  fmt.Println("Follower 90th percentile:", getPercentile(90.0, followerTimes))
+  println("Leader 50th percentile:", getPercentile(50.0, leaderTimes))
+  println("Leader 90th percentile:", getPercentile(90.0, leaderTimes))
+  println("Follower 50th percentile:", getPercentile(50.0, followerTimes))
+  println("Follower 90th percentile:", getPercentile(90.0, followerTimes))
 }
 
 func (l *Logger) getLeaderCDF() {
   leaderTimes, followerTimes := l.getLeaderTimes()
 
-  fmt.Print("Leader time CDF: [")
+  print("Leader time CDF: [")
   for _, t := range normalize(leaderTimes) {
-    fmt.Print(t, ",")
+    print(t, ",")
   }
-  fmt.Println("]")
+  println("]")
 
-  fmt.Print("Follower time CDF: [")
+  print("Follower time CDF: [")
   for _, t := range normalize(followerTimes) {
-    fmt.Print(t, ",")
+    print(t, ",")
   }
-  fmt.Println("]")
+  println("]")
 }
 
 func (l *Logger) getTimeCDF() {
-  fmt.Print("Time CDF: [")
+  print("Time CDF: [")
   for _, t := range normalize(toSlice(l.times)) {
-    fmt.Print(t, ",")
+    print(t, ",")
   }
-  fmt.Println("]")
+  println("]")
 }
 
 /* Runner. */

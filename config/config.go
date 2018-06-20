@@ -63,14 +63,12 @@ type Conf struct {
   ChokerStrategy string
 }
 
-/**
- * Usage:
- *  c := NewConf().
- *    WithParams(func(c *Conf) {
- *      c.OutPeers = 5
- *      c.MinNodes = 10
- *    })
- */
+// Usage:
+//  c := NewConf().
+//    WithParams(func(c *Conf) {
+//      c.OutPeers = 5
+//      c.MinNodes = 10
+//    })
 func (c *Conf) WithParams(f func (c *Conf)) *Conf {
   f(c)
   return c
