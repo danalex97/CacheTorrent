@@ -18,7 +18,7 @@ The general documentation is provided in Markdown, while the code uses [GoDoc](h
 #### Protocols
   - **[BitTorrent](docs/torrent.md)** - a simplified implementation of the BitTorrent protocol
   - **[CacheTorrent](docs/cache.md)** - a BitTorrent extension aimed to reduce the inter-ISP traffic
-  - **[Extensions](docs/extension.md)** - extensions on top of CacheTorrent based on emperical results
+  - **[Extensions](docs/extensions.md)** - extensions on top of CacheTorrent based on emperical results
 
 #### Tools
   - Visualization tool [[usage](docs/usage.md)]
