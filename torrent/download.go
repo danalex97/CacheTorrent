@@ -1,12 +1,5 @@
 package torrent
 
-/**
- * This file follows the 'download.py' file from BitTorrent 5.3.0 release.
- *
- * We moved here some of the responsibility of 'MultiDownload.py'
- * and 'RequestManager.py'.
- */
-
 import (
   . "github.com/danalex97/Speer/interfaces"
   "github.com/danalex97/nfsTorrent/config"
@@ -20,6 +13,10 @@ import (
 var backlog  config.Const = config.NewConst(config.Backlog)
 var removeInterval int    = 20000
 
+// A Download component is reponsible for a long time download connection
+// between 2 peers. It can be used to check the state of the download, process
+// incoming messages, measure the download rates and request more pieces to
+// download from the Picker.
 type Download interface {
   Runner
 
@@ -31,9 +28,24 @@ type Download interface {
 
   RequestMore() // Request more pieces from a the peer.
 
-  Rate() float64 //
+  Rate() float64 // Measure download rates.
 }
 
+// The Download component is the most complex one, reacting to `choke`,
+// `unchoke`, `piece` and `have` messages. It keeps a list of active requests,
+// which are requests that have been sent but a piece was not yet received.
+// When the Download gets an `unchoke` message it populates the active requests
+// list by asking the Picker for next pieces to request. Then, the requests for
+// the picked pieces are sent. The `have` messages received by the Download
+// result in Picker getting notified and in a potential change of interest via
+// sending an interested message.
+//
+// The implementation follows the 'download.py' file from BitTorrent 5.3.0
+// release. We moved here some of the responsibility of 'MultiDownload.py'
+// and 'RequestManager.py'.
+//
+// For a more details on the implementation check the message receival internal
+// functions from the code. (gotHave, gotChoke, etc.)
 type TorrentDownload struct {
   *Components
 
@@ -234,9 +246,7 @@ func (d *TorrentDownload) gotHave(msg Have) {
   d.Picker.GotHave(d.from, index)
 }
 
-// Request more pieces from a the peer.
-//
-// The pieces are chosen using the Picker.
+// Request more pieces from a the peer. The pieces are chosen using the Picker.
 func (d *TorrentDownload) RequestMore() {
   size := backlog.Int()
   if len(d.ActiveRequests) >= size {

@@ -1,8 +1,8 @@
 package torrent
 
 // The Connector is only an interface towards Upload and Download components.
-//
-// This file follows the 'Upload' BitTorrent 5.3.0 release.
+// For simplicity at building the Connector is initialized using a builder
+// pattern(with no build intermediary structure).
 type Connector struct {
   *Components
 
@@ -29,16 +29,22 @@ func NewConnector(from, to string, components *Components) *Connector {
   return connector
 }
 
+// Decorate the connection with a new Upload. To support multiple types of
+// download, we use a 'func(*Connector) Download' for interfacing.
 func (c *Connector) WithUpload(newUpload func(*Connector) Upload) *Connector {
   c.Upload = newUpload(c)
   return c
 }
 
+// Decorate the connection with a new Download. To support multiple types of
+// download, we use a 'func(*Connector) Download' for interfacing.
 func (c *Connector) WithDownload(newDownload func(*Connector) Download) *Connector {
   c.Download = newDownload(c)
   return c
 }
 
+// The Register method is used to bind the Connection to a Peer. The Peer will
+// call this method from `AddConnector(id string)`.
 func (c *Connector) Register(p *Peer) *Connector {
   p.Connectors[c.To] = c
   p.Manager.AddConnector(c)
@@ -60,7 +66,7 @@ func (c *Connector) Run() {
 }
 
 // The Recv method is called whenever a message is dispached for processing
-// towards the Connector. 
+// towards the Connector.
 func (c *Connector) Recv(m interface {}) {
   if c.Upload != nil {
     c.Upload.Recv(m)

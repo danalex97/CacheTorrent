@@ -1,22 +1,13 @@
 package torrent
 
-
-// This file follows the 'PiecePicker.py' file from BitTorrent 5.3.0 release.
-//
-// We follow the description in Bram Cohen's Incentives Build Robustness
-// in BitTorrent, that is:
-// - the policy is rarest first
-// - first pieces are provided in random order rather than by rarest first policy
-//
-// We do not model endgame mode.
-//
-// Some reponsibilities of the 'RequestManager.py' have been moved to this file,
-// that is the accounting of active requests.
-
 import (
   "sync"
 )
 
+// The Picker is responsible for choosing the next piece to be selected by a
+// peer.(Next) To keep it updated each peer can notify if the a piece has been
+// requested(Active) or if a request has been dropped(Inactive). Moreover, the
+// Picker should be notified when a new Have piece did arrive.
 type Picker interface {
   GotHave(peer string, index int)
 
@@ -26,6 +17,20 @@ type Picker interface {
   Next(peer string) (int, bool)
 }
 
+
+// This structures follows the 'PiecePicker.py' file implementation  from
+// BitTorrent 5.3.0 release.
+//
+// We follow the description in Bram Cohen's Incentives Build Robustness
+// in BitTorrent, that is:
+// - the policy is rarest first
+// - first pieces are provided in random order rather than by rarest first policy
+//
+// We do not model endgame mode. A piece’s rarity is defined by the number of
+// peers in the local neighborhood that have that particular piece.
+//
+// Some reponsibilities of the 'RequestManager.py' have been moved to this file,
+// that is the accounting of active requests.
 type TorrentPicker struct {
   *sync.RWMutex
 
@@ -53,7 +58,7 @@ func NewPicker(Storage Storage) Picker {
   }
 }
 
-// Handler for receiving a `have` message.
+// Handler for receiving a `Have` message.
 func (p *TorrentPicker) GotHave(peer string, index int) {
   p.Lock()
   defer p.Unlock()
