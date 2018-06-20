@@ -1,16 +1,23 @@
 package cache_torrent
 
-// A leader can:
-//  - download from anybody
-//  - upload to anybody(see race condition)
-// A leader can not:
-//  - upload to different AS via an indirect connection
-
 import (
   "github.com/danalex97/nfsTorrent/torrent"
   "github.com/danalex97/nfsTorrent/log"
 )
 
+// A Leader is a privileaged node. It was appointed as a leader in an election
+// and acts as a cache at the margin of the autonomous system.
+// A Leader can:
+//  - download from anybody
+//  - upload to anybody(see race condition)
+// A Leader can not:
+//  - upload to different AS via an indirect connection
+//
+// The Leader forwards the 'have' message towards the Follower. When a Follower
+// asks the Leader for a piece, the Leader with either have the piece and
+// respond, or, in case it does not have it, it will try acquire the piece as
+// fast as possbile. To to that, the Leader gives priority to pieces requested
+// by Followers. This is achieved by using a new Picker.
 type Leader struct {
   *Peer
 

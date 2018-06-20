@@ -10,6 +10,18 @@ import (
 
 var LeaderPercent config.Const = config.NewConst(config.LeaderPercent)
 
+// The Election component is reponsible with Leader election. It runs as a
+// centralized component onto the Tracker. The election algorithm runs as
+// follows. Each autonomous system represents an Election Camera. When a
+// lower bound of 'limit' nodes have joined an entire system, all
+// camera election run for the whole system. Nodes joining later do not
+// participate in the election. When a camera was elected, the nodes in the
+// camera are notfied via a 'Leaders' message.
+//
+// The nodes are elected leaders by the biggest upload capacity criteria. In
+// case of equallity the leaders are chosen by arrival time. Most methods are
+// made public so that the MultiTorrent extension can use CacheTorrent
+// elections.
 type Election struct {
   sync.Mutex
 
@@ -71,6 +83,8 @@ func (e *Election) RemoveCandidate(toRemove string) {
   e.candidates[as] = newCandidates
 }
 
+// A candidate gets registered when a 'Candidate' message arrives. The
+// candidate messages are sent by all Peers directly to the Tracker.
 func (e *Election) RegisterCandidate(candidate Candidate) {
   e.Lock()
   defer e.Unlock()
@@ -103,6 +117,7 @@ func (e *Election) RegisterCandidate(candidate Candidate) {
   }
 }
 
+// The NewJoin message updates the Cameras when a new node Joins the system.
 func (e *Election) NewJoin(id string) {
   e.Lock()
   defer e.Unlock()
@@ -115,7 +130,8 @@ func (e *Election) NewJoin(id string) {
   e.camera[as] = append(e.camera[as], id)
 }
 
-/* Run elections for all ASes. */
+// Run elections for all autonomous systems. RunElection is called when the
+// node limit is reached. This limit is checked when Join messages arrive.
 func (e *Election) RunElection() {
   e.Lock()
   defer e.Unlock()
@@ -149,7 +165,9 @@ func (a byId) Less(i, j int) bool {
   return a[i].Id < a[j].Id
 }
 
-/* Run leader election in a specific as. */
+// Run leader election for a specific autonomous system. Candidates are elected
+// the the biggest upload capacity criteria. In case of equallity, the nodes'
+// download capacity is compared and, finally, the provided ID.
 func (e *Election) Elect(as string) []string {
   e.Lock()
   defer e.Unlock()

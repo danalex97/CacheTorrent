@@ -4,6 +4,10 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
 )
 
+// The CacheDownload is a Downloader corresponding to a leader. When a 'Have'
+// message is received it uses a Forwarder to forward the message towards the
+// Followers and the request are made by the CacheTorrent picker heuristic,
+// rather than usual Rarest First.
 type CacheDownload struct {
   *torrent.TorrentDownload
 }

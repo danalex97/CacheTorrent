@@ -1,14 +1,24 @@
 package cache_torrent
 
-// A follower can:
-//   - upload to anybody
-//   - download only from same AS
-
 import (
   "github.com/danalex97/nfsTorrent/torrent"
   "math/rand"
 )
 
+// A Follower is a Peer with limited capabilities.
+// A Follower can:
+//   - upload to anybody
+//   - download only from same AS
+//
+// The Follower mostly acts like a BitTorrent peer, whereas the Leader would
+// have further modifications such as message forwarding and special
+// piece picking, basically acting as a proxy between followers and other peers.
+//
+// The same autonomous system connections are establised as in the BitTorrent
+// protocol. For indirect connections, the Follower sends the 'leaderStart'
+// message towards randomly-chosen leaders of its autonomous system. When the
+// Leader receives the leaderStart message, it opens a download-only connection
+// with the remote peer that the follower wants to communicate with.
 type Follower struct {
   *Peer
 }

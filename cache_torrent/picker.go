@@ -4,6 +4,9 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
 )
 
+// The CachePicker is the Picker used by Leaders. It favors pieces that were
+// requested by followers and, in case no piece was requested by a follower, it
+// uses the default rarest first strategy as explained in BitTorrent's Picker.
 type CachePicker struct {
   *torrent.TorrentPicker
 
@@ -44,6 +47,9 @@ func (p *CachePicker) SelectBucket(bucket map[int]bool,
   iterate := bucket
   check1  := haves
   check2  := p.requested
+
+  // We use this as an optimization. We want the probability to pass the checks
+  // to be smaller so our implementation runs faster.
   if len(check1) < len(iterate) {
     check1, iterate = iterate, check1
   }
@@ -54,6 +60,7 @@ func (p *CachePicker) SelectBucket(bucket map[int]bool,
     check2, check1 = check1, check2
   }
 
+  // First, we check only the pieces requested by Followers.
   for index, _ := range iterate {
     if _, ok := check1[index]; ok {
       if _, ok := check2[index]; ok {
@@ -72,6 +79,7 @@ func (p *CachePicker) SelectBucket(bucket map[int]bool,
   if len(bucket) < len(haves) {
     check, iterate = iterate, check
   }
+  // If not, we check all pieces. (not necesarly requested by Followers)
   for index, _ := range iterate {
     // if the remote peer has the piece
     if _, ok := check[index]; ok {

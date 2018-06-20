@@ -5,6 +5,9 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
 )
 
+// The CacheTorrent Tracker is identical to the BitTorrent tracker, with the
+// addition that it also handles Candidate messages by sending messages towards
+// the Election.
 type Tracker struct {
   election *Election
 
@@ -25,15 +28,15 @@ func (t *Tracker) OnJoin() {
 
 func (t *Tracker) Recv(m interface {}) {
   switch msg := m.(type) {
-  /* New Protocol. */
+  // New Protocol.
   case torrent.Join:
     t.Join(msg, t.Neighbours)
   default:
-    /* Backward compatibility. */
+    // Backward compatibility.
     t.Tracker.Recv(m)
   }
 
-  /* New Protocol. */
+  // New Protocol.
   t.election.Recv(m)
 }
 

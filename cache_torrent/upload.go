@@ -4,6 +4,9 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
 )
 
+// The CacheUpload is used by Leaders. It acts like a BitTorrent upload, but
+// it may be that it does not have a Piece that it advertised. In this case, it
+// will not transfer the piece.
 type CacheUpload struct {
   *torrent.TorrentUpload
 }

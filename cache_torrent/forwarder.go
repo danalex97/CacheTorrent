@@ -4,6 +4,8 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
 )
 
+// A Forwarder is a structure used by a Leader to forward 'Have' messages
+// towards all its Followers.
 type Forwarder struct {
   *Leader
 
@@ -32,7 +34,7 @@ func (f *Forwarder) Recv(m interface {}) {
     case torrent.Request:
       _, ok := f.Storage.Have(msg.Index)
       if !ok {
-        // In this momment, the connection follower - leader is unchoked
+        // In this moment, the connection follower - leader is unchoked
         // but we don't have the piece. We will try to favor the transfer of
         // the piece by letting the picker know.
 

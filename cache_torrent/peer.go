@@ -6,6 +6,12 @@ import (
   "github.com/danalex97/nfsTorrent/log"
 )
 
+// The CacheTorrent peer is only a container extending the BitTorrent peer.
+// Depending on the role assigned by the election component, the CacheTorrent
+// peer will either implement a Follower or a Leader. The Follower mostly acts
+// like a BitTorrent peer, whereas the Leader will have further modifications
+// such as message forwarding and special piece picking algorithm, basically
+// acting as a proxy between followers and other peers.
 type Peer struct {
   *torrent.Peer
 
@@ -33,6 +39,8 @@ func (p *Peer) OnJoin() {
   }()
 }
 
+// The Process method is identical to BitTorrent's one, but it dispaches the
+// message towards the specific node component(i.e. Leader of Follower).
 func (p *Peer) Process(m interface {}, state int) {
   switch state {
   case torrent.BindRun:
@@ -47,6 +55,9 @@ func (p *Peer) Process(m interface {}, state int) {
   }
 }
 
+// The Bind method is backwards compatible with BitTorrent's Bind, but it
+// support 'cache_torrent.Neighbours' messages and 'cache_torrent.Leaders'
+// messages.
 func (p *Peer) Bind(m interface {}) (state int) {
   switch msg := m.(type) {
   // -- New Protocol --
@@ -81,8 +92,6 @@ func (p *Peer) Bind(m interface {}) (state int) {
 func (p *Peer) GetId(m interface {}) string {
   switch msg := m.(type) {
   case LeaderStart:
-    return msg.Id
-  case Miss:
     return msg.Id
   default:
     return p.Peer.GetId(m)
