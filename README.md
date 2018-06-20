@@ -1,54 +1,32 @@
-# nfsTorrent
+# Network friendly speedy Torrents
 [![Build Status](https://travis-ci.org/danalex97/Speer.svg?branch=master)](https://travis-ci.org/danalex97/nfsTorrent) [![Coverage Status](https://coveralls.io/repos/github/danalex97/nfsTorrent/badge.svg?branch=master)](https://coveralls.io/github/danalex97/nfsTorrent?branch=master)
 
-Network-friendly speedy torrents.
+CacheTorrent is a [file sharing system](https://en.wikipedia.org/wiki/File_sharing) CacheTorrent based on leader election, caches and indirect requests. It is fast in homogeneous networks and inexpensive in terms of inter-ISP redundant transmissions under any network conditions.
 
-To run use `go run main.go`. It supports the following arguments:
-```
--bias int
-  	Number of outgoing connections for a biased Tracker.
--cdf
-  	Enable printing time cumulative distribution function.
--conf string
-  	The path to configuration .json file. (default "./confs/small.json")
--cpuprofile file
-  	Write cpu profile to file.
--ext int
-  	Use the textesion with ext percent number of leaders.
--memprofile file
-  	Write memory profile to file.
--v	Verbose output
-```
+The CacheTorrent system extends the [BitTorrent protocol](https://en.wikipedia.org/wiki/BitTorrent), providing strong incentives for users to follow the proposed solution.
 
-To run multiple simulations in parallel, use `./remote.sh`.
-```
-Usage: ./remote.sh [-h] [-n NAME] [-r RUNS] command
+### Quick Start
 
-Run multiple simulations remotely.
+- Prerequisites: [Golang](https://golang.org/) >= 1.6
+- [Installation](docs/install.md) guide
+- [Usage](docs/usage.md) instructions
+- [Testing](docs/testing.md)
+- Reading [experimental results](docs/results.md)
 
-Positional arguments:
-  command
+### Documentation
 
-Optional arguments:
-  -h, --help            show this help message and exit
-  -n NAME, --name NAME  The name of the folder in which the results will be
-                        saved.
-  -r RUNS, --runs RUNS  Number of times that the job runs.
-```
-Example usage:
-```
-./remote.sh -n=test -r=5 go run main.go -conf=confs/itl.json -v
-```
+The general documentation is provided in Markdown, while the code uses [GoDoc](https://godoc.org/).
 
+#### Protocols
+  - **[BitTorrent](docs/torrent.md)** - a simplified implementation of the BitTorrent protocol
+  - **[CacheTorrent](docs/cache.md)** - a BitTorrent extension aimed to make the protocol mode network friendly by reducing the inter-ISP traffic
+  - **[Extensions](docs/extension.md)** - extensions on top of CacheTorrent based on emperical results
 
-### Simulation [![GoDoc](https://godoc.org/github.com/danalex97/Speer/interfaces?status.png)](https://godoc.org/github.com/danalex97/Speer/interfaces)
+#### Tools
+  - Visualization tool [[usage](docs/usage.md)]
+  - Remote deployment tool [[usage](docs/usage.md), [experimental results](docs/results.md)]
 
-The simulation package uses [Speer](https://github.com/danalex97/Speer) simulator.
+Simulations are made using the [Speer](https://github.com/danalex97/Speer) simulator.
 
-### BitTorrent [![GoDoc](https://godoc.org/github.com/danalex97/nfsTorrent/torrent?status.png)](https://godoc.org/github.com/danalex97/nfsTorrent/torrent)
-
-A simplified implementation of the BitTorrent protocol.
-
-### CacheTorrent [![GoDoc](https://godoc.org/github.com/danalex97/nfsTorrent/cache_torrent?status.png)](https://godoc.org/github.com/danalex97/nfsTorrent/cache_torrent)
-
-A BitTorrent extension aimed to make the protocol more network friendly using leader election, caches and indirect requests.
+### How to contribute!
+Want to help? You can [raise an issues](https://help.github.com/articles/creating-an-issue/) or contact me directly at *dan.alex97@yahoo.com*.
