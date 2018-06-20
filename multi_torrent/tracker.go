@@ -7,6 +7,9 @@ import (
   "github.com/danalex97/nfsTorrent/torrent"
 )
 
+// The MultiTracker is a usual CacheTorrent Tracker which uses a StripProxy
+// for sending messages towards the correct Peer and runs a MultiElection
+// instead of a usual Election.
 type MultiTracker struct {
   election *MultiElection
 

@@ -94,6 +94,8 @@ func (p *MultiPeer) getId(m interface {}) string {
   }
 }
 
+// The MultiTorrent's Bind method distributes all the initialization messages
+// towards the PeerProxies.
 func (p *MultiPeer) Bind(m interface {}) int {
   id := InternId(p.getId(m))
   if peer, ok := p.peers[id]; ok {
@@ -125,6 +127,8 @@ func (p *MultiPeer) Bind(m interface {}) int {
   return 0
 }
 
+// The MultiPeer's Process method redirects all the messages towards the
+// correct PeerProxy.
 func (p *MultiPeer) Process(m interface {}, state int) {
   id := InternId(p.getId(m))
   if peer, ok := p.peers[id]; ok {

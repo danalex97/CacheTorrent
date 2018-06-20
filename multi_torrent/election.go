@@ -7,6 +7,12 @@ import (
   "strconv"
 )
 
+// A MultiElection component is made out of multiple Election components. When
+// an election takes place, the nodes that were elected get banned for the
+// purpose of them not getting reelected. The banning process is done by
+// eliminating all the banned candidates from all the elections that did not
+// take place yet. For this algorithm to be correct, we require the number of
+// sub-Torrents to be smaller than 100/leaderPercent.
 type MultiElection struct {
   limit int
   nodes int

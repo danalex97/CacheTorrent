@@ -27,6 +27,12 @@ type StripProxy struct {
   Transport
 }
 
+// Each Peer is assigned an internal ID following the format
+// "<multipeer-id>:<peer-id>". When a message departs a peer towards a peer
+// <A>:<B>, the message will be sent towards the multi-peer <A>, which will
+// deliver the message to its internal peer <B>. To implement this mechanism
+// for sending messages, we implement a StripProxy which strips the peer
+// internal ID when a message is sent.
 func NewStripProxy(t Transport) *StripProxy {
   return &StripProxy{
     Transport : t,
