@@ -9,8 +9,7 @@ The CacheTorrent system extends the [BitTorrent protocol](https://en.wikipedia.o
 
 - [Installation](docs/install.md) guide
 - [Usage](docs/usage.md) instructions
-- [Testing](docs/testing.md)
-- Reading [experimental results](docs/results.md)
+- [Remote deployments](docs/remote.md) and experimental results
 
 ### Documentation
 
@@ -23,7 +22,7 @@ The general documentation is provided in Markdown, while the code uses [GoDoc](h
 
 #### Tools
   - Visualization tool [[usage](docs/usage.md)]
-  - Remote deployment tool [[usage](docs/usage.md), [experimental results](docs/results.md)]
+  - Remote deployment tool [[usage](docs/remote.md)]
 
 Simulations are made using the [Speer](https://github.com/danalex97/Speer) simulator.
 
