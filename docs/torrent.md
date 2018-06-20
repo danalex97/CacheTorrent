@@ -2,13 +2,15 @@
 
 The BitTorrent package is a simplified implementation of the BitTorrent protocol. For individual component implementation please refer to the **godoc**.
 
+![ ](pics/torrent.png)
+
 ### General protocol
 
 **BitTorrent** is a communication protocol for peer-to-peer file sharing (P2P) which is used to distribute data and electronic files over the Internet. The BitTorrent overlay is an unstructured one. Each peer wants to download the same file and the peers collaborate with the purpose of downloading the file faster and distributing the bandwidth load.
 
 A **tracker** is a special node which has the responsibility of providing the set of neighbors for each peer. The other peers are called **leechers**. The file to be transferred is broken into pieces, which are shared between the peers. A **leecher** that contains all the pieces and uploads them to other peers is called a seed.
 
-### nfsTorrent/torrent
+### Implementation
 
 We implement a version of the BitTorrent protocol following the [version 5.3 design](https://github.com/danalex97/BitTorrent) with some modifications. The main components in our implementation are:
 - **Storage** - stores, checks and responds to queries about the piece downloads
