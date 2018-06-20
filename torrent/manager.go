@@ -4,27 +4,30 @@ import (
   "sync"
 )
 
-// A manager is a central concurrent-safe connection keeper.
+// The Connection Manager is a lock-guarded list of Connectors. Since
+// we assume reliable delivery, unlike in version 5.3, the Connection
+// Manager does not have further responsibilities such as keeping connections
+// alive.
 type Manager interface {
   AddConnector(conn *Connector)
-  
+
   Uploads() []Upload
   Downloads() []Download
 }
 
-type ConnectionManager struct {
+type connectionManager struct {
   sync.RWMutex
 
   conns     []*Connector
 }
 
 func NewConnectionManager() Manager {
-  return &ConnectionManager{
+  return &connectionManager{
     conns : []*Connector{},
   }
 }
 
-func (m *ConnectionManager) AddConnector(conn *Connector) {
+func (m *connectionManager) AddConnector(conn *Connector) {
   m.Lock()
   defer m.Unlock()
 
@@ -38,7 +41,7 @@ func (m *ConnectionManager) AddConnector(conn *Connector) {
   }
 }
 
-func (m *ConnectionManager) Uploads() (uploads []Upload) {
+func (m *connectionManager) Uploads() (uploads []Upload) {
   m.RLock()
   defer m.RUnlock()
 
@@ -50,7 +53,7 @@ func (m *ConnectionManager) Uploads() (uploads []Upload) {
   return
 }
 
-func (m *ConnectionManager) Downloads() (downloads []Download) {
+func (m *connectionManager) Downloads() (downloads []Download) {
   m.RLock()
   defer m.RUnlock()
 
