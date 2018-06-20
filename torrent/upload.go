@@ -9,20 +9,25 @@ import (
   "sync"
 )
 
+// See TorrentUpload for more details.
 type Upload interface {
   Runner
 
   Choke()    // Actions done when I choke a connection(upload)
   Unchoke()  // Actions done when I unchoke a connection(upload)
 
-  Me() string
-  To() string
+  Me() string // The Uploader's ID.
+  To() string // The ID of the receiving end.
 
   Choking()      bool     // Returns if I'm choking the connection
   IsInterested() bool     // Returns if the other peer is interested in my pieces
-  Rate()         float64  //
+  Rate()         float64  // Returns the download rate of the connection.
 }
 
+// The Upload is a reactive component. It listens for `interested` and
+// `notInterested` messages and notifies the Choker. It starts uploads when it
+// receives a request for a piece and it provides a choke/unchoke interface for
+// the Choker to call.
 type TorrentUpload struct {
   *Components
 

@@ -8,6 +8,9 @@ import (
 
 var pieceNumber config.Const = config.NewConst(config.StoragePieces)
 
+// Storage is a concurrent-safe piece storage module. The synchronization is
+// done via a read-write lock and the pieces are stored using a map. When the
+// download is finished it also notifies the Configuration module.
 type Storage interface {
   Have(index int) (PieceMeta, bool)
   Store(Piece)

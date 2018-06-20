@@ -13,6 +13,21 @@ var Seeds          config.Const = config.NewConst(config.Seeds)
 var Pieces         config.Const = config.NewConst(config.Pieces)
 var PieceSize      config.Const = config.NewConst(config.PieceSize)
 
+// The Tracker works as a bootstrapping mechanism. Firstly, when a peer wants
+// to join the network it will ask the tracker for a list of peers to which it
+// can connect to. The tracker has a pool of peers, from which it randomly
+// chooses a fixed number of peers to pass to the requester. The second step,
+// thus, consists of the tracker sending the list of peers to the requester.
+// The peer will then try to connect to any of these peers.
+//
+// A modification that we make from the original Tracker is the fact that we
+// use SeedReq for intergration with Speer. For simplicity, a Tracker will
+// decide which nodes are seeds. This messages are useless in a real deployment.
+//
+// The Tracker reacts to messages:
+//  - TrackerReq
+//  - Join
+//  - SeedReq
 type Tracker struct {
   Ids       []string
 

@@ -100,7 +100,7 @@ type SeedReq struct {
   From string
 }
 
-// The SeedReq is a message used for intergration with Speer. See 'SeedReq'
+// The SeedRes is a message used for intergration with Speer. See 'SeedReq'
 // for details. See the 'Messsage' section for a list with all the types
 // of messages.
 type SeedRes struct {
