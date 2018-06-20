@@ -4,7 +4,7 @@ from util import ID
 import random
 
 class Pool:
-    def __init__(self):
+    def __init__(self, pool=None):
         def app(id, idx):
             if idx < 10:
                 id = id + "0"
@@ -18,7 +18,12 @@ class Pool:
             [app("point", i) for i in range(1, 61)] + \
             [app("voxel", i) for i in range(1, 27)] + \
             [app("graphic", i) for i in range(1, 13)]
-        self.pool = POOL[:]
+        try:
+            with open(pool, 'r') as f:
+                self.pool = f.read().splitlines()
+        except Exception:
+            # Use the default Pool configuration.
+            self.pool = POOL[:]
         random.shuffle(self.pool)
 
     def next(self):

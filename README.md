@@ -7,7 +7,6 @@ The CacheTorrent system extends the [BitTorrent protocol](https://en.wikipedia.o
 
 ### Quick Start
 
-- Prerequisites: [Golang](https://golang.org/) >= 1.6
 - [Installation](docs/install.md) guide
 - [Usage](docs/usage.md) instructions
 - [Testing](docs/testing.md)
@@ -19,7 +18,7 @@ The general documentation is provided in Markdown, while the code uses [GoDoc](h
 
 #### Protocols
   - **[BitTorrent](docs/torrent.md)** - a simplified implementation of the BitTorrent protocol
-  - **[CacheTorrent](docs/cache.md)** - a BitTorrent extension aimed to make the protocol mode network friendly by reducing the inter-ISP traffic
+  - **[CacheTorrent](docs/cache.md)** - a BitTorrent extension aimed to reduce the inter-ISP traffic
   - **[Extensions](docs/extension.md)** - extensions on top of CacheTorrent based on emperical results
 
 #### Tools
