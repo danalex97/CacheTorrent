@@ -2,6 +2,7 @@ package torrent
 
 import (
   . "github.com/danalex97/Speer/interfaces"
+  "github.com/danalex97/nfsTorrent/config"
 
   "testing"
 )
@@ -113,4 +114,61 @@ func TestInitRespondsToAllTrackerReq(t *testing.T) {
 
   // Check join was sent
   assertEqual(t, <-tr.send["0"], Join{"1"})
+}
+
+func TestBindReturnsCorrectState(t *testing.T) {
+  p, tr := newPeer("1", "0")
+  p.Tracker = "0"
+
+  tr.init("2")
+  assertEqual(t, p.Bind(TrackerReq{"2"}), BindDone)
+  assertEqual(t, p.Bind(Neighbours{[]string{"2"}}), BindDone)
+
+  assertEqual(t, p.Bind(SeedRes{[]PieceMeta{}}), BindRun)
+
+  assertEqual(t, p.Bind(nil), BindNone)
+
+  p.Connectors["1"] = &mockRunner{}
+  assertEqual(t, p.Bind(nil), BindRecv)
+}
+
+func TestRunInitAllComponentsAndConnections(t *testing.T) {
+  p, _ := newPeer("1", "0")
+
+  config.Config = new(config.Conf)
+
+  total := 0
+  add := func(_ string) {
+    total += 1
+  }
+
+  p.Ids = []string{"2", "3", "4"}
+  p.Run(add)
+
+  assertEqual(t, total, 3)
+
+  if p.Storage == nil {
+    t.Fatalf("Storage not initialized.")
+  }
+  if p.Picker == nil {
+    t.Fatalf("Picker not initialized.")
+  }
+  if p.Manager == nil {
+    t.Fatalf("Manager not initialized.")
+  }
+  if p.Choker == nil {
+    t.Fatalf("Choker not initialized.")
+  }
+}
+
+func TestRunRecvAddsConnection(t *testing.T) {
+  p, _ := newPeer("1", "0")
+
+  total := 0
+  add := func(_ string) {
+    total += 1
+  }
+
+  p.RunRecv("1", nil, add)
+  assertEqual(t, total, 1)
 }
