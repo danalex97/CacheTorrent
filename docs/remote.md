@@ -101,8 +101,8 @@ A single run is structured as follows:
   - 0.txt
   - 1.txt
   - ...
-  - <computer1>.txt
-  - <computer2>.txt
+  - computer1.txt
+  - computer2.txt
   - ...
 - summary.txt
 
@@ -112,4 +112,4 @@ In all *numbered files* there is only the individual summary of each run, contai
 - average download time
 - number of redundant transmissions per piece
 
-The *<computer>.txt* file contain the full logs of each separate run. The *summary.txt* file contains the averages of all the metrics presented above. Some files will also contains the leader and follower 50th percentile, 90th percentile and average download time. In some *<computer>.txt* at the end CDFs can be found if the query that run contained the `-cdf` flag.
+The *computer.txt* files contain the full logs of each separate run. The *summary.txt* file contains the averages of all the metrics presented above. Some *summary.txt* files will also contains the leader and follower 50th percentile, 90th percentile and average download time. In some *computer.txt* at the end CDFs can be found if the query that run contained the `-cdf` flag.
