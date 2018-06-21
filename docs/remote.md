@@ -90,3 +90,26 @@ FE80::0202:B3FF:FE1E:8329
 ```
 
 By default the script will use the Imperial Department of Computing pool of computers.
+
+#### Experimental results
+
+All our experimental results are saved into the archive `misc/results.zip`. Each folder contains multiple runs.
+
+A single run is structured as follows:
+- log.txt
+- runs
+  - 0.txt
+  - 1.txt
+  - ...
+  - <computer1>.txt
+  - <computer2>.txt
+  - ...
+- summary.txt
+
+In all *numbered files* there is only the individual summary of each run, containing the metrics:
+- 50th download time percentile
+- 90th download time percentile
+- average download time
+- number of redundant transmissions per piece
+
+The *<computer>.txt* file contain the full logs of each separate run. The *summary.txt* file contains the averages of all the metrics presented above. Some files will also contains the leader and follower 50th percentile, 90th percentile and average download time. In some *<computer>.txt* at the end CDFs can be found if the query that run contained the `-cdf` flag.
