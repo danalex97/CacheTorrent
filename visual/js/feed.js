@@ -1,6 +1,8 @@
 let Feed = function (feedArray, interval, nbr) {
   let self = this;
 
+  self.interval  = interval;
+
   function process(activeLink) {
     if (activeLink.target.pieces == self.pieces) {
       return;
@@ -14,7 +16,7 @@ let Feed = function (feedArray, interval, nbr) {
     d3.timeout(function() {
       activeLink.active = false;
       activeLink.target.active = false;
-    }, interval - interval / 10);
+    }, self.interval - self.interval / 10);
   }
 
   function get_pieces(feed) {
@@ -28,14 +30,24 @@ let Feed = function (feedArray, interval, nbr) {
 
   self.feedArray = feedArray;
   self.pos       = 0;
-  self.interval  = interval;
   self.nbr       = nbr;
   self.pieces    = get_pieces(self.feedArray);
+  self.restart   = false;
 
   // Initialize seed.
   self.feedArray[0].source.pieces = self.pieces;
 
   self.next = function() {
+    if (self.restart) {
+      self.restart = false;
+      self.running.stop();
+
+      let interval = self.interval;
+
+      self.running = d3.interval(self.next, interval);
+      return;
+    }
+
     for (let i = 0; i < nbr; i++) {
       if (self.pos > self.feedArray.length) {
         return;
@@ -47,7 +59,12 @@ let Feed = function (feedArray, interval, nbr) {
   };
 
   self.start = function() {
-    d3.interval(self.next, self.interval);
+    self.running = d3.interval(self.next, self.interval);
+  };
+
+  self.setInterval = function(interval) {
+    self.interval = interval;
+    self.restart = true;
   };
 
   return self;
